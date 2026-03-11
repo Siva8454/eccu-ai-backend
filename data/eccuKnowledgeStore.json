@@ -1,0 +1,1223 @@
+{
+  "lastSynced": "2026-02-10T09:57:49.598Z",
+  "courses": [
+    {
+      "modules": [
+        {
+          "moduleId": 15798,
+          "moduleName": "BookShelf® by VitalSource",
+          "items": [
+            {
+              "itemId": 210126,
+              "type": "ExternalTool",
+              "title": "Data Science Projects with Python",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 15799,
+          "moduleName": "ilabs",
+          "items": [
+            {
+              "itemId": 210127,
+              "type": "ExternalTool",
+              "title": "Module 01 iLabs - Data Exploration and Cleaning",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 210128,
+              "type": "ExternalTool",
+              "title": "Module 03 iLabs - Introduction to Scikit-Learn and Model Evaluation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 210129,
+              "type": "ExternalTool",
+              "title": "Module 04 iLabs - Details of Logistic Regression and Feature Exploration",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 210130,
+              "type": "ExternalTool",
+              "title": "Module 06 iLabs - The Bias-Variance Trade-off",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 210131,
+              "type": "ExternalTool",
+              "title": "Module 07 iLabs - Decision Trees and Random Forests",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 210132,
+              "type": "ExternalTool",
+              "title": "Module 08 iLabs - Imputation of Missing Data, Financial Analysis, and Delivery to Client",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modules": []
+    },
+    {
+      "modules": [
+        {
+          "moduleId": 16051,
+          "moduleName": "Getting Started",
+          "items": [
+            {
+              "itemId": 212313,
+              "type": "Page",
+              "title": "Course Introduction",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212316,
+              "type": "Page",
+              "title": "About EDRP",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212317,
+              "type": "Page",
+              "title": "EC-Council Labs",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212318,
+              "type": "Page",
+              "title": "Guide to Learning Resources",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16053,
+          "moduleName": "Week 1",
+          "items": [
+            {
+              "itemId": 212321,
+              "type": "Page",
+              "title": "Week 1: Overview",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212323,
+              "type": "Page",
+              "title": "Week 1: Reading and Support Materials",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212325,
+              "type": "Discussion",
+              "title": "Week 1: Introductory Discussion",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212327,
+              "type": "Discussion",
+              "title": "Week 1: Discussion 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212329,
+              "type": "Assignment",
+              "title": "Week 1: Assignment 1 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212331,
+              "type": "Assignment",
+              "title": "Week 1: Assignment 2 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212333,
+              "type": "Assignment",
+              "title": "Week 1: Case Study 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212334,
+              "type": "Quiz",
+              "title": "Week 1: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16055,
+          "moduleName": "Week 2",
+          "items": [
+            {
+              "itemId": 212337,
+              "type": "Page",
+              "title": "Week 2: Overview",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212338,
+              "type": "Page",
+              "title": "Week 2: Reading and Support Materials",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212339,
+              "type": "Discussion",
+              "title": "Week 2: Discussion 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212341,
+              "type": "Assignment",
+              "title": "Week 2: Assignment 1 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212343,
+              "type": "Assignment",
+              "title": "Week 2: Assignment 2 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212344,
+              "type": "Assignment",
+              "title": "Week 2: Lab Assignment 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212346,
+              "type": "Assignment",
+              "title": "Week 2: Case Study 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212347,
+              "type": "Quiz",
+              "title": "Week 2: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16059,
+          "moduleName": "Week 3 ",
+          "items": [
+            {
+              "itemId": 212350,
+              "type": "Page",
+              "title": "Week 3: Overview ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212353,
+              "type": "Page",
+              "title": "Week 3: Reading and Support Materials ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212354,
+              "type": "Discussion",
+              "title": "Week 3: Discussion 1 ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212355,
+              "type": "Assignment",
+              "title": "Week 3: Assignment 1 from Reading ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212356,
+              "type": "Assignment",
+              "title": "Week 3: Assignment 2 from Reading ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212357,
+              "type": "Assignment",
+              "title": "Week 3: Case Study 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212358,
+              "type": "Quiz",
+              "title": "Week 3: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16060,
+          "moduleName": "Week 4",
+          "items": [
+            {
+              "itemId": 212359,
+              "type": "Page",
+              "title": "Week 4: Overview",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212360,
+              "type": "Page",
+              "title": "Week 4: Reading and Support Materials",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212361,
+              "type": "Discussion",
+              "title": "Week 4: Discussion 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212362,
+              "type": "Assignment",
+              "title": "Week 4: Assignment 1 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212363,
+              "type": "Assignment",
+              "title": "Week 4: Assignment 2 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212364,
+              "type": "Assignment",
+              "title": "Week 4: Lab Assignment 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212365,
+              "type": "Quiz",
+              "title": "Week 4: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16061,
+          "moduleName": "Week 5",
+          "items": [
+            {
+              "itemId": 212366,
+              "type": "Page",
+              "title": "Week 5: Overview ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212367,
+              "type": "Page",
+              "title": "Week 5: Reading and Support Materials ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212368,
+              "type": "Discussion",
+              "title": "Week 5: Discussion 1 ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212369,
+              "type": "Assignment",
+              "title": "Week 5: Assignment 1 from Reading ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212370,
+              "type": "Assignment",
+              "title": "Week 5: Assignment 2 from Reading ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212371,
+              "type": "Assignment",
+              "title": "Week 5: Lab Assignment 1 ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212372,
+              "type": "Assignment",
+              "title": "Week 5: Case Study 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212373,
+              "type": "Quiz",
+              "title": "Week 5: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16062,
+          "moduleName": "Week 6 ",
+          "items": [
+            {
+              "itemId": 212374,
+              "type": "Page",
+              "title": "Week 6: Overview  ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212375,
+              "type": "Page",
+              "title": "Week 6: Reading and Support Materials  ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212376,
+              "type": "Discussion",
+              "title": "Week 6: Discussion 1  ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212377,
+              "type": "Assignment",
+              "title": "Week 6: Assignment 1 from Reading  ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212378,
+              "type": "Assignment",
+              "title": "Week 6: Assignment 2 from Reading  ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212379,
+              "type": "Assignment",
+              "title": "Week 6: Lab Assignment 1  ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212380,
+              "type": "Assignment",
+              "title": "Week 6: Case Study  1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212381,
+              "type": "Quiz",
+              "title": "Week 6: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16063,
+          "moduleName": "Week 7",
+          "items": [
+            {
+              "itemId": 212382,
+              "type": "Page",
+              "title": "Week 7: Overview",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212383,
+              "type": "Page",
+              "title": "Week 7: Reading and Support Materials",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212384,
+              "type": "Discussion",
+              "title": "Week 7: Discussion 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212385,
+              "type": "Assignment",
+              "title": "Week 7: Assignment 1 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212386,
+              "type": "Assignment",
+              "title": "Week 7: Assignment 2 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212387,
+              "type": "Assignment",
+              "title": "Week 7: Lab Assignment 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212388,
+              "type": "Quiz",
+              "title": "Week 7: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16064,
+          "moduleName": "Week 8",
+          "items": [
+            {
+              "itemId": 212389,
+              "type": "Page",
+              "title": "Week 8: Overview   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212390,
+              "type": "Page",
+              "title": "Week 8: Reading and Support Materials   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212391,
+              "type": "Discussion",
+              "title": "Week 8: Discussion 1   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212392,
+              "type": "Assignment",
+              "title": "Week 8: Assignment 1 from Reading   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212393,
+              "type": "Assignment",
+              "title": "Week 8: Assignment 2 from Reading   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212394,
+              "type": "Assignment",
+              "title": "Week 8: Lab Assignment 1   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212395,
+              "type": "Assignment",
+              "title": "Week 8: Case Study   1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212396,
+              "type": "Quiz",
+              "title": "Week 8: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16065,
+          "moduleName": "Week 9",
+          "items": [
+            {
+              "itemId": 212397,
+              "type": "Page",
+              "title": "Week 9: Overview",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212398,
+              "type": "Page",
+              "title": "Week 9: Reading and Support Materials",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212399,
+              "type": "Discussion",
+              "title": "Week 9: Discussion 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212400,
+              "type": "Assignment",
+              "title": "Week 9: Assignment 1 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212401,
+              "type": "Assignment",
+              "title": "Week 9: Assignment 2 from Reading",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212402,
+              "type": "Assignment",
+              "title": "Week 9: Case Study 1",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212403,
+              "type": "Quiz",
+              "title": "Week 9: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16066,
+          "moduleName": "Week 10",
+          "items": [
+            {
+              "itemId": 212404,
+              "type": "Page",
+              "title": "Week 10: Overview    ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212405,
+              "type": "Page",
+              "title": "Week 10: Reading and Support Materials    ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212406,
+              "type": "Discussion",
+              "title": "Week 10: Discussion 1    ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212407,
+              "type": "Assignment",
+              "title": "Week 10: Assignment 1 from Reading    ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212408,
+              "type": "Assignment",
+              "title": "Week 10: Assignment 2 from Reading    ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212409,
+              "type": "Assignment",
+              "title": "Week 10: Case Study 1   ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212410,
+              "type": "Quiz",
+              "title": "Week 10: Quiz 1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16067,
+          "moduleName": "Week 11",
+          "items": [
+            {
+              "itemId": 212411,
+              "type": "Page",
+              "title": "Week 11: Overview",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212412,
+              "type": "Assignment",
+              "title": "Week 11: Final Project",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16068,
+          "moduleName": "Week 12",
+          "items": [
+            {
+              "itemId": 212413,
+              "type": "Page",
+              "title": "Week 12: Overview     ",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212414,
+              "type": "Quiz",
+              "title": "Week 12: Final Exam",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16069,
+          "moduleName": "EC-Council Certification Exam",
+          "items": [
+            {
+              "itemId": 212415,
+              "type": "Page",
+              "title": "Purchase Your Exam Voucher",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 16070,
+          "moduleName": "EC-Council Certification Exam Testing",
+          "items": [
+            {
+              "itemId": 212416,
+              "type": "ExternalUrl",
+              "title": "EC-Council Disaster Recovery Professional Certification Information",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212417,
+              "type": "Page",
+              "title": "Instruction on Scheduling Exam and Taking Exam",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212418,
+              "type": "ExternalUrl",
+              "title": "Schedule Your Online Remote Proctored Exam",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 212419,
+              "type": "ExternalUrl",
+              "title": "Start Your Exam",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modules": [
+        {
+          "moduleId": 16921,
+          "moduleName": "Reading Materials",
+          "items": [
+            {
+              "itemId": 223795,
+              "type": "ExternalTool",
+              "title": "Certified Penetration Testing Professional (CPENT) Version 2 (Volumes 1 through 4) eBook",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 223796,
+              "type": "ExternalTool",
+              "title": "CEI Slides: Certified Penetration Testing Professional (CPENT) Version 2 (2nd ed.)",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 17789,
+          "moduleName": "CPENT Labs LTI 1.3",
+          "items": [
+            {
+              "itemId": 226401,
+              "type": "ExternalTool",
+              "title": "Open Source Intelligence (OSINT) and Attack Surface Mapping",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226402,
+              "type": "ExternalTool",
+              "title": "Social Engineering Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226403,
+              "type": "ExternalTool",
+              "title": "Web Application Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226404,
+              "type": "ExternalTool",
+              "title": "API and Java Web Token Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226406,
+              "type": "ExternalTool",
+              "title": "Perimeter Defence Evasion Techniques",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226407,
+              "type": "ExternalTool",
+              "title": "Windows Exploitation and Privilege Escalation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226408,
+              "type": "ExternalTool",
+              "title": "Active Directory Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226409,
+              "type": "ExternalTool",
+              "title": "Linux Exploitation and Privilege Escalation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226410,
+              "type": "ExternalTool",
+              "title": "Reverse Engineering, Fuzzing and Binary Exploitation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226411,
+              "type": "ExternalTool",
+              "title": "Lateral Movement and Pivoting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226412,
+              "type": "ExternalTool",
+              "title": "IoT Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226413,
+              "type": "ExternalTool",
+              "title": "Report Writing and Post Testing Actions",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226414,
+              "type": "ExternalTool",
+              "title": "Mastering Metasploit Framework",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226415,
+              "type": "ExternalTool",
+              "title": "PowerShell Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226416,
+              "type": "ExternalTool",
+              "title": "Bash Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226417,
+              "type": "ExternalTool",
+              "title": "Python Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226418,
+              "type": "ExternalTool",
+              "title": "Perl Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226419,
+              "type": "ExternalTool",
+              "title": "Ruby Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226420,
+              "type": "ExternalTool",
+              "title": "Database Penetration Testing Methodology",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modules": [
+        {
+          "moduleId": 16539,
+          "moduleName": "Reading Materials",
+          "items": [
+            {
+              "itemId": 214343,
+              "type": "ExternalTool",
+              "title": "Textbook: BookShelf® by VitalSource",
+              "due_at": null,
+              "published": false
+            },
+            {
+              "itemId": 214344,
+              "type": "ExternalTool",
+              "title": "BookShelf® by LIRN",
+              "due_at": null,
+              "published": false
+            },
+            {
+              "itemId": 216500,
+              "type": "ExternalTool",
+              "title": "Lecture Notes: BookShelf® by VitalSource",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 223773,
+              "type": "ExternalTool",
+              "title": "BookShelf® by VitalSource",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 17790,
+          "moduleName": "CPENT Labs LTI 1.3",
+          "items": [
+            {
+              "itemId": 226421,
+              "type": "ExternalTool",
+              "title": "Open Source Intelligence (OSINT) and Attack Surface Mapping",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226422,
+              "type": "ExternalTool",
+              "title": "Social Engineering Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226423,
+              "type": "ExternalTool",
+              "title": "Web Application Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226424,
+              "type": "ExternalTool",
+              "title": "API and Java Web Token Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226425,
+              "type": "ExternalTool",
+              "title": "Perimeter Defence Evasion Techniques",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226426,
+              "type": "ExternalTool",
+              "title": "Windows Exploitation and Privilege Escalation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226427,
+              "type": "ExternalTool",
+              "title": "Active Directory Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226428,
+              "type": "ExternalTool",
+              "title": "Linux Exploitation and Privilege Escalation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226429,
+              "type": "ExternalTool",
+              "title": "Reverse Engineering, Fuzzing and Binary Exploitation",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226430,
+              "type": "ExternalTool",
+              "title": "Lateral Movement and Pivoting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226431,
+              "type": "ExternalTool",
+              "title": "IoT Penetration Testing",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226432,
+              "type": "ExternalTool",
+              "title": "Report Writing and Post Testing Actions",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226433,
+              "type": "ExternalTool",
+              "title": "Mastering Metasploit Framework",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226434,
+              "type": "ExternalTool",
+              "title": "PowerShell Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226435,
+              "type": "ExternalTool",
+              "title": "Bash Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226436,
+              "type": "ExternalTool",
+              "title": "Python Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226437,
+              "type": "ExternalTool",
+              "title": "Perl Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226438,
+              "type": "ExternalTool",
+              "title": "Ruby Environment and Scripting",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 226439,
+              "type": "ExternalTool",
+              "title": "Database Penetration Testing Methodology",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modules": [
+        {
+          "moduleId": 15972,
+          "moduleName": "BookShelf® by VitalSource",
+          "items": [
+            {
+              "itemId": 211803,
+              "type": "ExternalTool",
+              "title": "Certified Cloud Security Engineer (CCSE)",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211814,
+              "type": "ExternalTool",
+              "title": "CEI Slides: Certified Cloud Security Engineer (CCSE) v1",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        },
+        {
+          "moduleId": 15973,
+          "moduleName": "lab new",
+          "items": [
+            {
+              "itemId": 211804,
+              "type": "ExternalTool",
+              "title": "Module 02 iLabs - Platform and Infrastructure Security in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211805,
+              "type": "ExternalTool",
+              "title": "Module 03 iLabs - Application Security in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211806,
+              "type": "ExternalTool",
+              "title": "Module 04 iLabs - Data Security in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211807,
+              "type": "ExternalTool",
+              "title": " Module 05 iLabs - Security Operations in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211808,
+              "type": "ExternalTool",
+              "title": "Module 06 iLabs - Penetration Testing in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211809,
+              "type": "ExternalTool",
+              "title": "Module 07 iLabs - Incident Response in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211810,
+              "type": "ExternalTool",
+              "title": "Module 08 iLabs - Forensic Investigation in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211811,
+              "type": "ExternalTool",
+              "title": "Module 09 iLabs - Business Continuity and Disaster Recovery in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211812,
+              "type": "ExternalTool",
+              "title": "Module 10 iLabs - Governance, Risk Management, and Compliance in Cloud",
+              "due_at": null,
+              "published": true
+            },
+            {
+              "itemId": 211813,
+              "type": "ExternalTool",
+              "title": "Module 11 iLabs - Standards, Policies, and Legal Issues in Cloud",
+              "due_at": null,
+              "published": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "keywords": ["submit assignment", "assignment submission"],
+    "answer": "Assignments can be submitted via Modules → Assignment. Ensure the status shows Submitted."
+  },
+  {
+    "keywords": ["labs", "ilabs"],
+    "answer": "Labs are accessed through the Labs module in your course. Ensure pop-ups are enabled."
+  },
+  {
+    "keywords": ["exam", "quiz"],
+    "answer": "Exams are timed and must be completed in one attempt. Please check the instructions before starting."
+  }
+]
