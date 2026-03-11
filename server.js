@@ -19,6 +19,8 @@ app.use("/chat", chatRoutes);
 app.use("/chat", require("./routes/chat"));
 app.use("/sync", require("./routes/sync"));
 
-app.listen(3001, () => {
-  console.log("ECCU AI Backend running on http://localhost:3001");
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`ECCU AI Backend running on port ${PORT}`);
 });
