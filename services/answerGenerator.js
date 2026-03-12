@@ -16,16 +16,35 @@ Question:
 ${question}
 `;
 
-  const response = await axios.post(
-    "http://localhost:11434/api/generate",
-    {
-      model: "llama3",
-      prompt: prompt,
-      stream: false
-    }
-  );
+  try {
 
-  return response.data.response;
+    const response = await axios.post(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        model: "llama3-8b-8192",
+        messages: [
+          { role: "system", content: "You are an ECCU course tutor." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.3
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return response.data.choices[0].message.content;
+
+  } catch (err) {
+
+    console.error("Groq error:", err.response?.data || err.message);
+    throw err;
+
+  }
+
 }
 
 module.exports = { generateAnswer };
