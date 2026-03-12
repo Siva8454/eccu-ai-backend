@@ -2,31 +2,21 @@ const axios = require("axios");
 
 async function getLocalEmbedding(text) {
 
-  try {
-
-    const res = await axios.post(
-      "https://api.groq.com/openai/v1/embeddings",
-      {
-        model: "nomic-embed-text-v1.5",
-        input: text
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json"
-        }
+  const res = await axios.post(
+    "https://api.together.xyz/v1/embeddings",
+    {
+      model: "togethercomputer/m2-bert-80M-8k-retrieval",
+      input: text
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
+        "Content-Type": "application/json"
       }
-    );
+    }
+  );
 
-    return res.data.data[0].embedding;
-
-  } catch (err) {
-
-    console.error("Groq embedding error:", err.response?.data || err.message);
-    throw err;
-
-  }
-
+  return res.data.data[0].embedding;
 }
 
 module.exports = { getLocalEmbedding };
