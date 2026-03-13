@@ -27,7 +27,9 @@ app.use("/sync", syncRoutes);
 /* SERVE WIDGET FILES */
 /* -------------------------------------------------- */
 
-app.use("/widget", express.static(path.join(__dirname, "widget")));
+const path = require("path")
+
+app.use("/widget", express.static(path.join(__dirname, "eccu-canvas-widget")))
 
 /* -------------------------------------------------- */
 /* WIDGET LOADER FOR CANVAS LTI */
