@@ -286,7 +286,7 @@ const data=await res.json()
 
 loading.remove()
 
-addMessage(data.reply,"bot-msg")
+addMessage(data.reply || "I'm still learning this topic. Please contact ECCU support if you need immediate assistance.","bot-msg")
 
 conversationHistory.push({
 role:"assistant",
