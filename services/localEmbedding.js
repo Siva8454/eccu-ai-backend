@@ -1,16 +1,22 @@
-const axios = require("axios");
+const axios = require("axios")
 
-async function getLocalEmbedding(text) {
+const HF_API =
+"https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
 
-  const res = await axios.post(
-    "http://127.0.0.1:11434/api/embed",
-    {
-      model: "nomic-embed-text",
-      input: text
-    }
-  );
+async function getLocalEmbedding(text){
 
-  return res.data.embeddings[0];
+const res = await axios.post(
+HF_API,
+{ inputs: text },
+{
+headers:{
+Authorization: `Bearer ${process.env.HF_API_KEY}`
+}
+}
+)
+
+return res.data[0]
+
 }
 
-module.exports = { getLocalEmbedding };
+module.exports = { getLocalEmbedding }
