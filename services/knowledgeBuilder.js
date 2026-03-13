@@ -1,14 +1,28 @@
+require("dotenv").config();
+
 const { QdrantClient } = require("@qdrant/js-client-rest");
 const { getLocalEmbedding } = require("./localEmbedding");
 
-const qdrant = new QdrantClient({
+/* -------------------------------------------------- */
+/* QDRANT CLIENT */
+/* -------------------------------------------------- */
+
+const client = new QdrantClient({
   url: process.env.QDRANT_URL,
-  apiKey: process.env.QDRANT_API_KEY
+  apiKey: process.env.QDRANT_API_KEY,
+  checkCompatibility: false
 });
 
 const COLLECTION = "eccu_knowledge";
 
+console.log("Knowledge builder started...");
+
+/* -------------------------------------------------- */
+/* EXTRACT LINKS FROM HTML */
+/* -------------------------------------------------- */
+
 function extractLinks(html) {
+
   if (!html) return [];
 
   const links = [];
@@ -17,10 +31,12 @@ function extractLinks(html) {
   let match;
 
   while ((match = regex.exec(html))) {
+
     links.push({
       url: match[1],
       text: match[2].replace(/<[^>]+>/g, "")
     });
+
   }
 
   return links;
@@ -33,14 +49,15 @@ function extractLinks(html) {
 async function ensureCollection() {
 
   try {
-    await qdrant.getCollection(COLLECTION);
+
+    await client.getCollection(COLLECTION);
     console.log("📦 Collection already exists");
 
   } catch {
 
     console.log("🆕 Creating Qdrant collection...");
 
-    await qdrant.createCollection(COLLECTION, {
+    await client.createCollection(COLLECTION, {
       vectors: {
         size: 768,
         distance: "Cosine"
@@ -48,34 +65,41 @@ async function ensureCollection() {
     });
 
     console.log("✅ Collection created");
+
   }
+
 }
-
-
 
 /* -------------------------------------------------- */
 /* TEXT CHUNKER */
 /* -------------------------------------------------- */
-
-
 
 function chunkText(text, size = 600) {
 
   if (!text) return [];
 
   const chunks = [];
+
   let i = 0;
 
   while (i < text.length) {
+
     chunks.push(text.slice(i, i + size));
     i += size;
+
   }
 
   return chunks;
 }
 
+/* -------------------------------------------------- */
+/* GENERATE UNIQUE ID */
+/* -------------------------------------------------- */
+
 function generateId() {
+
   return Date.now() + Math.floor(Math.random() * 100000);
+
 }
 
 /* -------------------------------------------------- */
@@ -91,16 +115,19 @@ function detectModuleNumber(name) {
   if (match) return Number(match[1]);
 
   return null;
+
 }
 
 /* -------------------------------------------------- */
-/* UPSERT POINT */
+/* UPSERT VECTOR */
 /* -------------------------------------------------- */
 
 async function upsertPoint(id, embedding, payload) {
 
-  await qdrant.upsert(COLLECTION, {
+  await client.upsert(COLLECTION, {
+
     wait: true,
+
     points: [
       {
         id,
@@ -108,7 +135,9 @@ async function upsertPoint(id, embedding, payload) {
         payload
       }
     ]
+
   });
+
 }
 
 /* -------------------------------------------------- */
@@ -121,7 +150,6 @@ async function buildKnowledgeStore(canvasData) {
 
   console.log("🚀 Building ECCU vector knowledge...");
 
-  let idCounter = 1;
   let totalIndexed = 0;
 
   for (const course of canvasData || []) {
@@ -132,15 +160,13 @@ async function buildKnowledgeStore(canvasData) {
 
     /* ================= MODULE ITEMS ================= */
 
-    /* ================= MODULE ITEMS ================= */
+    for (const module of (course.modules || [])) {
 
-for (const module of (course.modules || [])) {
+      const moduleNumber = detectModuleNumber(module.name);
 
-  const moduleNumber = detectModuleNumber(module.name);
+      for (const item of (module.items || [])) {
 
-  for (const item of (module.items || [])) {
-
-    const text = `
+        const text = `
 Course: ${course.name}
 
 Module: ${module.name}
@@ -153,42 +179,39 @@ Description:
 ${item.content || item.body || item.description || item.title || ""}
 `;
 
-    const moduleChunks = chunkText(text);
+        const chunks = chunkText(text);
 
-    await Promise.all(
-      moduleChunks.map(async chunk => {
+        for (const chunk of chunks) {
 
-        const embedding = await getLocalEmbedding(chunk);
+          const embedding = await getLocalEmbedding(chunk);
 
-        await upsertPoint(generateId(), embedding, {
-          type: "module_item",
-          courseId,
-          courseName: course.name,
-          moduleName: module.name,
-          moduleNumber,
-          title: item.title,
-          content: chunk
-        });
+          await upsertPoint(generateId(), embedding, {
 
-        totalIndexed++;
+            type: "module_item",
+            courseId,
+            courseName: course.name,
+            moduleName: module.name,
+            moduleNumber,
+            title: item.title,
+            content: chunk
 
-      })
-    );
+          });
 
-  }
+          totalIndexed++;
 
-}
+        }
 
+      }
+
+    }
 
     /* ================= PAGES ================= */
 
-/* ================= PAGES ================= */
+    for (const page of (course.pages || [])) {
 
-for (const page of (course.pages || [])) {
+      const links = extractLinks(page.body);
 
-  const links = extractLinks(page.body);
-
-  const text = `
+      const text = `
 Course: ${course.name}
 
 Page: ${page.title}
@@ -197,35 +220,34 @@ Content:
 ${page.body || ""}
 `;
 
-  const pageChunks = chunkText(text);
+      const chunks = chunkText(text);
 
-  await Promise.all(
-    pageChunks.map(async chunk => {
+      for (const chunk of chunks) {
 
-      const embedding = await getLocalEmbedding(chunk);
+        const embedding = await getLocalEmbedding(chunk);
 
-      await upsertPoint(idCounter++, embedding, {
-        type: "page",
-        courseId,
-        courseName: course.name,
-        title: page.title,
-        content: chunk,
-        links
-      });
+        await upsertPoint(generateId(), embedding, {
 
-      totalIndexed++;
+          type: "page",
+          courseId,
+          courseName: course.name,
+          title: page.title,
+          content: chunk,
+          links
 
-    })
-  );
-}
+        });
 
-    
+        totalIndexed++;
 
-/* ================= ASSIGNMENTS ================= */
+      }
 
-for (const a of (course.assignments || [])) {
+    }
 
-  const text = `
+    /* ================= ASSIGNMENTS ================= */
+
+    for (const a of (course.assignments || [])) {
+
+      const text = `
 Course: ${course.name}
 
 Assignment: ${a.name}
@@ -234,35 +256,33 @@ Description:
 ${a.description || ""}
 `;
 
-  const assignmentChunks = chunkText(text);
+      const chunks = chunkText(text);
 
-  await Promise.all(
-    assignmentChunks.map(async chunk => {
+      for (const chunk of chunks) {
 
-      const embedding = await getLocalEmbedding(chunk);
+        const embedding = await getLocalEmbedding(chunk);
 
-      await upsertPoint(idCounter++, embedding, {
-        type: "assignment",
-        courseId,
-        courseName: course.name,
-        title: a.name,
-        content: chunk
-      });
+        await upsertPoint(generateId(), embedding, {
 
-      totalIndexed++;
+          type: "assignment",
+          courseId,
+          courseName: course.name,
+          title: a.name,
+          content: chunk
 
-    })
-  );
+        });
 
-}
+        totalIndexed++;
 
-   
+      }
+
+    }
 
     /* ================= DISCUSSIONS ================= */
 
-for (const d of (course.discussions || [])) {
+    for (const d of (course.discussions || [])) {
 
-  const text = `
+      const text = `
 Course: ${course.name}
 
 Discussion Topic: ${d.title}
@@ -271,59 +291,73 @@ Content:
 ${d.message || ""}
 `;
 
-  const discussionChunks = chunkText(text);
+      const chunks = chunkText(text);
 
-  await Promise.all(
-    discussionChunks.map(async chunk => {
+      for (const chunk of chunks) {
 
-      const embedding = await getLocalEmbedding(chunk);
+        const embedding = await getLocalEmbedding(chunk);
 
-      await upsertPoint(idCounter++, embedding, {
-        type: "discussion",
-        courseId,
-        courseName: course.name,
-        title: d.title,
-        content: chunk
-      });
+        await upsertPoint(generateId(), embedding, {
 
-      totalIndexed++;
+          type: "discussion",
+          courseId,
+          courseName: course.name,
+          title: d.title,
+          content: chunk
 
-    })
-  );
+        });
 
-}
+        totalIndexed++;
 
-  
+      }
 
-   
+    }
 
-   /* ================= FILES ================= */
+    /* ================= FILES ================= */
 
-for (const f of (course.files || [])) {
+    for (const f of (course.files || [])) {
 
-  const text = `
+      const text = `
 Course: ${course.name}
 
 File:
 ${f.display_name}
 `;
 
-  const embedding = await getLocalEmbedding(text);
+      const embedding = await getLocalEmbedding(text);
 
-  await upsertPoint(idCounter++, embedding, {
-    type: "file",
-    courseId,
-    courseName: course.name,
-    title: f.display_name,
-    content: text
-  });
+      await upsertPoint(generateId(), embedding, {
 
-  totalIndexed++;
-}
-  
-}
+        type: "file",
+        courseId,
+        courseName: course.name,
+        title: f.display_name,
+        content: text
+
+      });
+
+      totalIndexed++;
+
+    }
+
+  }
 
   console.log(`🎉 Vector build complete. Indexed: ${totalIndexed}`);
+
 }
 
+/* -------------------------------------------------- */
+/* EXPORT */
+/* -------------------------------------------------- */
+
 module.exports = { buildKnowledgeStore };
+
+/* -------------------------------------------------- */
+/* PREVENT DIRECT RUN */
+/* -------------------------------------------------- */
+
+if (require.main === module) {
+
+  console.log("⚠ knowledgeBuilder should be called from sync.js with Canvas data");
+
+}

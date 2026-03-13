@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { QdrantClient } = require("@qdrant/js-client-rest");
 
 const client = new QdrantClient({
@@ -6,6 +7,7 @@ const client = new QdrantClient({
 });
 
 async function setup() {
+
   const collections = await client.getCollections();
 
   const exists = collections.collections.find(
@@ -19,7 +21,7 @@ async function setup() {
 
   await client.createCollection("eccu_knowledge", {
     vectors: {
-      size: 768,
+      size: 384,
       distance: "Cosine"
     }
   });

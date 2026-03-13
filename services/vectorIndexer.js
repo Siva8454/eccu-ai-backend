@@ -63,7 +63,7 @@ store.courses.forEach(c => {
     });
   }
 
-  await qdrant.upsert(COLLECTION, {
+  await client.upsert(COLLECTION, {
     wait: true,
     points: vectors
   });

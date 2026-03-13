@@ -3,18 +3,14 @@ const axios = require("axios");
 async function getLocalEmbedding(text) {
 
   const res = await axios.post(
-    "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
+    "http://127.0.0.1:11434/api/embed",
     {
-      inputs: text
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.HF_API_KEY}`
-      }
+      model: "nomic-embed-text",
+      input: text
     }
   );
 
-  return res.data[0];
+  return res.data.embeddings[0];
 }
 
 module.exports = { getLocalEmbedding };
