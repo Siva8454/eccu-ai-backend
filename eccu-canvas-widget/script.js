@@ -1,16 +1,22 @@
 /* =====================================================
    ECCU AI Tutor Chatbot
-   ===================================================== */
+   Canvas Safe Version
+===================================================== */
 
-(function () {
+(function(){
 
-if (document.getElementById("eccu-chatbot")) return;
+/* Prevent duplicate loading */
 
-/* ---------- CANVAS CONTEXT ---------- */
+if(window.eccuChatLoaded) return;
+window.eccuChatLoaded = true;
+
+/* --------------------------------------------------
+   CANVAS CONTEXT
+-------------------------------------------------- */
 
 function getCanvasContext(){
 
-const context={
+const context = {
 courseName:null,
 moduleName:null,
 dueDate:null,
@@ -25,18 +31,36 @@ null
 return context
 }
 
-const CANVAS_CONTEXT=getCanvasContext()
+/* --------------------------------------------------
+   COURSE ID
+-------------------------------------------------- */
 
-/* ---------- CONVERSATION MEMORY ---------- */
+function getCourseId(){
+
+const match = window.location.pathname.match(/courses\/(\d+)/)
+
+return match ? Number(match[1]) : null
+
+}
+
+/* --------------------------------------------------
+   INITIALIZE CHATBOT
+-------------------------------------------------- */
+
+function initChatbot(){
+
+if(document.getElementById("eccu-chatbot")) return;
+
+const CANVAS_CONTEXT = getCanvasContext()
 
 let conversationHistory = []
 
 /* ---------- CREATE CHAT UI ---------- */
 
-const root=document.createElement("div")
+const root = document.createElement("div")
 root.id="eccu-chatbot"
 
-root.innerHTML=`
+root.innerHTML = `
 <div id="eccu-avatar">💬</div>
 
 <div id="eccu-chat">
@@ -82,16 +106,6 @@ chatBody.scrollTop=chatBody.scrollHeight
 return div
 }
 
-/* ---------- COURSE ID ---------- */
-
-function getCourseId(){
-
-const match=window.location.pathname.match(/courses\/(\d+)/)
-
-return match ? Number(match[1]) : null
-
-}
-
 /* ---------- FAQ ---------- */
 
 function showFAQs(){
@@ -112,11 +126,8 @@ const btn=document.createElement("button")
 btn.innerText=q
 
 btn.onclick=()=>{
-
 addMessage(q,"user-msg")
-
 processMessage(q)
-
 }
 
 container.appendChild(btn)
@@ -180,15 +191,17 @@ processMessage(msg)
 
 }
 
-/* ---------- MESSAGE LOGIC ---------- */
+/* --------------------------------------------------
+   MESSAGE LOGIC
+-------------------------------------------------- */
 
 async function processMessage(msg){
 
+const text=msg.toLowerCase()
 
+/* ---------- SUPPORT FAQ ---------- */
 
-  const text=msg.toLowerCase()
-
-  const supportKeywords = [
+const supportKeywords=[
 "lab",
 "assignment",
 "submit",
@@ -202,27 +215,14 @@ async function processMessage(msg){
 "not opening"
 ]
 
-const learningKeywords = [
-"what",
-"explain",
-"define",
-"phases",
-"penetration",
-"hacking",
-"reconnaissance",
-"vulnerability",
-"network security",
-"malware"
-]
-const isSupportQuery = supportKeywords.some(k => text.includes(k))
-const isLearningQuery = learningKeywords.some(k => text.includes(k))
+const isSupportQuery=supportKeywords.some(k=>text.includes(k))
 
-  if(isSupportQuery){
+if(isSupportQuery){
 
 if(text.includes("ebook") || text.includes("popup")){
 
 addMessage(
-"The eBook link may not open because your browser is blocking pop-ups. Click the pop-up blocked icon in the top-right of your browser and select 'Always allow pop-ups and redirects from eccouncil.instructure.com'. Then refresh the Canvas page and click the eBook link again.",
+"The eBook link may not open because your browser is blocking pop-ups. Click the pop-up blocked icon in the top-right of your browser and allow pop-ups for eccouncil.instructure.com.",
 "bot-msg"
 )
 
@@ -232,7 +232,7 @@ return
 if(text.includes("lab")){
 
 addMessage(
-"If you cannot access your lab, try the following:\n\n1. Refresh the Canvas page\n2. Allow pop-ups in your browser\n3. Use Google Chrome\n4. Disable browser extensions\n\nIf the issue continues, contact ECCU support.",
+"If you cannot access your lab try:\n\n1. Refresh Canvas\n2. Allow pop-ups\n3. Use Chrome\n4. Disable extensions\n\nIf the issue continues contact ECCU support.",
 "bot-msg"
 )
 
@@ -241,7 +241,7 @@ return
 
 }
 
-/* GREETING */
+/* ---------- GREETING ---------- */
 
 if(text==="hi"||text==="hello"||text==="hey"){
 
@@ -250,56 +250,37 @@ addMessage("Hello 👋 I'm your ECCU AI Tutor. How can I help you today?","bot-m
 return
 }
 
-/* SMALL TALK */
+/* ---------- LOADING ANIMATION ---------- */
 
-if(text.includes("how are you")){
-
-addMessage("I'm doing great! I'm here to help you with ECCU courses and assignments.","bot-msg")
-
-return
-}
-
-
-
-/* EBOOK POPUP ISSUE */
-
-if(
-text.includes("ebook")||
-text.includes("jbl")||
-text.includes("popup")||
-text.includes("pop up")
-){
-
-addMessage(
-"The eBook link may not open because your browser is blocking pop-ups. Click the pop-up blocked icon in the top-right of your browser and select 'Always allow pop-ups and redirects from eccouncil.instructure.com'. Then refresh the Canvas page and click the eBook link again.",
-"bot-msg"
-)
-
-return
-}
-
-/* AI SEARCH */
-
-const loading = document.createElement("div")
-loading.className = "bot-msg typing"
-loading.innerHTML = "<span></span><span></span><span></span>"
+const loading=document.createElement("div")
+loading.className="bot-msg typing"
+loading.innerHTML="<span></span><span></span><span></span>"
 
 chatBody.appendChild(loading)
-chatBody.scrollTop = chatBody.scrollHeight
+
+chatBody.scrollTop=chatBody.scrollHeight
 
 try{
 
 const res=await fetch("https://eccu-ai-backend.onrender.com/chat",{
+
 method:"POST",
-headers:{"Content-Type":"application/json"},
+
+headers:{
+"Content-Type":"application/json"
+},
+
 body:JSON.stringify({
+
 message:msg,
+
 history:conversationHistory.slice(-6),
+
 courseId:getCourseId()
-})
+
 })
 
-
+})
 
 const data=await res.json()
 
@@ -321,5 +302,28 @@ addMessage("⚠ Unable to reach AI Tutor service.","bot-msg")
 }
 
 }
+
+}
+
+/* --------------------------------------------------
+   INITIAL LOAD
+-------------------------------------------------- */
+
+initChatbot()
+
+/* --------------------------------------------------
+   CANVAS PAGE CHANGE DETECTOR
+-------------------------------------------------- */
+
+const observer=new MutationObserver(()=>{
+
+initChatbot()
+
+})
+
+observer.observe(document.body,{
+childList:true,
+subtree:true
+})
 
 })();
