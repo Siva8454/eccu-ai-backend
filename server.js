@@ -17,6 +17,12 @@ app.use(cors());
 app.use(express.json());
 
 /* -------------------------------------------------- */
+/* SERVE WIDGET STATIC FILES */
+/* -------------------------------------------------- */
+
+app.use("/widget", express.static(path.join(__dirname, "eccu-canvas-widget")));
+
+/* -------------------------------------------------- */
 /* API ROUTES */
 /* -------------------------------------------------- */
 
@@ -24,15 +30,7 @@ app.use("/chat", chatRoutes);
 app.use("/sync", syncRoutes);
 
 /* -------------------------------------------------- */
-/* SERVE WIDGET FILES */
-/* -------------------------------------------------- */
-
-const path = require("path")
-
-app.use("/widget", express.static(path.join(__dirname, "eccu-canvas-widget")))
-
-/* -------------------------------------------------- */
-/* WIDGET LOADER FOR CANVAS LTI */
+/* WIDGET LOADER FOR CANVAS */
 /* -------------------------------------------------- */
 
 app.get("/widget-loader", (req, res) => {
@@ -45,19 +43,14 @@ res.send(`
 
 if(window.parent){
 
-const script = window.parent.document.createElement("script")
+const script = window.parent.document.createElement("script");
+script.src = "https://eccu-ai-backend.onrender.com/widget/script.js";
+window.parent.document.head.appendChild(script);
 
-script.src = "https://eccu-ai-backend.onrender.com/widget/script.js"
-
-window.parent.document.head.appendChild(script)
-
-const css = window.parent.document.createElement("link")
-
-css.rel = "stylesheet"
-
-css.href = "https://eccu-ai-backend.onrender.com/widget/styles.css"
-
-window.parent.document.head.appendChild(css)
+const css = window.parent.document.createElement("link");
+css.rel = "stylesheet";
+css.href = "https://eccu-ai-backend.onrender.com/widget/styles.css";
+window.parent.document.head.appendChild(css);
 
 }
 
