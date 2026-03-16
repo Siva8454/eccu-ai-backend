@@ -97,7 +97,7 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
   }
 
-  const filter = mustFilters.length ? { must: mustFilters } : undefined;
+  const filter = undefined;
 
   /* -------------------------------------------------- */
   /* VECTOR SEARCH */
