@@ -103,7 +103,7 @@ async function vectorSearch(question, allowedCourseIds = []) {
   /* VECTOR SEARCH */
   /* -------------------------------------------------- */
 
-  let results = await qdrant.search(COLLECTION, {
+  let results = await client.search(COLLECTION, {
     vector: embedding,
     limit: 10, // ⭐ retrieve more candidates
     filter
@@ -117,7 +117,7 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
     console.log("⚠ No results — running fallback search");
 
-    results = await qdrant.search(COLLECTION, {
+    results = await client.search(COLLECTION, {
       vector: embedding,
       limit: 10
     });
