@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+
 const { searchKnowledge } = require("../services/eccuResponder");
 const { vectorSearch } = require("../services/vectorSearch");
 const { generateAnswer } = require("../services/localLLM");
@@ -99,9 +100,9 @@ const ragResult = await vectorSearch(
 if (ragResult) {
 
   const finalAnswer = await generateAnswer(
-    message,
-    ragResult.context
-  );
+  message,
+  ragResult.context
+);
 
   /* ---------- AUTO LEARNING ---------- */
 
