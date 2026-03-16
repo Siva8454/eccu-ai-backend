@@ -1,7 +1,7 @@
 const axios = require("axios")
 
 const HF_API =
-"https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+"https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2"
 
 async function getLocalEmbedding(text){
 
