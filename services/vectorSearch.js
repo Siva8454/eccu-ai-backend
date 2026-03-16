@@ -70,12 +70,12 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
   /* ---------------- MODULE SEARCH ---------------- */
 
-  if (moduleNumber) {
-    mustFilters.push({
-      key: "moduleNumber",
-      match: { value: moduleNumber }
-    });
-  }
+  if (moduleNumber && moduleNumber > 0) {
+  mustFilters.push({
+    key: "moduleNumber",
+    match: { value: moduleNumber }
+  });
+}
 
   /* ---------------- INTENT FILTERS ---------------- */
 
