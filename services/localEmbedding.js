@@ -1,22 +1,34 @@
-const axios = require("axios")
+const { pipeline } = require("@xenova/transformers")
 
-const HF_API =
-"https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2"
+let embedder = null
 
-async function getLocalEmbedding(text){
+async function initModel() {
 
-const res = await axios.post(
-HF_API,
-{ inputs: text },
-{
-headers:{
-Authorization: `Bearer ${process.env.HF_API_KEY}`
+  if (!embedder) {
+
+    console.log("Loading embedding model...")
+
+    embedder = await pipeline(
+      "feature-extraction",
+      "Xenova/bge-base-en-v1.5"
+    )
+
+    console.log("Embedding model loaded")
+  }
+
+  return embedder
 }
-}
-)
 
-return res.data[0]
+async function getLocalEmbedding(text) {
 
+  const model = await initModel()
+
+  const output = await model(text, {
+    pooling: "mean",
+    normalize: true
+  })
+
+  return Array.from(output.data)
 }
 
 module.exports = { getLocalEmbedding }
