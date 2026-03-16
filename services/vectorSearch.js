@@ -105,7 +105,7 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
   let results = await client.search(COLLECTION, {
     vector: embedding,
-    limit: 10, // ⭐ retrieve more candidates
+    limit: 15, // ⭐ retrieve more candidates
     filter
   });
 
@@ -119,7 +119,7 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
     results = await client.search(COLLECTION, {
       vector: embedding,
-      limit: 10
+      limit: 15
     });
 
   }
