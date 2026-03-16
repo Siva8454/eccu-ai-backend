@@ -1,34 +1,17 @@
-const { pipeline } = require("@xenova/transformers")
+const crypto = require("crypto")
 
-let embedder = null
+function getLocalEmbedding(text) {
 
-async function initModel() {
+  const dimension = 768
+  const vector = new Array(dimension).fill(0)
 
-  if (!embedder) {
+  const hash = crypto.createHash("sha512").update(text).digest()
 
-    console.log("Loading embedding model...")
-
-    embedder = await pipeline(
-      "feature-extraction",
-      "Xenova/bge-base-en-v1.5"
-    )
-
-    console.log("Embedding model loaded")
+  for (let i = 0; i < dimension; i++) {
+    vector[i] = hash[i % hash.length] / 255
   }
 
-  return embedder
-}
-
-async function getLocalEmbedding(text) {
-
-  const model = await initModel()
-
-  const output = await model(text, {
-    pooling: "mean",
-    normalize: true
-  })
-
-  return Array.from(output.data)
+  return vector
 }
 
 module.exports = { getLocalEmbedding }
