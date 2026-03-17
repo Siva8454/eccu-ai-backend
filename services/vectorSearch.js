@@ -1,7 +1,7 @@
 const { QdrantClient } = require("@qdrant/js-client-rest");
 const { getLocalEmbedding } = require("./localEmbedding");
 const { detectIntent } = require("./intentDetector");
-const { rerank } = require("./reranker"); // ⭐ new
+const { rerank } = require("./reranker");
 
 const client = new QdrantClient({
   url: process.env.QDRANT_URL,
@@ -68,36 +68,20 @@ async function vectorSearch(question, allowedCourseIds = []) {
     });
   }
 
-  /* ---------------- MODULE SEARCH ---------------- */
+  /* ---------------- MODULE FILTER ---------------- */
 
   if (moduleNumber && moduleNumber > 0) {
-  mustFilters.push({
-    key: "moduleNumber",
-    match: { value: moduleNumber }
-  });
-}
-
-  /* ---------------- INTENT FILTERS ---------------- */
-
-  if (intent === "assignment") {
-
     mustFilters.push({
-      key: "type",
-      match: { value: "assignment" }
+      key: "moduleNumber",
+      match: { value: moduleNumber }
     });
-
   }
 
-  if (intent === "file") {
+  /* ---------------- FILTER BUILD ---------------- */
 
-    mustFilters.push({
-      key: "type",
-      match: { value: "file" }
-    });
+  const filter = mustFilters.length ? { must: mustFilters } : undefined;
 
-  }
-
-  const filter = undefined;
+  console.log("Applied filters:", JSON.stringify(filter, null, 2));
 
   /* -------------------------------------------------- */
   /* VECTOR SEARCH */
@@ -105,9 +89,11 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
   let results = await client.search(COLLECTION, {
     vector: embedding,
-    limit: 15, // ⭐ retrieve more candidates
+    limit: 15,
     filter
   });
+
+  console.log("Vector results:", results.length);
 
   /* -------------------------------------------------- */
   /* HYBRID FALLBACK */
@@ -115,7 +101,7 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
   if (!results.length) {
 
-    console.log("⚠ No results — running fallback search");
+    console.log("⚠ No filtered results — running global fallback search");
 
     results = await client.search(COLLECTION, {
       vector: embedding,
@@ -124,7 +110,10 @@ async function vectorSearch(question, allowedCourseIds = []) {
 
   }
 
-  if (!results.length) return null;
+  if (!results.length) {
+    console.log("❌ No results found in vector DB");
+    return null;
+  }
 
   /* -------------------------------------------------- */
   /* RERANK RESULTS */

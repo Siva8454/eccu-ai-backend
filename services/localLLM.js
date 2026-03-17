@@ -1,42 +1,66 @@
-const axios = require("axios");
+const Groq = require("groq-sdk");
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
 async function generateAnswer(question, context) {
 
-  const prompt = `
-You are an ECCU course tutor.
+  try {
 
-Answer the student's question using the course materials.
+    const prompt = `
+You are an ECCU AI Tutor.
 
 Student Question:
 ${question}
 
-Course Materials:
+Course Content:
 ${context}
 
-Provide:
-1. Clear explanation
-2. Related lecture notes
-3. Video resources if available
-4. Book references if available
-5. Provide all related contents if available
+Instructions:
 
-IMPORTANT:
-Only include course resources (videos, lecture notes, ebooks) 
-if the question is related to course topics.
+1. If the question is about a COURSE TOPIC:
+   - Clearly explain the concept in simple terms
+   - Use structured explanation (steps / points if needed)
+   - If module references, links, or resources are present, include them
 
-If the question is a support issue (labs, login, ebook access),
-do NOT include course references.
+2. If the question is a SUPPORT ISSUE (lab, ebook, login, etc):
+   - Provide only a direct solution
+   - DO NOT include course references
 
-Do not invent information.
+3. If the answer is NOT found in the provided course content:
+   - Say:
+   "This topic is not available in your course materials. Please connect with your instructor for further clarification."
+
+4. Do NOT invent information
+
+Make the answer clear, structured, and student-friendly.
 `;
 
-  const res = await axios.post("http://localhost:11434/api/generate", {
-    model: "llama3",
-    prompt: prompt,
-    stream: false
-  });
+    const response = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
+      temperature: 0.3,
+      max_tokens: 800,
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    });
 
-  return res.data.response;
+    const answer = response?.choices?.[0]?.message?.content;
+
+    return answer || "AI could not generate a response.";
+
+  } catch (err) {
+
+    console.error("❌ Groq error:", err);
+
+    return "AI service is temporarily unavailable. Please try again.";
+
+  }
+
 }
 
 module.exports = { generateAnswer };

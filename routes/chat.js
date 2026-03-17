@@ -97,26 +97,68 @@ const ragResult = await vectorSearch(
   intent
 );
 
-if (ragResult) {
+/* ---------- FALLBACK HANDLING ---------- */
 
-  const finalAnswer = await generateAnswer(
+const supportKeywords = [
+  "lab",
+  "assignment",
+  "submit",
+  "submission",
+  "ebook",
+  "popup",
+  "login",
+  "access",
+  "not opening"
+];
+
+const isSupportQuery = supportKeywords.some(k =>
+  message.toLowerCase().includes(k)
+);
+
+/* ---------- WEAK / NO CONTEXT ---------- */
+
+if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
+
+  console.log("⚠ Weak or no context");
+
+  /* SUPPORT FALLBACK */
+
+  if (isSupportQuery) {
+    return res.json({
+      source: "support-fallback",
+      reply: "Please contact the ECCU support team for assistance with this issue."
+    });
+  }
+
+  /* CONTENT FALLBACK */
+
+  return res.json({
+    source: "content-fallback",
+    reply: "This topic is not available in your course materials. Please connect with your instructor for further clarification."
+  });
+}
+
+/* ---------- GENERATE AI ANSWER ---------- */
+
+const finalAnswer = await generateAnswer(
   message,
   ragResult.context
 );
 
-  /* ---------- AUTO LEARNING ---------- */
+/* ---------- AUTO LEARNING ---------- */
 
-  if (finalAnswer && finalAnswer.length > 50 && ragResult.confidence > 0.6) {
-    saveQA(message, finalAnswer);
-    console.log("🧠 Learned new Q&A");
-  }
-
-  return res.json({
-    source: "rag+ollama",
-    reply: finalAnswer,
-    confidence: ragResult.confidence
-  });
+if (finalAnswer && finalAnswer.length > 50 && ragResult.confidence > 0.5) {
+  saveQA(message, finalAnswer);
+  console.log("🧠 Learned new Q&A");
 }
+
+/* ---------- RESPONSE ---------- */
+
+return res.json({
+  source: "rag+groq",
+  reply: finalAnswer,
+  confidence: ragResult.confidence
+});
 
     /* -------------------------------------------------- */
     /* 5️⃣ Fallback */

@@ -21,7 +21,7 @@ async function setup() {
 
   await client.createCollection("eccu_knowledge", {
     vectors: {
-      size: 384,
+      size: 768,
       distance: "Cosine"
     }
   });
