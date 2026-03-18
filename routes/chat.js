@@ -10,7 +10,7 @@ const { saveQA, searchLearned } = require("../services/learningService");
 
 router.post("/", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, currentPage } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
@@ -94,7 +94,8 @@ console.log("Detected intent:", intent);
 const ragResult = await vectorSearch(
   message,
   allowedCourseIds,
-  intent
+  intent,
+  currentPage   // ⭐ PASS THIS
 );
 
 /* ---------- FALLBACK HANDLING ---------- */

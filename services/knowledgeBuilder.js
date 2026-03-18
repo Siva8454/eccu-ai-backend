@@ -233,7 +233,8 @@ ${page.body || ""}
           courseName: course.name,
           title: page.title,
           content: chunk,
-          links
+          links,
+          pageUrl: page.url
 
         });
 

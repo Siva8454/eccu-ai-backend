@@ -34,23 +34,21 @@ function detectCourseCode(question) {
 /* MAIN VECTOR SEARCH */
 /* -------------------------------------------------- */
 
-async function vectorSearch(question, allowedCourseIds = []) {
+async function vectorSearch(
+  question,
+  allowedCourseIds = [],
+  intent,
+  currentPage
+) {
 
   console.log("🔎 Vector search:", question);
-
-  const intent = detectIntent(question);
-  const moduleNumber = detectModuleNumber(question);
-  const courseCode = detectCourseCode(question);
-
-  console.log("Intent:", intent);
-  console.log("Module:", moduleNumber);
-  console.log("Course:", courseCode);
+  console.log("📄 Current Page:", currentPage);
 
   const embedding = await getLocalEmbedding(question);
 
-  const mustFilters = [];
+  /* ---------------- BASE FILTER ---------------- */
 
-  /* ---------------- COURSE SECURITY ---------------- */
+  const mustFilters = [];
 
   if (allowedCourseIds.length) {
     mustFilters.push({
@@ -59,73 +57,86 @@ async function vectorSearch(question, allowedCourseIds = []) {
     });
   }
 
-  /* ---------------- COURSE FILTER ---------------- */
-
-  if (courseCode) {
-    mustFilters.push({
-      key: "courseName",
-      match: { text: courseCode }
-    });
-  }
-
-  /* ---------------- MODULE FILTER ---------------- */
-
-  if (moduleNumber && moduleNumber > 0) {
-    mustFilters.push({
-      key: "moduleNumber",
-      match: { value: moduleNumber }
-    });
-  }
-
-  /* ---------------- FILTER BUILD ---------------- */
-
   const filter = mustFilters.length ? { must: mustFilters } : undefined;
 
-  console.log("Applied filters:", JSON.stringify(filter, null, 2));
-
   /* -------------------------------------------------- */
-  /* VECTOR SEARCH */
+  /* VECTOR SEARCH (DEEP SEARCH) */
   /* -------------------------------------------------- */
 
   let results = await client.search(COLLECTION, {
     vector: embedding,
-    limit: 15,
+    limit: 25, // ⭐ deeper search
     filter
   });
-
-  console.log("Vector results:", results.length);
-
-  /* -------------------------------------------------- */
-  /* HYBRID FALLBACK */
-  /* -------------------------------------------------- */
-
-  if (!results.length) {
-
-    console.log("⚠ No filtered results — running global fallback search");
-
-    results = await client.search(COLLECTION, {
-      vector: embedding,
-      limit: 15
-    });
-
-  }
 
   if (!results.length) {
     console.log("❌ No results found in vector DB");
     return null;
   }
 
+  console.log("Raw results:", results.length);
+
   /* -------------------------------------------------- */
-  /* RERANK RESULTS */
+  /* BOOSTING LOGIC (VERY IMPORTANT) */
   /* -------------------------------------------------- */
 
-  results = rerank(question, results);
+  results = results.map(r => {
+
+    let score = r.score;
+    const p = r.payload;
+
+    /* ⭐ PRIORITY 1 — CURRENT PAGE MATCH */
+
+    if (
+      currentPage &&
+      p.pageUrl &&
+      currentPage.includes(p.pageUrl)
+    ) {
+      score += 0.4;
+    }
+
+    /* ⭐ PRIORITY 2 — MODULE MATCH */
+
+    if (
+      p.moduleName &&
+      question.toLowerCase().includes(p.moduleName.toLowerCase())
+    ) {
+      score += 0.2;
+    }
+
+    /* ⭐ PRIORITY 3 — TITLE MATCH */
+
+    if (
+      p.title &&
+      question.toLowerCase().includes(p.title.toLowerCase())
+    ) {
+      score += 0.2;
+    }
+
+    return {
+      ...r,
+      boostedScore: score
+    };
+
+  });
+
+  /* -------------------------------------------------- */
+  /* SORT BY BOOSTED SCORE */
+  /* -------------------------------------------------- */
+
+  results.sort((a, b) => b.boostedScore - a.boostedScore);
+
+  /* -------------------------------------------------- */
+  /* TAKE TOP RESULTS */
+  /* -------------------------------------------------- */
+
+  const topResults = results.slice(0, 5);
 
   /* -------------------------------------------------- */
   /* BUILD CONTEXT */
   /* -------------------------------------------------- */
 
-  const context = results.map(r => {
+  const context = topResults.map(r => {
 
     const p = r.payload;
 
@@ -152,9 +163,11 @@ Type: ${p.type}
 
   }).join("\n\n----------------\n\n");
 
+  console.log("Final context size:", context.length);
+
   return {
     context,
-    confidence: results[0].score
+    confidence: topResults[0].boostedScore
   };
 
 }

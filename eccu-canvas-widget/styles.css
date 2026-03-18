@@ -66,12 +66,90 @@
 
 /* HEADER */
 #eccu-chat-header {
-  background: var(--eccu-red);
-  color: #fff;
-  padding: 14px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #d32f2f;
+  color: white;
+  padding: 10px 12px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.eccu-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eccu-title {
+  font-weight: 600;
+}
+
+.eccu-right {
+  display: flex;
+  gap: 6px;
+}
+
+#eccu-menu,
+#eccu-min,
+#eccu-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#eccu-menu:hover,
+#eccu-min:hover,
+#eccu-close:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+/*eccu settings*/
+
+.fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  bottom: 0 !important;
+  right: 0 !important;
+}
+
+/*eccu settings*/
+
+.eccu-hidden {
+  display: none;
+}
+
+#eccu-settings {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+}
+
+.eccu-settings-box {
+  background: white;
+  padding: 15px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.eccu-settings-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.eccu-settings-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
 }
 
 /* BODY */
@@ -158,6 +236,22 @@ margin-right:auto;
 text-align:left;
 }
 
+/* TEXT OVERFLOW */
+
+.bot-msg, .user-msg {
+  max-width: 85%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.bot-msg {
+  overflow-x: hidden;
+}
+
+.bot-msg a {
+  word-break: break-all;
+}
 
 /* FAQ */
 

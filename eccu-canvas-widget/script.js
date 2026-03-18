@@ -66,8 +66,31 @@ root.innerHTML = `
 <div id="eccu-chat">
 
 <div id="eccu-chat-header">
-ECCU AI Tutor
-<button id="eccu-close">✕</button>
+
+  <div class="eccu-left">
+    <button id="eccu-menu">⋮</button>
+    <span class="eccu-title">ECCU AI Tutor</span>
+  </div>
+
+  <div class="eccu-right">
+    <button id="eccu-max">⬜</button>
+    <button id="eccu-close">×</button>
+  </div>
+
+</div>
+
+<div id="eccu-settings" class="eccu-hidden">
+  <div class="eccu-settings-box">
+
+    <div class="eccu-settings-header">
+      Settings
+      <button id="eccu-settings-close">×</button>
+    </div>
+
+    <div class="eccu-settings-item">🔇 Turn off sound</div>
+    <div class="eccu-settings-item">✉ Email transcript</div>
+
+  </div>
 </div>
 
 <div id="eccu-chat-body"></div>
@@ -90,6 +113,7 @@ const closeBtn=root.querySelector("#eccu-close")
 const sendBtn=root.querySelector("#eccu-send")
 const input=root.querySelector("#eccu-input")
 const chatBody=root.querySelector("#eccu-chat-body")
+const maxBtn = root.querySelector("#eccu-max") 
 
 /* ---------- MESSAGE BUBBLES ---------- */
 
@@ -110,27 +134,46 @@ return div
 
 function showFAQs(){
 
-const container=document.createElement("div")
-container.className="eccu-faq"
+const container = document.createElement("div")
+container.className = "eccu-faq"
 
-const questions=[
-"I cannot access my lab",
-"How do I submit my assignment?",
-"My eBook link is not opening"
+const options = [
+  {
+    label: "Course / Topic",
+    reply: "Please enter your query related to this topic."
+  },
+  {
+    label: "Labs",
+    reply: "Type your question or concern here."
+  },
+  {
+    label: "Assignments / Research Project / Case Study",
+    reply: "Tell us what you need help with."
+  },
+  {
+    label: "Help & Support",
+    reply: "Enter your query for personalized support."
+  },
+  {
+    label: "Other",
+    reply: "Describe your question in a few words."
+  }
 ]
 
-questions.forEach(q=>{
+options.forEach(opt => {
 
-const btn=document.createElement("button")
+  const btn = document.createElement("button")
+  btn.innerText = opt.label
 
-btn.innerText=q
+  btn.onclick = () => {
 
-btn.onclick=()=>{
-addMessage(q,"user-msg")
-processMessage(q)
-}
+    addMessage(opt.label, "user-msg")
 
-container.appendChild(btn)
+    processMessage(opt.label)
+
+  }
+
+  container.appendChild(btn)
 
 })
 
@@ -148,9 +191,7 @@ if(!chatBody.hasChildNodes()){
 
 addMessage(`Hi 👋 You're in ${CANVAS_CONTEXT.courseName || "ECCU Course"}.`,"bot-msg")
 
-addMessage("How can I help you today?","bot-msg")
-
-addMessage("Here are some common questions students ask:","bot-msg")
+addMessage("What do you need help with today?","bot-msg")
 
 showFAQs()
 
@@ -162,6 +203,12 @@ showFAQs()
 
 closeBtn.onclick=()=>{
 chat.style.display="none"
+}
+
+/* ---------- MAXIMIZE CHAT ---------- */
+
+maxBtn.onclick = () => {
+  chat.classList.toggle("fullscreen")
 }
 
 /* ---------- SEND MESSAGE ---------- */
@@ -270,14 +317,11 @@ headers:{
 "Content-Type":"application/json"
 },
 
-body:JSON.stringify({
-
-message:msg,
-
-history:conversationHistory.slice(-6),
-
-courseId:getCourseId()
-
+body: JSON.stringify({
+  message: msg,
+  history: conversationHistory.slice(-6),
+  courseId: getCourseId(),
+  currentPage: window.location.pathname   // ⭐ ADD THIS LINE
 })
 
 })
