@@ -67,13 +67,12 @@ root.innerHTML = `
 
 <div id="eccu-chat-header">
 
-  <div class="eccu-left">
-    <button id="eccu-menu">⋮</button>
+    
     <span class="eccu-title">ECCU AI Tutor</span>
   </div>
 
   <div class="eccu-right">
-    <button id="eccu-max">⬜</button>
+    <button id="eccu-max">⛶</button>
     <button id="eccu-close">×</button>
   </div>
 
@@ -165,13 +164,35 @@ options.forEach(opt => {
   const btn = document.createElement("button")
   btn.innerText = opt.label
 
-  btn.onclick = () => {
+ btn.onclick = () => {
 
-    addMessage(opt.label, "user-msg")
+  addMessage(q, "user-msg")
 
-    processMessage(opt.label)
+  let response = ""
 
+  if (q === "Course / Topic") {
+    response = "Please enter your query related to this topic."
   }
+
+  else if (q === "Labs") {
+    response = "Type your question or concern here."
+  }
+
+  else if (q === "Assignments / Research Project / Case Study") {
+    response = "Tell us what you need help with."
+  }
+
+  else if (q === "Help & Support") {
+    response = "Enter your query for personalized support."
+  }
+
+  else {
+    response = "Describe your question in a few words."
+  }
+
+  addMessage(response, "bot-msg")
+
+}
 
   container.appendChild(btn)
 

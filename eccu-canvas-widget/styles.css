@@ -76,6 +76,11 @@
   border-top-right-radius: 16px;
 }
 
+/* group buttons on right */
+#eccu-chat-header button {
+  margin-left: 8px;
+}
+
 .eccu-left {
   display: flex;
   align-items: center;
@@ -110,13 +115,21 @@
   background: rgba(255,255,255,0.35);
 }
 
-/*eccu settings*/
+/* FULLSCREEN MODE */
+#eccu-chat.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh; /* ⭐ FIXES BROWSER OVERFLOW */
+  border-radius: 0;
+  z-index: 999999;
+}
 
-.fullscreen {
-  width: 100vw !important;
-  height: 100vh !important;
-  bottom: 0 !important;
-  right: 0 !important;
+/* FIX INTERNAL LAYOUT */
+#eccu-chat.fullscreen #eccu-chat-body {
+  height: calc(100dvh - 120px); /* header + input */
+  overflow-y: auto;
 }
 
 /*eccu settings*/
@@ -253,6 +266,12 @@ text-align:left;
   word-break: break-all;
 }
 
+/* TEXT streching */
+#eccu-chat.fullscreen #eccu-chat-body {
+  max-width: 900px;
+  margin: auto;
+}
+
 /* FAQ */
 
 .eccu-faq{
@@ -262,14 +281,17 @@ gap:6px;
 margin-top:10px;
 }
 
-.eccu-faq button{
-background:#f2f2f2;
-border:none;
-padding:8px;
-border-radius:10px;
-cursor:pointer;
-font-size:13px;
-text-align:left;
+.eccu-faq button {
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: none;
+  background: #f1f1f1;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
 }
 .eccu-faq{
 margin-top:10px;
