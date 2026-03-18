@@ -1,26 +1,20 @@
 /* =====================================================
-   ECCU AI Tutor Chatbot
-   Canvas Safe Version
+   ECCU AI Tutor Chatbot (Clean Version)
 ===================================================== */
 
 (function(){
 
-/* Prevent duplicate loading */
-
 if(window.eccuChatLoaded) return;
 window.eccuChatLoaded = true;
 
-/* --------------------------------------------------
-   CANVAS CONTEXT
--------------------------------------------------- */
+/* -------------------------------------------------- */
+/* CANVAS CONTEXT */
+/* -------------------------------------------------- */
 
 function getCanvasContext(){
 
 const context = {
-courseName:null,
-moduleName:null,
-dueDate:null,
-submissionStatus:null
+courseName:null
 }
 
 context.courseName =
@@ -31,31 +25,29 @@ null
 return context
 }
 
-/* --------------------------------------------------
-   COURSE ID
--------------------------------------------------- */
+/* -------------------------------------------------- */
+/* COURSE ID */
+/* -------------------------------------------------- */
 
 function getCourseId(){
 
 const match = window.location.pathname.match(/courses\/(\d+)/)
-
 return match ? Number(match[1]) : null
 
 }
 
-/* --------------------------------------------------
-   INITIALIZE CHATBOT
--------------------------------------------------- */
+/* -------------------------------------------------- */
+/* INIT */
+/* -------------------------------------------------- */
 
 function initChatbot(){
 
 if(document.getElementById("eccu-chatbot")) return;
 
 const CANVAS_CONTEXT = getCanvasContext()
-
 let conversationHistory = []
 
-/* ---------- CREATE CHAT UI ---------- */
+/* ---------- UI ---------- */
 
 const root = document.createElement("div")
 root.id="eccu-chatbot"
@@ -65,39 +57,21 @@ root.innerHTML = `
 
 <div id="eccu-chat">
 
-<div id="eccu-chat-header">
-
-    
+  <div id="eccu-chat-header">
     <span class="eccu-title">ECCU AI Tutor</span>
-  </div>
 
-  <div class="eccu-right">
-    <button id="eccu-max">⛶</button>
-    <button id="eccu-close">×</button>
-  </div>
-
-</div>
-
-<div id="eccu-settings" class="eccu-hidden">
-  <div class="eccu-settings-box">
-
-    <div class="eccu-settings-header">
-      Settings
-      <button id="eccu-settings-close">×</button>
+    <div class="eccu-actions">
+      <button id="eccu-max">⛶</button>
+      <button id="eccu-close">×</button>
     </div>
-
-    <div class="eccu-settings-item">🔇 Turn off sound</div>
-    <div class="eccu-settings-item">✉ Email transcript</div>
-
   </div>
-</div>
 
-<div id="eccu-chat-body"></div>
+  <div id="eccu-chat-body"></div>
 
-<div id="eccu-chat-footer">
-<input id="eccu-input" placeholder="Ask me anything..." />
-<button id="eccu-send">➤</button>
-</div>
+  <div id="eccu-chat-footer">
+    <input id="eccu-input" placeholder="Ask me anything..." />
+    <button id="eccu-send">➤</button>
+  </div>
 
 </div>
 `
@@ -106,25 +80,24 @@ document.body.appendChild(root)
 
 /* ---------- ELEMENTS ---------- */
 
-const avatar=root.querySelector("#eccu-avatar")
-const chat=root.querySelector("#eccu-chat")
-const closeBtn=root.querySelector("#eccu-close")
-const sendBtn=root.querySelector("#eccu-send")
-const input=root.querySelector("#eccu-input")
-const chatBody=root.querySelector("#eccu-chat-body")
-const maxBtn = root.querySelector("#eccu-max") 
+const avatar = root.querySelector("#eccu-avatar")
+const chat = root.querySelector("#eccu-chat")
+const closeBtn = root.querySelector("#eccu-close")
+const sendBtn = root.querySelector("#eccu-send")
+const input = root.querySelector("#eccu-input")
+const chatBody = root.querySelector("#eccu-chat-body")
+const maxBtn = root.querySelector("#eccu-max")
 
-/* ---------- MESSAGE BUBBLES ---------- */
+/* ---------- MESSAGE ---------- */
 
-function addMessage(text,cls){
+function addMessage(text, cls){
 
-const div=document.createElement("div")
-div.className=cls
-div.innerText=text
+const div = document.createElement("div")
+div.className = cls
+div.innerText = text
 
 chatBody.appendChild(div)
-
-chatBody.scrollTop=chatBody.scrollHeight
+chatBody.scrollTop = chatBody.scrollHeight
 
 return div
 }
@@ -164,35 +137,10 @@ options.forEach(opt => {
   const btn = document.createElement("button")
   btn.innerText = opt.label
 
- btn.onclick = () => {
-
-  addMessage(q, "user-msg")
-
-  let response = ""
-
-  if (q === "Course / Topic") {
-    response = "Please enter your query related to this topic."
+  btn.onclick = () => {
+    addMessage(opt.label, "user-msg")
+    addMessage(opt.reply, "bot-msg")
   }
-
-  else if (q === "Labs") {
-    response = "Type your question or concern here."
-  }
-
-  else if (q === "Assignments / Research Project / Case Study") {
-    response = "Tell us what you need help with."
-  }
-
-  else if (q === "Help & Support") {
-    response = "Enter your query for personalized support."
-  }
-
-  else {
-    response = "Describe your question in a few words."
-  }
-
-  addMessage(response, "bot-msg")
-
-}
 
   container.appendChild(btn)
 
@@ -202,17 +150,17 @@ chatBody.appendChild(container)
 
 }
 
-/* ---------- OPEN CHAT ---------- */
+/* ---------- OPEN ---------- */
 
-avatar.onclick=()=>{
+avatar.onclick = () => {
 
-chat.style.display="flex"
+chat.style.display = "flex"
 
 if(!chatBody.hasChildNodes()){
 
-addMessage(`Hi 👋 You're in ${CANVAS_CONTEXT.courseName || "ECCU Course"}.`,"bot-msg")
+addMessage(`Hi 👋 You're in ${CANVAS_CONTEXT.courseName || "ECCU Course"}.`, "bot-msg")
 
-addMessage("What do you need help with today?","bot-msg")
+addMessage("What do you need help with today?", "bot-msg")
 
 showFAQs()
 
@@ -220,138 +168,100 @@ showFAQs()
 
 }
 
-/* ---------- CLOSE CHAT ---------- */
+/* ---------- CLOSE ---------- */
 
-closeBtn.onclick=()=>{
-chat.style.display="none"
+closeBtn.onclick = () => {
+chat.style.display = "none"
 }
 
-/* ---------- MAXIMIZE CHAT ---------- */
+/* ---------- MAXIMIZE ---------- */
 
 maxBtn.onclick = () => {
-  chat.classList.toggle("fullscreen")
+chat.classList.toggle("fullscreen")
 }
 
-/* ---------- SEND MESSAGE ---------- */
+/* ---------- SEND ---------- */
 
-sendBtn.onclick=sendMessage
+sendBtn.onclick = sendMessage
 
-input.addEventListener("keydown",e=>{
-if(e.key==="Enter") sendMessage()
+input.addEventListener("keydown", e => {
+if(e.key === "Enter") sendMessage()
 })
 
 function sendMessage(){
 
-const msg=input.value.trim()
-
+const msg = input.value.trim()
 if(!msg) return
 
-addMessage(msg,"user-msg")
+addMessage(msg, "user-msg")
 
 conversationHistory.push({
 role:"user",
 content:msg
 })
 
-input.value=""
+input.value = ""
 
 processMessage(msg)
 
 }
 
-/* --------------------------------------------------
-   MESSAGE LOGIC
--------------------------------------------------- */
+/* -------------------------------------------------- */
+/* MESSAGE LOGIC */
+/* -------------------------------------------------- */
 
 async function processMessage(msg){
 
-const text=msg.toLowerCase()
+const text = msg.toLowerCase()
 
-/* ---------- SUPPORT FAQ ---------- */
-
-const supportKeywords=[
-"lab",
-"assignment",
-"submit",
-"submission",
-"ebook",
-"jbl",
-"popup",
-"pop up",
-"login",
-"access",
-"not opening"
-]
-
-const isSupportQuery=supportKeywords.some(k=>text.includes(k))
-
-if(isSupportQuery){
+/* SUPPORT QUICK RESPONSES */
 
 if(text.includes("ebook") || text.includes("popup")){
 
-addMessage(
-"The eBook link may not open because your browser is blocking pop-ups. Click the pop-up blocked icon in the top-right of your browser and allow pop-ups for eccouncil.instructure.com.",
-"bot-msg"
-)
-
+addMessage("Please enable pop-ups in your browser for ECCU.", "bot-msg")
 return
 }
 
 if(text.includes("lab")){
 
-addMessage(
-"If you cannot access your lab try:\n\n1. Refresh Canvas\n2. Allow pop-ups\n3. Use Chrome\n4. Disable extensions\n\nIf the issue continues contact ECCU support.",
-"bot-msg"
-)
-
+addMessage("Try refreshing Canvas and enabling pop-ups. Contact support if issue persists.", "bot-msg")
 return
 }
 
-}
+/* LOADING */
 
-/* ---------- GREETING ---------- */
-
-if(text==="hi"||text==="hello"||text==="hey"){
-
-addMessage("Hello 👋 I'm your ECCU AI Tutor. How can I help you today?","bot-msg")
-
-return
-}
-
-/* ---------- LOADING ANIMATION ---------- */
-
-const loading=document.createElement("div")
-loading.className="bot-msg typing"
-loading.innerHTML="<span></span><span></span><span></span>"
+const loading = document.createElement("div")
+loading.className = "bot-msg"
+loading.innerText = "Typing..."
 
 chatBody.appendChild(loading)
 
-chatBody.scrollTop=chatBody.scrollHeight
+/* API CALL */
 
 try{
 
-const res=await fetch("https://eccu-ai-backend.onrender.com/chat",{
+const res = await fetch("https://eccu-ai-backend.onrender.com/chat", {
 
 method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
+headers:{ "Content-Type":"application/json" },
 
 body: JSON.stringify({
   message: msg,
   history: conversationHistory.slice(-6),
   courseId: getCourseId(),
-  currentPage: window.location.pathname   // ⭐ ADD THIS LINE
+  currentPage: window.location.pathname
 })
 
 })
 
-const data=await res.json()
+const data = await res.json()
 
 loading.remove()
 
-addMessage(data.reply || "I'm still learning this topic. Please contact ECCU support if you need immediate assistance.","bot-msg")
+addMessage(
+  data.reply || "Please contact your instructor or ECCU support.",
+  "bot-msg"
+)
 
 conversationHistory.push({
 role:"assistant",
@@ -361,29 +271,22 @@ content:data.reply
 }catch(e){
 
 loading.remove()
-
-addMessage("⚠ Unable to reach AI Tutor service.","bot-msg")
-
-}
+addMessage("⚠ AI service not reachable.", "bot-msg")
 
 }
 
 }
 
-/* --------------------------------------------------
-   INITIAL LOAD
--------------------------------------------------- */
+}
+
+/* INIT */
 
 initChatbot()
 
-/* --------------------------------------------------
-   CANVAS PAGE CHANGE DETECTOR
--------------------------------------------------- */
+/* OBSERVER */
 
-const observer=new MutationObserver(()=>{
-
+const observer = new MutationObserver(() => {
 initChatbot()
-
 })
 
 observer.observe(document.body,{
