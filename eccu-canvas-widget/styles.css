@@ -88,10 +88,13 @@
 
 /* FOOTER */
 #eccu-chat-footer {
-  display: flex;
-  gap: 8px;
+  position: sticky;
+  bottom: 0;
+  background: white;
   padding: 10px;
   border-top: 1px solid #eee;
+  display: flex;
+  gap: 8px;
 }
 
 #eccu-chat-footer input {
@@ -111,24 +114,37 @@
   cursor: pointer;
 }
 
-/* BUBBLES */
-.user-msg {
-  background: var(--eccu-red);
-  color: white;
-  padding: 10px 14px;
-  border-radius: 16px;
-  margin: 8px 0;
-  max-width: 75%;
-  margin-left: auto;
+/* MESSAGE WRAPPER */
+#eccu-chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.bot-msg {
-  background: #f1f1f1;
+/* COMMON BUBBLE */
+.bot-msg,
+.user-msg {
   padding: 10px 14px;
   border-radius: 16px;
-  margin: 8px 0;
   max-width: 75%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+/* BOT → LEFT */
+.bot-msg {
+  background: #f1f1f1;
+  align-self: flex-start;
   margin-right: auto;
+}
+
+/* USER → RIGHT */
+.user-msg {
+  background: #d12e2e;
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
 }
 
 /* TEXT FIX */
@@ -179,22 +195,24 @@
   flex-direction: column;
 }
 
-/* CENTER CONTENT LIKE CHATGPT */
-#eccu-chat.fullscreen #eccu-chat-body {
-  flex: 1;
-  overflow-y: auto;
 
+/* CENTER CONTENT LIKE CHATGPT */
+#eccu-chat.fullscreen {
   display: flex;
   flex-direction: column;
+}
 
-  padding: 20px 0;
+#eccu-chat-body {
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* INNER CONTAINER (KEY FIX) */
-#eccu-chat.fullscreen #eccu-chat-body > * {
+#eccu-chat.fullscreen #eccu-chat-body {
+  max-width: 800px;
   width: 100%;
-  max-width: 850px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 /* FIX INPUT AREA */
