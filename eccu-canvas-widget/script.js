@@ -47,6 +47,31 @@ if(document.getElementById("eccu-chatbot")) return;
 const CANVAS_CONTEXT = getCanvasContext()
 let conversationHistory = []
 
+/* ---------- FORMAT LINKS ---------- */
+
+function formatLinks(text) {
+  // Convert URLs to clickable links
+  let formatted = text.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    '<a href="$1" target="_blank">$1</a>'
+  )
+
+  // Convert line breaks to <br>
+  formatted = formatted.replace(/\n/g, "<br>")
+
+  return formatted
+}
+
+/* ---------- SCROLL MESSAGE TOP ---------- */
+function scrollToMessage(element) {
+  setTimeout(() => {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 50);
+}
+
 /* ---------- UI ---------- */
 
 const root = document.createElement("div")
@@ -92,14 +117,18 @@ const maxBtn = root.querySelector("#eccu-max")
 
 function addMessage(text, cls){
 
-const div = document.createElement("div")
-div.className = cls
-div.innerText = text
+  const div = document.createElement("div")
+  div.className = cls
 
-chatBody.appendChild(div)
-chatBody.scrollTop = chatBody.scrollHeight
+  div.innerHTML = formatLinks(text)   // ✅ IMPORTANT
 
-return div
+  chatBody.appendChild(div)
+  
+   if (cls === "bot-msg") {
+    scrollToMessage(div)
+  }
+
+  return div
 }
 
 /* ---------- FAQ ---------- */
@@ -213,6 +242,32 @@ processMessage(msg)
 async function processMessage(msg){
 
 const text = msg.toLowerCase()
+
+/* ---------- AI KEY TRANSFER HELP ---------- */
+
+if (
+  text.includes("ai key") ||
+  text.includes("activation key") ||
+  text.includes("transfer key") ||
+  text.includes("parrot") ||
+  text.includes("ai activation")
+) {
+
+  addMessage(
+`You can find the instructions here:<br><br>
+
+<a href="https://eccouncil.instructure.com/courses/2201/pages/module-01-content" target="_blank">
+Open Module 01 – CEH Lab Setup
+</a><br><br>
+
+Follow the section:
+<strong>“Instructions to Download your AI Activation Key for ECCU LMS.”</strong>
+`,
+"bot-msg"
+);
+
+  return;
+}
 
 /* SUPPORT QUICK RESPONSES */
 
