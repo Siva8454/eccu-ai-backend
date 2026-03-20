@@ -51,23 +51,27 @@ let conversationHistory = []
 
 function formatLinks(text) {
 
-  // ✅ Fix markdown-style links: [text](url)
-  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g, '$2')
+  // Convert Module references into links
+  const courseId = getCourseId()
 
-  // ✅ Remove trailing brackets
-  text = text.replace(/\)\]/g, '')
+  text = text.replace(
+    /Module\s*(\d+)\s*Content/gi,
+    (match, num) => {
+      if (!courseId) return match
 
-  // ✅ Convert URLs to clickable links
+      const url = `https://eccouncil.instructure.com/courses/${courseId}/pages/module-${num.padStart(2, '0')}-content`
+
+      return `<a href="${url}" target="_blank">${match}</a>`
+    }
+  )
+
+  // Convert normal URLs
   text = text.replace(
     /(https?:\/\/[^\s<]+)/g,
     '<a href="$1" target="_blank">$1</a>'
   )
 
-  // ✅ Line breaks
-  text = text.replace(
-  /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g,
-  '<a href="$2" target="_blank">$1</a>'
-)
+  text = text.replace(/\n/g, "<br>")
 
   return text
 }
