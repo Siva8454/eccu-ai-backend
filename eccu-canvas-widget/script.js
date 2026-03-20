@@ -263,15 +263,23 @@ if (
   text.includes("ai activation")
 ) {
 
- addMessage(
-`You can find the instructions here:
+ const courseId = getCourseId()
 
-https://eccouncil.instructure.com/courses/2201/pages/module-01-content
+const moduleLink = courseId
+  ? `https://eccouncil.instructure.com/courses/${courseId}/modules`
+  : ""
 
-Follow the section:
-"Instructions to Download your AI Activation Key for ECCU LMS."`,
+addMessage(
+`You can find the instructions on how to transfer the AI Key from the Host Machine to the Parrot Security VM in:
+
+📘 Module 01 – Lab Setup
+
+Under the section:
+“Instructions to Download your AI Activation Key for ECCU LMS.”
+
+${moduleLink ? `\nGo to Modules: ${moduleLink}` : ""}`,
 "bot-msg"
-);
+)
 
   return;
 }
