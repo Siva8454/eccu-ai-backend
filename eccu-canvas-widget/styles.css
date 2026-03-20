@@ -160,6 +160,12 @@
   background: #e5e5e5;
 }
 
+/* LINK */
+.bot-msg a {
+  color: #1a73e8;
+  text-decoration: underline;
+}
+
 /* FULLSCREEN */
 #eccu-chat.fullscreen {
   position: fixed;

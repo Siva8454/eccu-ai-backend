@@ -71,6 +71,11 @@ function scrollToMessage(element) {
     });
   }, 50);
 }
+function scrollToBottom() {
+  setTimeout(() => {
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }, 50);
+}
 
 /* ---------- UI ---------- */
 
@@ -123,7 +128,12 @@ function addMessage(text, cls){
   div.innerHTML = formatLinks(text)   // ✅ IMPORTANT
 
   chatBody.appendChild(div)
-  
+
+  if (cls === "user-msg") {
+    // ✅ show user message immediately
+    scrollToBottom()
+  }
+
    if (cls === "bot-msg") {
     scrollToMessage(div)
   }
@@ -253,16 +263,13 @@ if (
   text.includes("ai activation")
 ) {
 
-  addMessage(
-`You can find the instructions here:<br><br>
+ addMessage(
+`You can find the instructions here:
 
-<a href="https://eccouncil.instructure.com/courses/2201/pages/module-01-content" target="_blank">
-Open Module 01 – CEH Lab Setup
-</a><br><br>
+https://eccouncil.instructure.com/courses/2201/pages/module-01-content
 
 Follow the section:
-<strong>“Instructions to Download your AI Activation Key for ECCU LMS.”</strong>
-`,
+"Instructions to Download your AI Activation Key for ECCU LMS."`,
 "bot-msg"
 );
 
