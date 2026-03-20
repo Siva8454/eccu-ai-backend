@@ -166,7 +166,7 @@
   text-decoration: underline;
 }
 
-/* FULLSCREEN */
+/* FULLSCREEN MODE */
 #eccu-chat.fullscreen {
   position: fixed;
   top: 0;
@@ -175,12 +175,56 @@
   height: 100dvh;
   border-radius: 0;
   z-index: 999999;
+  display: flex;
+  flex-direction: column;
 }
 
-/* CENTER CONTENT IN FULLSCREEN */
+/* CENTER CONTENT LIKE CHATGPT */
 #eccu-chat.fullscreen #eccu-chat-body {
-  max-width: 900px;
-  margin: auto;
+  flex: 1;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px 0;
+}
+
+/* INNER CONTAINER (KEY FIX) */
+#eccu-chat.fullscreen #eccu-chat-body > * {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+/* FIX INPUT AREA */
+#eccu-chat.fullscreen #eccu-chat-footer {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border-top: 1px solid #eee;
+}
+
+/* CENTER INPUT LIKE CHATGPT */
+#eccu-chat.fullscreen #eccu-chat-footer input,
+#eccu-chat.fullscreen #eccu-chat-footer button {
+  max-width: 850px;
+}
+
+/* WRAP INPUT + BUTTON */
+#eccu-chat.fullscreen #eccu-chat-footer {
+  gap: 8px;
+}
+
+/* OPTIONAL: nicer input width */
+#eccu-chat.fullscreen #eccu-chat-footer input {
+  width: 100%;
+  max-width: 780px;
+}
+
+/* BETTER MESSAGE WIDTH */
+.bot-msg, .user-msg {
+  max-width: 100%;
 }
 
 /* TYPING */
