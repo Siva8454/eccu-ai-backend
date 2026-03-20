@@ -50,16 +50,26 @@ let conversationHistory = []
 /* ---------- FORMAT LINKS ---------- */
 
 function formatLinks(text) {
-  // Convert URLs to clickable links
-  let formatted = text.replace(
+
+  // ✅ Fix markdown-style links: [text](url)
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g, '$2')
+
+  // ✅ Remove trailing brackets
+  text = text.replace(/\)\]/g, '')
+
+  // ✅ Convert URLs to clickable links
+  text = text.replace(
     /(https?:\/\/[^\s<]+)/g,
     '<a href="$1" target="_blank">$1</a>'
   )
 
-  // Convert line breaks to <br>
-  formatted = formatted.replace(/\n/g, "<br>")
+  // ✅ Line breaks
+  text = text.replace(
+  /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g,
+  '<a href="$2" target="_blank">$1</a>'
+)
 
-  return formatted
+  return text
 }
 
 /* ---------- SCROLL MESSAGE TOP ---------- */
