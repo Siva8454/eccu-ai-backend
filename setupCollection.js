@@ -20,11 +20,15 @@ async function setup() {
   }
 
   await client.createCollection("eccu_knowledge", {
-    vectors: {
-      size: 768,
-      distance: "Cosine"
-    }
-  });
+  vectors: {
+    size: 768,
+    distance: "Cosine"
+  },
+
+  optimizers_config: {
+    indexing_threshold: 0
+  }
+});
 
   console.log("Collection created");
 }

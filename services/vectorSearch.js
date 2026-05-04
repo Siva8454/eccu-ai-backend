@@ -48,16 +48,7 @@ async function vectorSearch(
 
   /* ---------------- BASE FILTER ---------------- */
 
-  const mustFilters = [];
-
-  if (allowedCourseIds.length) {
-    mustFilters.push({
-      key: "courseId",
-      match: { any: allowedCourseIds }
-    });
-  }
-
-  const filter = mustFilters.length ? { must: mustFilters } : undefined;
+  const filter = undefined;
 
   /* -------------------------------------------------- */
   /* VECTOR SEARCH (DEEP SEARCH) */
@@ -66,7 +57,6 @@ async function vectorSearch(
   let results = await client.search(COLLECTION, {
     vector: embedding,
     limit: 25, // ⭐ deeper search
-    filter
   });
 
   if (!results.length) {
@@ -75,6 +65,15 @@ async function vectorSearch(
   }
 
   console.log("Raw results:", results.length);
+
+  // ✅ Manual course filtering (since Qdrant index not available)
+if (allowedCourseIds.length) {
+  results = results.filter(r =>
+    allowedCourseIds.includes(r.payload.courseId)
+  );
+}
+
+console.log("Filtered results:", results.length);
 
   /* -------------------------------------------------- */
   /* BOOSTING LOGIC (VERY IMPORTANT) */

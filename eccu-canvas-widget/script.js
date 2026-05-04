@@ -37,12 +37,30 @@ return match ? Number(match[1]) : null
 }
 
 /* -------------------------------------------------- */
+/* COURSE FILTER */
+/* -------------------------------------------------- */
+function isAllowedCourse() {
+
+  const courseId = getCourseId()
+
+  const allowedCourses = [2213, 2281]
+
+  return allowedCourses.includes(courseId)
+}
+
+
+/* -------------------------------------------------- */
 /* INIT */
 /* -------------------------------------------------- */
 
 function initChatbot(){
 
 if(document.getElementById("eccu-chatbot")) return;
+
+if (!isAllowedCourse()) {
+  console.log("🚫 ECCU AI Tutor disabled for this course:", getCourseId())
+  return;
+}
 
 const CANVAS_CONTEXT = getCanvasContext()
 let conversationHistory = []
