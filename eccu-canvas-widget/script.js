@@ -18,31 +18,18 @@ function getCanvasContext() {
     isHomePage: false
   };
 
-  // ✅ Detect course name
-  const courseEl =
-    document.querySelector(".ellipsible") ||
-    document.querySelector(".course-title");
+  // ✅ Course name (clean, reliable)
+  context.courseName = ENV?.COURSE?.name || null;
 
-  if (courseEl) {
-    context.courseName = courseEl.innerText.trim();
-  }
+  // ✅ Page title (clean, no HTML)
+  context.pageTitle = ENV?.CONTEXT?.title || null;
 
-  // ✅ Detect page title
-  const titleEl =
-    document.querySelector(".page-title") ||
-    document.querySelector("h1.title") ||
-    document.querySelector("h1");
-
-  if (titleEl) {
-    context.pageTitle = titleEl.innerText.trim();
-  }
-
-  // ✅ Detect HOME page
+  // ✅ Detect home
   const path = window.location.pathname;
 
   if (
-    path.match(/\/courses\/\d+$/) ||       // /courses/2213
-    path.includes("/home")                 // /courses/2213/home
+    path.match(/\/courses\/\d+$/) ||
+    path.includes("/home")
   ) {
     context.isHomePage = true;
   }
