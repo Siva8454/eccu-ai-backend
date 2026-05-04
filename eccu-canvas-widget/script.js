@@ -11,18 +11,43 @@ window.eccuChatLoaded = true;
 /* CANVAS CONTEXT */
 /* -------------------------------------------------- */
 
-function getCanvasContext(){
+function getCanvasContext() {
+  const context = {
+    courseName: null,
+    pageTitle: null,
+    isHomePage: false
+  };
 
-const context = {
-courseName:null
-}
+  // ✅ Detect course name
+  const courseEl =
+    document.querySelector(".ellipsible") ||
+    document.querySelector(".course-title");
 
-context.courseName =
-document.title?.replace(" - Canvas","").trim() ||
-document.querySelector("h1")?.innerText.trim() ||
-null
+  if (courseEl) {
+    context.courseName = courseEl.innerText.trim();
+  }
 
-return context
+  // ✅ Detect page title
+  const titleEl =
+    document.querySelector(".page-title") ||
+    document.querySelector("h1.title") ||
+    document.querySelector("h1");
+
+  if (titleEl) {
+    context.pageTitle = titleEl.innerText.trim();
+  }
+
+  // ✅ Detect HOME page
+  const path = window.location.pathname;
+
+  if (
+    path.match(/\/courses\/\d+$/) ||       // /courses/2213
+    path.includes("/home")                 // /courses/2213/home
+  ) {
+    context.isHomePage = true;
+  }
+
+  return context;
 }
 
 /* -------------------------------------------------- */
@@ -223,13 +248,19 @@ chatBody.appendChild(container)
 
 /* ---------- OPEN ---------- */
 
+const context = getCanvasContext();
+
 avatar.onclick = () => {
 
 chat.style.display = "flex"
 
 if(!chatBody.hasChildNodes()){
 
-addMessage(`Hi 👋 You're in ${CANVAS_CONTEXT.courseName || "ECCU Course"}.`, "bot-msg")
+const displayText = context.isHomePage
+    ? context.courseName
+    : context.pageTitle || context.courseName;
+
+  addMessage(`Hi 👋 You're in ${displayText}`, "bot-msg");
 
 addMessage("What do you need help with today?", "bot-msg")
 
