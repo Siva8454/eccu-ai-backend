@@ -7,6 +7,7 @@ const { vectorSearch } = require("../services/vectorSearch");
 const { generateAnswer } = require("../services/localLLM");
 const { fetchUserEnrollments } = require("../services/canvasFetcher");
 const { saveQA, searchLearned } = require("../services/learningService");
+const { detectIntent } = require("../services/intentDetector");
 
 router.post("/", async (req, res) => {
   try {
@@ -79,11 +80,24 @@ if (learned) {
     /* intent detection */
     /* -------------------------------------------------- */
     
-const { detectIntent } = require("../services/intentDetector");
+
 
 const intent = detectIntent(message);
 
 console.log("Detected intent:", intent);
+
+/* -------------------------------------------------- */
+/* 🚫 RESTRICTED / EXAM GUARDRAIL */
+/* -------------------------------------------------- */
+
+if (intent === "restricted") {
+  console.log("🚫 Blocked restricted query");
+
+  return res.json({
+    source: "guardrail",
+    reply: "Providing answers for exams or assessments is prohibited. Please refer to your course materials or contact your instructor."
+  });
+}
 
 
 

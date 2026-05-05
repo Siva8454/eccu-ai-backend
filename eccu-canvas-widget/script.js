@@ -12,29 +12,35 @@ window.eccuChatLoaded = true;
 /* -------------------------------------------------- */
 
 function getCanvasContext() {
-  const context = {
-    courseName: null,
-    pageTitle: null,
-    isHomePage: false
-  };
 
-  // ✅ Course name (clean, reliable)
-  context.courseName = ENV?.COURSE?.name || null;
+  const courseName =
+    document.querySelector(".ellipsible")?.innerText ||
+    document.title?.replace(" - Canvas", "").trim() ||
+    null;
 
-  // ✅ Page title (clean, no HTML)
-  context.pageTitle = ENV?.CONTEXT?.title || null;
+  const breadcrumbItems = document.querySelectorAll(".ic-app-crumbs a");
 
-  // ✅ Detect home
-  const path = window.location.pathname;
+  let pageTitle = null;
 
-  if (
-    path.match(/\/courses\/\d+$/) ||
-    path.includes("/home")
-  ) {
-    context.isHomePage = true;
+  if (breadcrumbItems.length) {
+    pageTitle = breadcrumbItems[breadcrumbItems.length - 1].innerText.trim();
+
+    const badTitles = ["home page", "pages", "home"];
+
+    if (badTitles.includes(pageTitle.toLowerCase())) {
+      pageTitle = null;
+    }
   }
 
-  return context;
+  const isHomePage =
+    window.location.pathname.endsWith("/pages/home") ||
+    window.location.pathname.endsWith("/home");
+
+  return {
+    courseName,
+    pageTitle,
+    isHomePage
+  };
 }
 
 /* -------------------------------------------------- */
@@ -237,15 +243,20 @@ chatBody.appendChild(container)
 
 const context = getCanvasContext();
 
+console.log("ENV:", window.ENV);
+console.log("courseName:", context.courseName);
+console.log("pageTitle:", context.pageTitle);
+
 avatar.onclick = () => {
 
 chat.style.display = "flex"
 
 if(!chatBody.hasChildNodes()){
 
-const displayText = context.isHomePage
+const displayText =
+  context.isHomePage
     ? context.courseName
-    : context.pageTitle || context.courseName;
+    : context.pageTitle || context.courseName || "this page";
 
   addMessage(`Hi 👋 You're in ${displayText}`, "bot-msg");
 

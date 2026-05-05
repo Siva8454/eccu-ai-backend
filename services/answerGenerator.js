@@ -3,16 +3,33 @@ const axios = require("axios");
 async function generateAnswer(question, context) {
 
   const prompt = `
-You are an ECCU AI tutor.
+You are an ECCU AI Tutor.
 
-Answer the student's question using ONLY the context below.
-Be clear and helpful.
-If labs are mentioned, explain what the student will learn.
+STRICT RULES:
+- Answer ONLY using the provided context.
+- Do NOT generate answers outside the context.
+- Do NOT guess or hallucinate.
 
-Context:
-${context}
+ACADEMIC INTEGRITY:
+- If the student asks for exam answers, quiz answers, test answers, or tries to cheat:
+  → Respond EXACTLY with:
+  "Providing answers for exams or assessments is prohibited. Please refer to your course materials or contact your instructor."
 
-Question:
+FALLBACK:
+- If the answer is NOT present in the context:
+  → Respond EXACTLY with:
+  "Please contact your instructor."
+
+STYLE:
+- Be clear, concise, and helpful.
+- If labs are mentioned, explain what the student will learn.
+
+---------------------
+CONTEXT:
+${context || "No context available"}
+
+---------------------
+QUESTION:
 ${question}
 `;
 
@@ -23,10 +40,16 @@ ${question}
       {
         model: "llama3-8b-8192",
         messages: [
-          { role: "system", content: "You are an ECCU course tutor." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content: "You are a strict ECCU AI Tutor that follows rules exactly."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
         ],
-        temperature: 0.3
+        temperature: 0.2 // 🔥 lower = more controlled output
       },
       {
         headers: {
