@@ -380,7 +380,8 @@ body: JSON.stringify({
   message: msg,
   history: conversationHistory.slice(-6),
   courseId: getCourseId(),
-  currentPage: window.location.pathname
+  currentPage: window.location.pathname,
+  userId: currentUserId
 })
 
 })
