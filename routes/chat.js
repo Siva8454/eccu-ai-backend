@@ -194,18 +194,15 @@ if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
 
 /* ---------- GENERATE AI ANSWER ---------- */
 
-const webContext = webResources
-  .map(r =>
-    `${r.title}\n${r.content}\n${r.url}`
-  )
-  .join("\n\n");
+const webResources =
+  await trustedWebSearch(message);
 
 const finalContext = `
 ECCU CONTENT:
 ${ragResult.context}
 
 TRUSTED ONLINE RESOURCES:
-${webContext}
+${webResources}
 `;
 
 const finalAnswer = await generateAnswer(
