@@ -371,6 +371,8 @@ chatBody.appendChild(loading)
 
 try{
 
+const currentUserId = getCourseId() + "-student"; 
+
 const res = await fetch("https://eccu-ai-backend.onrender.com/chat", {
 
 method:"POST",
