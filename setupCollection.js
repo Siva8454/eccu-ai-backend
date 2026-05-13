@@ -1,36 +1,60 @@
 require("dotenv").config();
-const { QdrantClient } = require("@qdrant/js-client-rest");
 
-const client = new QdrantClient({
-  url: process.env.QDRANT_URL,
-  apiKey: process.env.QDRANT_API_KEY
-});
+const axios = require("axios");
+
+async function createCollection(name) {
+
+  try {
+
+    await axios.put(
+      `${process.env.QDRANT_URL}/collections/${name}`,
+      {
+        vectors: {
+          size: 768,
+          distance: "Cosine"
+        }
+      },
+      {
+        headers: {
+          "api-key": process.env.QDRANT_API_KEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log(`✅ ${name} created`);
+
+  } catch (err) {
+
+    if (
+      err.response?.data?.status?.error
+        ?.includes("already exists")
+    ) {
+
+      console.log(
+        `✅ ${name} already exists`
+      );
+
+    } else {
+
+      console.error(err.response?.data || err.message);
+
+    }
+
+  }
+
+}
 
 async function setup() {
 
-  const collections = await client.getCollections();
-
-  const exists = collections.collections.find(
-    c => c.name === "eccu_knowledge"
+  await createCollection(
+    "eccu_knowledge"
   );
 
-  if (exists) {
-    console.log("Collection already exists");
-    return;
-  }
+  await createCollection(
+    "trusted_cyber_knowledge"
+  );
 
-  await client.createCollection("eccu_knowledge", {
-  vectors: {
-    size: 768,
-    distance: "Cosine"
-  },
-
-  optimizers_config: {
-    indexing_threshold: 0
-  }
-});
-
-  console.log("Collection created");
 }
 
 setup();

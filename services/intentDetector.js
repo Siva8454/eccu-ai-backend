@@ -27,6 +27,20 @@ function detectIntent(question) {
     return "restricted";
   }
 
+   /* -------------------------------------------------- */
+  /* 🧪 EXERCISE GENERATION */
+  /* -------------------------------------------------- */
+
+  if (
+    q.includes("exercise") ||
+    q.includes("hands-on") ||
+    q.includes("practice") ||
+    q.includes("lab activity") ||
+    q.includes("practical")
+  ) {
+    return "exercise_generation";
+  }
+
   /* -------------------------------------------------- */
   /* 📘 COURSE INTENTS */
   /* -------------------------------------------------- */

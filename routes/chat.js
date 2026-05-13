@@ -7,17 +7,48 @@ const { vectorSearch } = require("../services/vectorSearch");
 const { generateAnswer } = require("../services/localLLM");
 const { fetchUserEnrollments } = require("../services/canvasFetcher");
 const { saveQA, searchLearned } = require("../services/learningService");
+const {
+  trustedWebSearch
+} = require("../services/trustedWebSearch");
 const { detectIntent } = require("../services/intentDetector");
+const {
+  saveMemory,
+  getMemory
+} = require("../services/memoryStore");
 
 router.post("/", async (req, res) => {
   try {
-    const { message, currentPage } = req.body;
+    const {
+  message,
+  currentPage,
+  lastAnswer
+} = req.body;
 
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
 
     console.log("💬 Student question:", message);
+
+    /* -------------------------------------------------- */
+/* 🧠 MEMORY USER */
+/* -------------------------------------------------- */
+
+const userId = "default-user";
+
+/* -------------------------------------------------- */
+/* 🧠 LOAD MEMORY */
+/* -------------------------------------------------- */
+
+const memory = getMemory(userId);
+
+const previousQuestion =
+  memory?.previousQuestion || "";
+
+const previousMemoryAnswer =
+  memory?.lastAnswer || "";
+
+console.log("🧠 Previous question:", previousQuestion);
 
     /* ---------- LEARNED KNOWLEDGE ---------- */
 
@@ -112,6 +143,10 @@ const ragResult = await vectorSearch(
   currentPage   // ⭐ PASS THIS
 );
 
+/* TRUSTED ONLINE SEARCH */
+const webResources =
+  await trustedWebSearch(message);
+
 /* ---------- FALLBACK HANDLING ---------- */
 
 const supportKeywords = [
@@ -123,7 +158,10 @@ const supportKeywords = [
   "popup",
   "login",
   "access",
-  "not opening"
+  "not opening",
+  "error",
+  "issue",
+  "problem"
 ];
 
 const isSupportQuery = supportKeywords.some(k =>
@@ -155,9 +193,24 @@ if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
 
 /* ---------- GENERATE AI ANSWER ---------- */
 
+const webContext = webResources
+  .map(r =>
+    `${r.title}\n${r.content}\n${r.url}`
+  )
+  .join("\n\n");
+
+const finalContext = `
+ECCU CONTENT:
+${ragResult.context}
+
+TRUSTED ONLINE RESOURCES:
+${webContext}
+`;
+
 const finalAnswer = await generateAnswer(
   message,
-  ragResult.context
+  finalContext,
+  intent
 );
 
 /* ---------- AUTO LEARNING ---------- */
