@@ -12,8 +12,8 @@ const {
 } = require("../services/trustedWebSearch");
 const { detectIntent } = require("../services/intentDetector");
 const {
-  saveMemory,
-  getMemory
+  getMemory,
+  saveMemory
 } = require("../services/memoryStore");
 
 router.post("/", async (req, res) => {
@@ -34,7 +34,8 @@ router.post("/", async (req, res) => {
 /* 🧠 MEMORY USER */
 /* -------------------------------------------------- */
 
-const userId = "default-user";
+const userId =
+  req.body.userId || "default-user";
 
 /* -------------------------------------------------- */
 /* 🧠 LOAD MEMORY */
