@@ -5,76 +5,64 @@ async function trustedWebSearch(query) {
   try {
 
     const response = await axios.post(
-      "https://api.groq.com/openai/v1/chat/completions",
+      "https://api.tavily.com/search",
       {
-        model: "llama-3.3-70b-versatile",
+        api_key: process.env.TAVILY_API_KEY,
 
-        messages: [
-          {
-            role: "system",
-            content:
-              `
-You are a cybersecurity academic assistant.
+        query: `
+${query}
 
-Provide ONLY trusted supplementary learning resources.
+Find cybersecurity educational resources.
 
-STRICT RULES:
-- Include only trusted cybersecurity sources.
-- NEVER include competitor universities.
-- NEVER include dark web content.
-- NEVER include suspicious blogs.
-- NEVER include piracy or illegal content.
+PRIORITY:
+1. eccu.edu
+2. owasp.org
+3. nist.gov
+4. cisa.gov
 
-ALLOWED SOURCES:
-- OWASP
-- NIST
-- Microsoft Learn
-- IBM
-- Cisco
-- Cloudflare
-- MITRE
-- EC-Council
-- CISA
-- Mozilla Developer Docs
-- PortSwigger
+Return direct topic-specific pages only.
+Avoid homepage links.
+`,
 
-Format:
-1. Resource Name
-2. Short description
-3. URL
-`
-          },
+        search_depth: "advanced",
 
-          {
-            role: "user",
-            content: query
-          }
-        ],
+        include_answer: false,
 
-        temperature: 0.3
-      },
+        max_results: 5,
 
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json"
-        }
+        include_domains: [
+          "eccu.edu",
+          "owasp.org",
+          "nist.gov",
+          "cisa.gov"
+        ]
       }
     );
 
-    return response.data.choices[0].message.content;
+    const results = response.data.results || [];
+
+    if (!results.length) {
+      return "No trusted resources found.";
+    }
+
+    return results
+      .map((r, index) => {
+        return `
+${index + 1}. ${r.title}
+${r.url}
+`;
+      })
+      .join("\n");
 
   } catch (err) {
 
     console.error(
-      "Trusted search error:",
+      "Tavily search error:",
       err.response?.data || err.message
     );
 
-    return "";
-
+    return "No trusted resources found.";
   }
-
 }
 
 module.exports = {
