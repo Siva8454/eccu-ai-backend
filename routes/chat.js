@@ -198,9 +198,6 @@ const webResources =
 const finalContext = `
 ECCU CONTENT:
 ${ragResult.context}
-
-TRUSTED ONLINE RESOURCES:
-${webResources}
 `;
 
 const finalAnswer = await generateAnswer(
@@ -208,6 +205,20 @@ const finalAnswer = await generateAnswer(
   finalContext,
   intent
 );
+
+const resourcesText = webResources
+  .map((r, i) => `
+${i + 1}. ${r.title}
+${r.url}
+`)
+  .join("\n");
+
+const completeResponse = `
+${finalAnswer}
+
+Trusted Resources:
+${resourcesText}
+`;
 
 /* ---------- AUTO LEARNING ---------- */
 
@@ -219,9 +230,8 @@ if (finalAnswer && finalAnswer.length > 50 && ragResult.confidence > 0.5) {
 /* ---------- RESPONSE ---------- */
 
 return res.json({
-  source: "rag+groq",
-  reply: finalAnswer,
-  confidence: ragResult.confidence
+  source: "rag+liveweb",
+  reply: completeResponse,
 });
 
     /* -------------------------------------------------- */

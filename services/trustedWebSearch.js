@@ -45,14 +45,16 @@ Avoid homepage links.
       return "No trusted resources found.";
     }
 
-    return results
-      .map((r, index) => {
-        return `
-${index + 1}. ${r.title}
-${r.url}
-`;
-      })
-      .join("\n");
+    const filtered = results.filter(r =>
+  r.url &&
+  !r.url.includes("404") &&
+  !r.url.includes("error")
+);
+
+    return filtered.map(r => ({
+  title: r.title,
+  url: r.url
+}));
 
   } catch (err) {
 
