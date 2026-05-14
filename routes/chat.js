@@ -206,19 +206,36 @@ const finalAnswer = await generateAnswer(
   intent
 );
 
-const resourcesText = webResources
-  .map((r, i) => `
+const shouldShowResources =
+  intent === "general" &&
+  !finalAnswer.toLowerCase().includes("cannot provide") &&
+  webResources &&
+  webResources.length > 0;
+
+  let completeResponse = finalAnswer;
+
+if (shouldShowResources) {
+
+  const resourcesText = webResources
+    .map((r, i) => `
 • ${r.title}
 ${r.url}
 `)
-  .join("\n\n");
+    .join("\n\n");
 
-const completeResponse = `
-${finalAnswer}
+  completeResponse += `
 
 Trusted Resources:
 ${resourcesText}
 `;
+}
+
+return res.json({
+  source: "rag+liveweb",
+  reply: completeResponse
+});
+
+
 
 /* ---------- AUTO LEARNING ---------- */
 
