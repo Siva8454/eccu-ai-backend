@@ -372,6 +372,8 @@ try{
 
 const currentUserId = getCourseId() + "-student"; 
 
+const pageText = document.body.innerText.slice(0, 15000);
+
 const res = await fetch("https://eccu-ai-backend.onrender.com/chat", {
 
 method:"POST",

@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
     const {
   message,
   currentPage,
+  pageText,
   lastAnswer
 } = req.body;
 
@@ -196,6 +197,9 @@ const webResources =
   await trustedWebSearch(message);
 
 const finalContext = `
+CURRENT CANVAS PAGE CONTENT:
+${pageText}
+
 ECCU CONTENT:
 ${ragResult.context}
 `;
