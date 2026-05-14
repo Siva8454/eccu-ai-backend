@@ -87,19 +87,18 @@ let conversationHistory = []
 
 function formatLinks(text) {
 
-  // Convert Module references into links
-  const courseId = getCourseId()
-
+  // remove angle brackets around URLs
   text = text.replace(
-    /Module\s*(\d+)\s*Content/gi,
-    (match, num) => {
-      if (!courseId) return match
+    /<(https?:\/\/[^>]+)>/g,
+    '$1'
+  );
 
-      const url = `https://eccouncil.instructure.com/courses/${courseId}/pages/module-${num.padStart(2, '0')}-content`
-
-      return `<a href="${url}" target="_blank">${match}</a>`
-    }
-  )
+  // convert URLs into clickable links
+  return text.replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<a href="$1" target="_blank">$1</a>'
+  );
+}
 
   // Convert normal URLs
   text = text.replace(

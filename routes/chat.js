@@ -208,10 +208,10 @@ const finalAnswer = await generateAnswer(
 
 const resourcesText = webResources
   .map((r, i) => `
-${i + 1}. ${r.title}
+• ${r.title}
 ${r.url}
 `)
-  .join("\n");
+  .join("\n\n");
 
 const completeResponse = `
 ${finalAnswer}
