@@ -18,7 +18,7 @@ async function buildCanvasCache() {
   const courses = await fetchCourses();
 
   for (const course of courses) {
-    const courseId = course.id;
+    const courseId = Number(course.id);
     const courseName = course.name;
 
     console.log(`📘 Processing: ${courseName} (${courseId})`);

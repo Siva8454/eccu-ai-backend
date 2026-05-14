@@ -13,22 +13,22 @@ async function createIndexes() {
 
   console.log("Creating payload indexes...");
 
-  await client.createPayloadIndex(COLLECTION, {
+  await client.createFieldIndex(COLLECTION, {
     field_name: "courseId",
     field_schema: "integer"
   });
 
-  await client.createPayloadIndex(COLLECTION, {
+  await client.createFieldIndex(COLLECTION, {
     field_name: "moduleNumber",
     field_schema: "integer"
   });
 
-  await client.createPayloadIndex(COLLECTION, {
+  await client.createFieldIndex(COLLECTION, {
     field_name: "courseName",
     field_schema: "keyword"
   });
 
-  await client.createPayloadIndex(COLLECTION, {
+  await client.createFieldIndex(COLLECTION, {
     field_name: "type",
     field_schema: "keyword"
   });

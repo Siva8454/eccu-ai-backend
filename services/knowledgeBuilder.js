@@ -154,7 +154,7 @@ async function buildKnowledgeStore(canvasData) {
 
   for (const course of canvasData || []) {
 
-    const courseId = course.id;
+    const courseId = Number(course.id);
 
     console.log(`📘 Course: ${course.name}`);
 
