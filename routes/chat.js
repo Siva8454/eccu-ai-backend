@@ -144,9 +144,7 @@ const ragResult = await vectorSearch(
   currentPage   // ⭐ PASS THIS
 );
 
-/* TRUSTED ONLINE SEARCH */
-const webResources =
-  await trustedWebSearch(message);
+
 
 /* ---------- FALLBACK HANDLING ---------- */
 
