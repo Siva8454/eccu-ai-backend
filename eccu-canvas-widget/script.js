@@ -94,21 +94,15 @@ function formatLinks(text) {
   );
 
   // convert URLs into clickable links
-  return text.replace(
-    /(https?:\/\/[^\s]+)/g,
-    '<a href="$1" target="_blank">$1</a>'
-  );
-}
-
-  // Convert normal URLs
   text = text.replace(
     /(https?:\/\/[^\s<]+)/g,
     '<a href="$1" target="_blank">$1</a>'
-  )
+  );
 
-  text = text.replace(/\n/g, "<br>")
+  // preserve line breaks
+  text = text.replace(/\n/g, "<br>");
 
-  return text
+  return text;
 }
 
 /* ---------- SCROLL MESSAGE TOP ---------- */
@@ -384,6 +378,7 @@ body: JSON.stringify({
   history: conversationHistory.slice(-6),
   courseId: getCourseId(),
   currentPage: window.location.pathname,
+  pageText,
   userId: currentUserId
 })
 
