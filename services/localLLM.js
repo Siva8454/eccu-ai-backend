@@ -34,10 +34,6 @@ Instructions:
 
 4. Do NOT invent information
 
-5. When giving security examples, clearly label placeholder URLs as illustrative examples only
-- Do not present example.com links as real vulnerable websites
-- Prefer pseudocode or sample endpoint patterns instead of fake live URLs
-
 Make the answer clear, structured, and student-friendly.
 `;
 
