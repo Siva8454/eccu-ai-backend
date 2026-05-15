@@ -222,10 +222,13 @@ const webResources =
   await trustedWebSearch(message);
 
 const finalContext = `
-CURRENT CANVAS PAGE CONTENT:
-${pageText}
+CURRENT CANVAS PAGE:
+${pageText || "No page content available"}
 
-ECCU CONTENT:
+CURRENT PAGE URL:
+${currentPage || "Unknown"}
+
+ECCU COURSE CONTENT:
 ${ragResult.context}
 `;
 

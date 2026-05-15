@@ -252,13 +252,15 @@ if (context.pageTitle?.toLowerCase().includes("syllabus")) {
   displayText = "the Syllabus page 📘";
 }
 else if (context.pageTitle?.toLowerCase().includes("discussion")) {
-  displayText = "a Discussion page 💬";
+  displayText = `${context.pageTitle || "Discussion"} 💬`;
 }
+
 else if (context.pageTitle?.toLowerCase().includes("assignment")) {
-  displayText = "an Assignment page 📝";
+  displayText = `${context.pageTitle || "Assignment"} 📝`;
 }
+
 else if (context.pageTitle?.toLowerCase().includes("quiz")) {
-  displayText = "a Quiz page 🧠";
+  displayText = `${context.pageTitle || "Quiz"} 🧠`;
 }
 else {
   displayText =
