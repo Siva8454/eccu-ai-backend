@@ -3,7 +3,7 @@ function detectIntent(question) {
   const q = question.toLowerCase();
 
   /* -------------------------------------------------- */
-  /* 🚫 RESTRICTED / CHEATING DETECTION (HIGHEST PRIORITY) */
+  /* 🚫 RESTRICTED */
   /* -------------------------------------------------- */
 
   const restrictedKeywords = [
@@ -13,13 +13,10 @@ function detectIntent(question) {
     "midterm",
     "final exam",
     "give me answers",
-    "answers for exam",
     "correct answers",
     "cheat",
-    "cheating",
     "answer key",
     "solve exam",
-    "solve test",
     "mcq answers"
   ];
 
@@ -27,47 +24,46 @@ function detectIntent(question) {
     return "restricted";
   }
 
-   /* -------------------------------------------------- */
+  /* -------------------------------------------------- */
+  /* 🛠️ TECHNICAL SUPPORT */
+  /* -------------------------------------------------- */
+
+  const supportKeywords = [
+    "cannot login",
+    "can't login",
+    "login issue",
+    "access issue",
+    "not loading",
+    "page not loading",
+    "canvas issue",
+    "ebook issue",
+    "lab not working",
+    "unable to access",
+    "technical issue",
+    "system error",
+    "website issue",
+    "popup blocked",
+    "download problem"
+  ];
+
+  if (supportKeywords.some(k => q.includes(k))) {
+    return "support";
+  }
+
+  /* -------------------------------------------------- */
   /* 🧪 EXERCISE GENERATION */
   /* -------------------------------------------------- */
 
   if (
     q.includes("exercise") ||
     q.includes("hands-on") ||
-    q.includes("practice") ||
-    q.includes("lab activity") ||
-    q.includes("practical")
+    q.includes("practice questions")
   ) {
     return "exercise_generation";
   }
 
   /* -------------------------------------------------- */
-  /* 📘 COURSE INTENTS */
-  /* -------------------------------------------------- */
-
-  if (q.includes("module")) {
-    return "module";
-  }
-
-  if (q.includes("assignment")) {
-    return "assignment";
-  }
-
-  if (
-    q.includes("file") ||
-    q.includes("document") ||
-    q.includes("pdf") ||
-    q.includes("lab")
-  ) {
-    return "file";
-  }
-
-  if (q.includes("discussion")) {
-    return "discussion";
-  }
-
-  /* -------------------------------------------------- */
-  /* 🔹 DEFAULT */
+  /* 📘 EVERYTHING EDUCATIONAL */
   /* -------------------------------------------------- */
 
   return "general";
