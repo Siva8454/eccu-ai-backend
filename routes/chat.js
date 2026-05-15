@@ -181,6 +181,13 @@ USER QUESTION:
 ${message}
 `;
 
+const ragResult = await vectorSearch(
+  contextualMessage,
+  allowedCourseIds,
+  intent,
+  currentPage
+);
+
 console.log("📚 RAG RESULT:", ragResult);
 
 if (fullPageText && fullPageText.length > 500) {
