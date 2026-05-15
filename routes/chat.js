@@ -21,7 +21,6 @@ router.post("/", async (req, res) => {
     const {
   message,
   currentPage,
-  pageTitle,
   pageText,
   lastAnswer
 } = req.body;
