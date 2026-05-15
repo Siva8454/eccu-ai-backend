@@ -92,7 +92,7 @@ console.log("Filtered results:", results.length);
     if (
       currentPage &&
       p.pageUrl &&
-      currentPage.includes(p.pageUrl)
+      (currentPage?.url || "").includes(p.pageUrl)
     ) {
       score += 0.4;
     }
