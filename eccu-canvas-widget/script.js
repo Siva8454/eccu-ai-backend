@@ -384,7 +384,14 @@ try{
 
 const currentUserId = getCourseId() + "-student"; 
 
-const pageText = document.body.innerText.slice(0, 15000);
+const mainContent =
+  document.querySelector("#content") ||
+  document.querySelector(".discussion-topic") ||
+  document.querySelector(".assignment") ||
+  document.querySelector(".quiz") ||
+  document.body;
+
+const pageText = mainContent.innerText.slice(0, 25000);
 
 const currentPage = {
   url: window.location.href,
@@ -403,6 +410,7 @@ body: JSON.stringify({
   courseId: getCourseId(),
   currentPage: {
   url: window.location.href,
+  pageTitle: document.title,
   title: document.title,
   text: pageText
 },

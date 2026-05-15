@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
     const {
   message,
   currentPage,
+  pageTitle,
   pageText,
   lastAnswer
 } = req.body;
@@ -163,8 +164,26 @@ if (
 /* Vector Search (RAG) */
 /* ------------------------------------ */
 
+console.log("📄 PAGE TITLE:", pageTitle);
+console.log("🔗 PAGE URL:", pageUrl);
+console.log("📚 PAGE TEXT SAMPLE:", fullPageText.slice(0, 1000));
+
+const contextualMessage = `
+CURRENT PAGE TITLE:
+${pageTitle}
+
+CURRENT PAGE URL:
+${pageUrl}
+
+CURRENT PAGE CONTENT:
+${fullPageText}
+
+USER QUESTION:
+${message}
+`;
+
 const ragResult = await vectorSearch(
-  message,
+  contextualMessage,
   allowedCourseIds,
   intent,
   currentPage   // ⭐ PASS THIS
