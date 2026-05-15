@@ -358,17 +358,16 @@ ${moduleLink ? `\nGo to Modules: ${moduleLink}` : ""}`,
 
 /* SUPPORT QUICK RESPONSES */
 
-if(text.includes("ebook") || text.includes("popup")){
+if (
+   text.includes("ebook not opening") ||
+   text.includes("cannot open ebook") ||
+   text.includes("popup blocked")
+){
 
 addMessage("Please enable pop-ups in your browser for ECCU.", "bot-msg")
 return
 }
 
-if(text.includes("lab")){
-
-addMessage("Try refreshing Canvas and enabling pop-ups. Contact support if issue persists.", "bot-msg")
-return
-}
 
 /* LOADING */
 
