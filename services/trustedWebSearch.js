@@ -31,11 +31,14 @@ Avoid homepage links.
         max_results: 5,
 
         include_domains: [
-          "eccu.edu",
-          "owasp.org",
-          "nist.gov",
-          "cisa.gov"
-        ]
+  "eccu.edu",
+  "owasp.org",
+  "nist.gov",
+  "cisa.gov",
+  "portswigger.net",
+  "sans.org",
+  "tryhackme.com"
+]
       }
     );
 
@@ -45,11 +48,28 @@ Avoid homepage links.
       return "No trusted resources found.";
     }
 
-    const filtered = results.filter(r =>
-  r.url &&
-  !r.url.includes("404") &&
-  !r.url.includes("error")
-);
+    const filtered = results.filter(r => {
+
+  const title = (r.title || "").toLowerCase();
+  const url = (r.url || "").toLowerCase();
+
+  return (
+    r.url &&
+    r.title &&
+
+    !url.includes("404") &&
+    !url.includes("error") &&
+    !url.includes("/search") &&
+    !url.includes("/tag/") &&
+    !url.includes("/category/") &&
+
+    !title.includes("page not found") &&
+    !title.includes("not found") &&
+    !title.includes("access denied") &&
+    !title.includes("homepage") &&
+    !title.includes("home page")
+  );
+});
 
     return filtered.map(r => ({
   title: r.title,

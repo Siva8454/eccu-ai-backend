@@ -59,6 +59,11 @@ STRICT RULES:
 - Do NOT generate unsupported claims.
 - Do NOT hallucinate.
 
+IMPORTANT:
+Only use URLs explicitly provided in WEB SEARCH RESULTS.
+Never invent, guess, or generate URLs.
+If no verified URL exists, mention the resource without a hyperlink.
+
 CURRENT CANVAS PAGE RULES:
 
 - The CURRENT CANVAS PAGE contains live content from the student's current Canvas page.
