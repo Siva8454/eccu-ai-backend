@@ -202,10 +202,35 @@ ${pageTitle}
 PAGE CONTENT:
 ${fullPageText.slice(0, 12000)}
 `;
-}
+
+  try {
+
+    const webResources = await trustedWebSearch(message);
+
+    combinedContext += `
+WEB SEARCH RESULTS:
+${JSON.stringify(webResources, null, 2)}
+`;
+
+    const pageReply = await generateAnswer(
+      message,
+      combinedContext
+    );
 
     console.log("🧠 PAGE REPLY:", pageReply);
 
+    if (
+      pageReply &&
+      typeof pageReply === "string" &&
+      pageReply.trim().length > 20
+    ) {
+
+      return res.json({
+        source: "page-context",
+        reply: pageReply
+      });
+
+    }
 
     console.log("⚠️ Empty page reply — falling back to RAG");
 
@@ -264,7 +289,7 @@ const webResources =
   combinedContext += `
 
 WEB SEARCH RESULTS:
-${JSON.stringify(webResults, null, 2)}
+${JSON.stringify(webResources, null, 2)}
 `;
 
 const finalContext = `
@@ -310,10 +335,7 @@ ${resourcesText}
 `;
 }
 
-return res.json({
-  source: "rag+liveweb",
-  reply: completeResponse
-});
+
 
 
 
