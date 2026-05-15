@@ -44,6 +44,9 @@ async function vectorSearch(
   console.log("🔎 Vector search:", question);
   console.log("📄 Current Page:", currentPage);
 
+  console.log("📄 VECTOR INPUT SAMPLE:");
+console.log(question.slice(0, 3000));
+
   const embedding = await getLocalEmbedding(question);
 
   /* ---------------- BASE FILTER ---------------- */
