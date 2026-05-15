@@ -246,12 +246,28 @@ chat.style.display = "flex"
 
 if(!chatBody.hasChildNodes()){
 
-const displayText =
-  context.isHomePage
-    ? context.courseName
-    : context.pageTitle || context.courseName || "this page";
+let displayText = "this page";
 
-  addMessage(`Hi 👋 You're in ${displayText}`, "bot-msg");
+if (context.pageTitle?.toLowerCase().includes("syllabus")) {
+  displayText = "the Syllabus page 📘";
+}
+else if (context.pageTitle?.toLowerCase().includes("discussion")) {
+  displayText = "a Discussion page 💬";
+}
+else if (context.pageTitle?.toLowerCase().includes("assignment")) {
+  displayText = "an Assignment page 📝";
+}
+else if (context.pageTitle?.toLowerCase().includes("quiz")) {
+  displayText = "a Quiz page 🧠";
+}
+else {
+  displayText =
+    context.pageTitle ||
+    context.courseName ||
+    "this page";
+}
+
+  addMessage(`Hi 👋 You're on ${displayText}`, "bot-msg");
 
 addMessage("What do you need help with today?", "bot-msg")
 
@@ -368,6 +384,12 @@ const currentUserId = getCourseId() + "-student";
 
 const pageText = document.body.innerText.slice(0, 15000);
 
+const currentPage = {
+  url: window.location.href,
+  title: document.title,
+  text: pageText
+};
+
 const res = await fetch("https://eccu-ai-backend.onrender.com/chat", {
 
 method:"POST",
@@ -377,7 +399,11 @@ body: JSON.stringify({
   message: msg,
   history: conversationHistory.slice(-6),
   courseId: getCourseId(),
-  currentPage: window.location.pathname,
+  currentPage: {
+  url: window.location.href,
+  title: document.title,
+  text: pageText
+},
   pageText,
   userId: currentUserId
 })

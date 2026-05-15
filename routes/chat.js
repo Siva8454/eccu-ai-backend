@@ -25,6 +25,19 @@ router.post("/", async (req, res) => {
   lastAnswer
 } = req.body;
 
+const pageUrl = currentPage?.url || "";
+const pageTitle = currentPage?.title || "";
+const fullPageText =
+  currentPage?.text || pageText || "";
+
+console.log("📄 Page Title:", pageTitle);
+console.log("🔗 Page URL:", pageUrl);
+
+const isSyllabusPage =
+  pageUrl.toLowerCase().includes("syllabus") ||
+  pageTitle.toLowerCase().includes("syllabus") ||
+  fullPageText.toLowerCase().includes("course syllabus");
+
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
@@ -132,6 +145,18 @@ if (intent === "restricted") {
   });
 }
 
+/* 📘 PAGE-AWARE SYLLABUS DETECTION */
+
+if (
+  isSyllabusPage &&
+  message.toLowerCase().includes("syllabus")
+) {
+  return res.json({
+    source: "page-aware",
+    reply:
+      "You are currently on the course syllabus page. Please click the View button in the syllabus section to access the syllabus document."
+  });
+}
 
 
     /* ------------------------------------ */
