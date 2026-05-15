@@ -181,27 +181,28 @@ USER QUESTION:
 ${message}
 `;
 
-const ragResult = await vectorSearch(
-  contextualMessage,
-  allowedCourseIds,
-  intent,
-  currentPage   // ⭐ PASS THIS
-);
-
 console.log("📚 RAG RESULT:", ragResult);
 
 if (fullPageText && fullPageText.length > 500) {
 
   console.log("✅ USING PAGE CONTEXT DIRECTLY");
 
-  const pageAwareReply = await generateAnswer({
-    question: message,
-    context: fullPageText.slice(0, 12000)
-  });
+  const pageReply = await generateAnswer(
+    message,
+    `
+PAGE TITLE:
+${pageTitle}
+
+PAGE CONTENT:
+${fullPageText.slice(0, 12000)}
+`
+  );
+
+  console.log("🧠 PAGE REPLY:", pageReply);
 
   return res.json({
     source: "page-context",
-    reply: pageAwareReply
+    reply: pageReply
   });
 }
 
