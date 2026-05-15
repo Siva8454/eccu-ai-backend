@@ -185,25 +185,43 @@ console.log("📚 RAG RESULT:", ragResult);
 
 if (fullPageText && fullPageText.length > 500) {
 
-  console.log("✅ USING PAGE CONTEXT DIRECTLY");
+  console.log("✅ TRYING PAGE CONTEXT");
 
-  const pageReply = await generateAnswer(
-    message,
-    `
+  try {
+
+    const pageReply = await generateAnswer(
+      message,
+      `
 PAGE TITLE:
 ${pageTitle}
 
 PAGE CONTENT:
 ${fullPageText.slice(0, 12000)}
 `
-  );
+    );
 
-  console.log("🧠 PAGE REPLY:", pageReply);
+    console.log("🧠 PAGE REPLY:", pageReply);
 
-  return res.json({
-    source: "page-context",
-    reply: pageReply
-  });
+    if (
+      pageReply &&
+      typeof pageReply === "string" &&
+      pageReply.trim().length > 20
+    ) {
+
+      return res.json({
+        source: "page-context",
+        reply: pageReply
+      });
+
+    }
+
+    console.log("⚠️ Empty page reply — falling back to RAG");
+
+  } catch (err) {
+
+    console.log("❌ PAGE CONTEXT ERROR:", err);
+
+  }
 }
 
 /* ---------- FALLBACK HANDLING ---------- */
