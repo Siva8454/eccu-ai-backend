@@ -189,38 +189,23 @@ const ragResult = await vectorSearch(
 );
 
 console.log("📚 RAG RESULT:", ragResult);
+let combinedContext = "";
 
 if (fullPageText && fullPageText.length > 500) {
 
   console.log("✅ TRYING PAGE CONTEXT");
 
-  try {
-
-    const pageReply = await generateAnswer(
-      message,
-      `
+  combinedContext += `
 PAGE TITLE:
 ${pageTitle}
 
 PAGE CONTENT:
 ${fullPageText.slice(0, 12000)}
-`
-    );
+`;
+}
 
     console.log("🧠 PAGE REPLY:", pageReply);
 
-    if (
-      pageReply &&
-      typeof pageReply === "string" &&
-      pageReply.trim().length > 20
-    ) {
-
-      return res.json({
-        source: "page-context",
-        reply: pageReply
-      });
-
-    }
 
     console.log("⚠️ Empty page reply — falling back to RAG");
 
@@ -276,15 +261,23 @@ if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
 const webResources =
   await trustedWebSearch(message);
 
+  combinedContext += `
+
+WEB SEARCH RESULTS:
+${JSON.stringify(webResults, null, 2)}
+`;
+
 const finalContext = `
+${combinedContext}
+
 CURRENT CANVAS PAGE:
 ${pageText || "No page content available"}
 
 CURRENT PAGE URL:
-${currentPage || "Unknown"}
+${currentPage?.url || "Unknown"}
 
 ECCU COURSE CONTENT:
-${ragResult.context}
+${ragResult?.context || ""}
 `;
 
 const finalAnswer = await generateAnswer(
