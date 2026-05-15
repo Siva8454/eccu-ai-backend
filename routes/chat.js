@@ -188,15 +188,26 @@ const ragResult = await vectorSearch(
   currentPage   // ⭐ PASS THIS
 );
 
+console.log("📚 RAG RESULT:", ragResult);
 
+if (fullPageText && fullPageText.length > 500) {
+
+  console.log("✅ USING PAGE CONTEXT DIRECTLY");
+
+  const pageAwareReply = await generateAnswer({
+    question: message,
+    context: fullPageText.slice(0, 12000)
+  });
+
+  return res.json({
+    source: "page-context",
+    reply: pageAwareReply
+  });
+}
 
 /* ---------- FALLBACK HANDLING ---------- */
 
 const supportKeywords = [
-  "lab",
-  "assignment",
-  "submit",
-  "submission",
   "ebook",
   "popup",
   "login",
