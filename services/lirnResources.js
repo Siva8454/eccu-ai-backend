@@ -1,24 +1,36 @@
 const LIBRARY_LINKS = {
 
+  // Main LIRN Portal
+  lirnHome:
+    "https://proxy.lirn.net/ECCouncilUniv?_rwpLaunch=true&groupID=2",
+
+  // GALE eBooks
   gale:
-    "https://proxy.lirn.net/login?url=https://go.gale.com/ps/start.do?p=GVRL",
+    "https://4b20baz4n-mp03-y-https-go-gale-com.proxy.lirn.net/ps/start.do?p=GVRL&u=lirn97850",
 
+  // ProQuest Ebook Central
   ebookCentral:
-    "https://proxy.lirn.net/login?url=https://ebookcentral.proquest.com",
+    "https://4b21mayz4-mp03-y-https-ebookcentral-proquest-com.proxy.lirn.net/lib/eccu/home.action",
 
+  // ProQuest Central
   proquestCentral:
-    "https://proxy.lirn.net/login?url=https://www.proquest.com"
+    "https://www.proquest.com/central/index?accountid=174310"
 
 };
 
 
 /* -------------------------------------------------- */
-/* 🔍 BUILD SEARCH LINKS */
+/* LIRN RESOURCE LIST */
 /* -------------------------------------------------- */
 
-function getLibraryResources(query = "") {
+function getLibraryResources() {
 
   return [
+
+    {
+      title: "Open LIRN Library Portal",
+      url: LIBRARY_LINKS.lirnHome
+    },
 
     {
       title: "GALE eBooks Cybersecurity Collection",
@@ -38,6 +50,12 @@ function getLibraryResources(query = "") {
   ];
 }
 
+
+/* -------------------------------------------------- */
+/* EXPORTS */
+/* -------------------------------------------------- */
+
 module.exports = {
+  LIBRARY_LINKS,
   getLibraryResources
 };
