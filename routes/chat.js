@@ -16,7 +16,7 @@ const {
   getMemory,
   saveMemory
 } = require("../services/memoryStore");
-const lirnResources = getLibraryResources(message);
+
 
 router.post("/", async (req, res) => {
   try {
@@ -285,6 +285,9 @@ if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
 
 /* ---------- GENERATE AI ANSWER ---------- */
 
+const lirnResources =
+getLibraryResources(message);
+
 const webResources =
   await trustedWebSearch(message);
 
@@ -321,7 +324,25 @@ const shouldShowResources =
 
   let completeResponse = finalAnswer;
 
-  /* -------------------------------------------------- */
+ 
+
+if (shouldShowResources) {
+
+  const resourcesText = webResources
+    .map((r, i) => `
+• ${r.title}
+${r.url}
+`)
+    .join("\n\n");
+
+  completeResponse += `
+
+Trusted Resources:
+${resourcesText}
+`;
+}
+
+ /* -------------------------------------------------- */
 /* 📚 LIRN LIBRARY RESOURCES */
 /* -------------------------------------------------- */
 
@@ -340,24 +361,6 @@ ${r.url}`
 `;
 
 }
-
-if (shouldShowResources) {
-
-  const resourcesText = webResources
-    .map((r, i) => `
-• ${r.title}
-${r.url}
-`)
-    .join("\n\n");
-
-  completeResponse += `
-
-Trusted Resources:
-${resourcesText}
-`;
-}
-
-
 
 
 
