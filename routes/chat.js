@@ -389,7 +389,7 @@ console.log("APPENDING LIRN RESOURCES");
 
   completeResponse += `
 
-LIRN LIBRARY RESOURCES:
+Search the following LIRN Library resources for more information on this topic:
 
 ${lirnResources.map(r =>
 `• ${r.title}
