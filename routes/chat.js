@@ -183,6 +183,10 @@ USER QUESTION:
 ${message}
 `;
 
+const lirnResources =
+getLibraryResources(message);
+console.log("LIRN RESOURCES:", JSON.stringify(lirnResources, null, 2));
+
 const ragResult = await vectorSearch(
   contextualMessage,
   allowedCourseIds,
@@ -227,10 +231,31 @@ ${JSON.stringify(webResources, null, 2)}
       pageReply.trim().length > 20
     ) {
 
-      return res.json({
-        source: "page-context",
-        reply: pageReply
-      });
+      let pageCompleteResponse = pageReply;
+
+/* LIRN RESOURCES */
+
+if (
+  intent === "general" &&
+  lirnResources &&
+  lirnResources.length > 0
+) {
+
+  pageCompleteResponse += `
+
+LIRN LIBRARY RESOURCES:
+
+${lirnResources.map(r =>
+`• ${r.title}
+${r.url}`
+).join("\n\n")}
+`;
+}
+
+return res.json({
+  source: "page-context",
+  reply: pageCompleteResponse
+});
 
     }
 
@@ -285,8 +310,7 @@ if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
 
 /* ---------- GENERATE AI ANSWER ---------- */
 
-const lirnResources =
-getLibraryResources(message);
+
 
 const webResources =
   await trustedWebSearch(message);
@@ -323,6 +347,8 @@ const shouldShowResources =
   webResources.length > 0;
 
   let completeResponse = finalAnswer;
+  console.log("BEFORE APPEND");
+console.log("LIRN LENGTH:", lirnResources.length);
 
  
 
@@ -346,9 +372,14 @@ ${resourcesText}
 /* 📚 LIRN LIBRARY RESOURCES */
 /* -------------------------------------------------- */
 
-console.log("📚 LIRN:", lirnResources);
 
-if (lirnResources && lirnResources.length > 0) {
+if (
+  intent === "general" &&
+  lirnResources &&
+  lirnResources.length > 0
+) {
+
+console.log("APPENDING LIRN RESOURCES");
 
   completeResponse += `
 

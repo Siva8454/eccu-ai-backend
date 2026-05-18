@@ -19,36 +19,36 @@ const LIBRARY_LINKS = {
 /* 🔍 BUILD SEARCH LINKS */
 /* -------------------------------------------------- */
 
-function getLibraryResources(query = "") {
+function getLibraryResources(query) {
 
-  const encodedQuery = encodeURIComponent(query);
+  const q = query.toLowerCase();
 
-  return [
+  const resources = [];
 
-    {
-      title: "Search GALE eBooks",
-      url: `${LIBRARY_LINKS.gale}&query=${encodedQuery}`
-    },
+  if (
+    q.includes("xss") ||
+    q.includes("cross site scripting")
+  ) {
 
-    {
-      title: "Search ProQuest Ebook Central",
-      url: `${LIBRARY_LINKS.ebookCentral}?query=${encodedQuery}`
-    },
+    resources.push({
+      title: "OWASP XSS Guide (LIRN Recommended)",
+      url: "https://owasp.org/www-community/attacks/xss/"
+    });
 
-    {
-      title: "Search ProQuest Central",
-      url: `${LIBRARY_LINKS.proquestCentral}?query=${encodedQuery}`
-    }
+    resources.push({
+      title: "Gale eBooks Cybersecurity Collection",
+      url: "https://4b20baya-mp03-y-https-go-gale-com.proxy.lirn.net/ps/start.do?p=GVRL&u=lirn97850"
+    });
 
-  ];
+    resources.push({
+      title: "ProQuest Ebook Central",
+      url: "https://4b21mayz4-mp03-y-https-ebookcentral-proquest-com.proxy.lirn.net/lib/eccu/home.action"
+    });
+  }
+
+  return resources;
 }
 
-
-/* -------------------------------------------------- */
-/* EXPORTS */
-/* -------------------------------------------------- */
-
 module.exports = {
-  LIBRARY_LINKS,
   getLibraryResources
 };
