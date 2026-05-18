@@ -355,15 +355,21 @@ console.log("LIRN LENGTH:", lirnResources.length);
 if (shouldShowResources) {
 
   const resourcesText = webResources
-    .map((r, i) => `
+    .map((r) => `
 • ${r.title}
 ${r.url}
 `)
     .join("\n\n");
 
+  /* REMOVE AI-GENERATED REFERENCES */
+  completeResponse = completeResponse.replace(
+    /References:[\s\S]*?(?=LIRN LIBRARY RESOURCES:|$)/i,
+    ""
+  );
+
   completeResponse += `
 
-Trusted Resources:
+REFERENCES:
 ${resourcesText}
 `;
 }
