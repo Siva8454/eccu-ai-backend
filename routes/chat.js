@@ -7,6 +7,7 @@ const { vectorSearch } = require("../services/vectorSearch");
 const { generateAnswer } = require("../services/localLLM");
 const { fetchUserEnrollments } = require("../services/canvasFetcher");
 const { saveQA, searchLearned } = require("../services/learningService");
+const { getLibraryResources } = require("../services/lirnResources");
 const {
   trustedWebSearch
 } = require("../services/trustedWebSearch");
@@ -15,6 +16,7 @@ const {
   getMemory,
   saveMemory
 } = require("../services/memoryStore");
+const lirnResources = getLIRNResources(message);
 
 router.post("/", async (req, res) => {
   try {
@@ -318,6 +320,26 @@ const shouldShowResources =
   webResources.length > 0;
 
   let completeResponse = finalAnswer;
+
+  /* -------------------------------------------------- */
+/* 📚 LIRN LIBRARY RESOURCES */
+/* -------------------------------------------------- */
+
+console.log("📚 LIRN:", lirnResources);
+
+if (lirnResources && lirnResources.length > 0) {
+
+  completeResponse += `
+
+LIRN LIBRARY RESOURCES:
+
+${lirnResources.map(r =>
+`• ${r.title}
+${r.url}`
+).join("\n\n")}
+`;
+
+}
 
 if (shouldShowResources) {
 
