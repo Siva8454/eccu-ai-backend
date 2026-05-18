@@ -243,7 +243,7 @@ if (
 
   pageCompleteResponse += `
 
-LIRN LIBRARY RESOURCES:
+Search the following LIRN Library resources for more information on this topic:
 
 ${lirnResources.map(r =>
 `• ${r.title}
@@ -363,7 +363,7 @@ ${r.url}
 
   /* REMOVE AI-GENERATED REFERENCES */
   completeResponse = completeResponse.replace(
-    /References:[\s\S]*?(?=LIRN LIBRARY RESOURCES:|$)/i,
+    /References:[\s\S]*?(?=Search the following LIRN Library resources for more information on this topic:|$)/i,
     ""
   );
 
