@@ -16,7 +16,7 @@ const {
   getMemory,
   saveMemory
 } = require("../services/memoryStore");
-const lirnResources = getLIRNResources(message);
+const lirnResources = getLibraryResources(message);
 
 router.post("/", async (req, res) => {
   try {
