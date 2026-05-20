@@ -375,9 +375,11 @@ if (shouldSearch) {
 }
 
   combinedContext += `
+VERIFIED EDUCATIONAL RESOURCES:
 
-WEB SEARCH RESULTS:
-${JSON.stringify(webResources, null, 2)}
+${webResources.map(r =>
+`TITLE: ${r.title}`
+).join("\n")}
 `;
 
 const finalContext = `
@@ -414,23 +416,32 @@ console.log("LIRN LENGTH:", lirnResources.length);
 if (shouldShowResources) {
 
   const resourcesText = webResources
-   .map((r) => `
-• [${r.title}](${r.url})
-`)
-    .join("\n\n");
+  .map((r) =>
+`• ${r.title}
+${r.url}`
+  )
+  .join("\n\n");
 
   /* REMOVE AI-GENERATED REFERENCES */
   completeResponse = completeResponse.replace(
 
-/(References|Additional Resources|Course Reference|Online Resources|Further Reading|Resources)\s*:?\s*[\s\S]*?(?=Search the following LIRN Library resources for more information on this topic:|$)/gi,
+/(references|additional resources|course reference|online resources|further reading|resources|citations)\s*:?\s*[\s\S]*$/i,
 
 ""
 
 );
 
+/* REMOVE BROKEN MARKDOWN LINKS */
+
+completeResponse = completeResponse
+  .replace(/\]\((https?:\/\/.*?)\)/g, "")
+  .replace(/\[(https?:\/\/.*?)\]/g, "$1");
+
+
   completeResponse += `
 
-REFERENCES:
+Verified Learning Resources:
+
 ${resourcesText}
 `;
 }

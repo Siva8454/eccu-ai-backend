@@ -65,25 +65,17 @@ STRICT RULES:
 - NEVER mention CompTIA, Udemy, Coursera, or unrelated training providers.
 - NEVER provide broken or guessed links.
 
-IMPORTANT URL RULES:
-- ONLY use URLs explicitly provided in WEB SEARCH RESULTS.
-- If no verified URL exists:
-  → mention the resource WITHOUT a hyperlink.
-- NEVER create or guess URLs manually.
-- NEVER generate homepage URLs unless they are directly relevant.
-- ONLY include topic-specific trusted resources.
+CRITICAL RULES:
 
-REFERENCE RULES:
-DO NOT generate:
-- references
-- citations
-- external links
-- additional resources
-- source URLs
-- further reading sections
-- certification resource sections
+- NEVER generate URLs
+- NEVER generate hyperlinks
+- NEVER generate markdown links
+- NEVER generate References sections
+- NEVER generate citations
+- NEVER generate Additional Resources sections
+- NEVER mention websites
 
-These will be appended separately by the system.
+The backend system will automatically append verified educational resources separately.
 
 CURRENT CANVAS PAGE RULES:
 
