@@ -1,24 +1,104 @@
 const axios = require("axios");
 
+const {
+  search
+} = require("duck-duck-scrape");
+
 async function trustedWebSearch(query) {
 
   try {
 
+    /* ===================================== */
+    /* DUCKDUCKGO SEARCH */
+    /* ===================================== */
+
+    const ddgResults = await search(query, {
+
+      safeSearch: false
+
+    });
+
+    const trustedDomains = [
+
+      "eccu.edu",
+      "owasp.org",
+      "nist.gov",
+      "cisa.gov",
+      "portswigger.net",
+      "sans.org",
+      "tryhackme.com"
+
+    ];
+
+    const filtered = (ddgResults.results || [])
+
+      .filter(r => {
+
+        const url =
+          (r.url || "").toLowerCase();
+
+        const title =
+          (r.title || "").toLowerCase();
+
+        return (
+
+          trustedDomains.some(domain =>
+            url.includes(domain)
+          ) &&
+
+          !url.includes("404") &&
+          !url.includes("/search") &&
+          !url.includes("/tag/") &&
+          !url.includes("/category/") &&
+
+          !title.includes("not found") &&
+          !title.includes("access denied")
+
+        );
+
+      })
+
+      .slice(0, 5)
+
+      .map(r => ({
+
+        title: r.title,
+        url: r.url
+
+      }));
+
+
+    /* ===================================== */
+    /* RETURN DDG RESULTS */
+    /* ===================================== */
+
+    if (filtered.length > 0) {
+
+      return filtered;
+    }
+
+
+    /* ===================================== */
+    /* TAVILY FALLBACK */
+    /* ===================================== */
+
+    console.log(
+      "DDG failed. Using Tavily fallback..."
+    );
+
     const response = await axios.post(
+
       "https://api.tavily.com/search",
+
       {
-        api_key: process.env.TAVILY_API_KEY,
+
+        api_key:
+          process.env.TAVILY_API_KEY,
 
         query: `
 ${query}
 
 Find cybersecurity educational resources.
-
-PRIORITY:
-1. eccu.edu
-2. owasp.org
-3. nist.gov
-4. cisa.gov
 
 Return direct topic-specific pages only.
 Avoid homepage links.
@@ -30,60 +110,32 @@ Avoid homepage links.
 
         max_results: 5,
 
-        include_domains: [
-  "eccu.edu",
-  "owasp.org",
-  "nist.gov",
-  "cisa.gov",
-  "portswigger.net",
-  "sans.org",
-  "tryhackme.com"
-]
+        include_domains: trustedDomains
+
       }
+
     );
 
-    const results = response.data.results || [];
+    const tavilyResults =
+      response.data.results || [];
 
-    if (!results.length) {
-      return "No trusted resources found.";
-    }
+    return tavilyResults.map(r => ({
 
-    const filtered = results.filter(r => {
+      title: r.title,
+      url: r.url
 
-  const title = (r.title || "").toLowerCase();
-  const url = (r.url || "").toLowerCase();
+    }));
 
-  return (
-    r.url &&
-    r.title &&
+  }
 
-    !url.includes("404") &&
-    !url.includes("error") &&
-    !url.includes("/search") &&
-    !url.includes("/tag/") &&
-    !url.includes("/category/") &&
-
-    !title.includes("page not found") &&
-    !title.includes("not found") &&
-    !title.includes("access denied") &&
-    !title.includes("homepage") &&
-    !title.includes("home page")
-  );
-});
-
-    return filtered.map(r => ({
-  title: r.title,
-  url: r.url
-}));
-
-  } catch (err) {
+  catch (err) {
 
     console.error(
-      "Tavily search error:",
-      err.response?.data || err.message
+      "trustedWebSearch error:",
+      err.message
     );
 
-    return "No trusted resources found.";
+    return [];
   }
 }
 

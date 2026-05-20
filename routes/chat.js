@@ -17,6 +17,48 @@ const {
   saveMemory
 } = require("../services/memoryStore");
 
+/* ===================================== */
+/* EDUCATIONAL TOPIC DETECTION */
+/* ===================================== */
+
+function isEducationalTopic(query) {
+
+  const text = query.toLowerCase();
+
+  const keywords = [
+
+    "what is",
+    "explain",
+    "define",
+    "difference",
+    "how does",
+    "sql injection",
+    "xss",
+    "phishing",
+    "malware",
+    "cybersecurity",
+    "network",
+    "firewall",
+    "encryption",
+    "owasp",
+    "linux",
+    "ethical hacking",
+    "vulnerability",
+    "attack",
+    "threat",
+    "risk",
+    "nist",
+    "cisa",
+    "authentication",
+    "authorization",
+    "cloud security",
+    "penetration testing"
+  ];
+
+  return keywords.some(keyword =>
+    text.includes(keyword)
+  );
+}
 
 router.post("/", async (req, res) => {
   try {
@@ -211,7 +253,16 @@ ${fullPageText.slice(0, 12000)}
 
   try {
 
-    const webResources = await trustedWebSearch(message);
+    let webResources = [];
+
+const shouldSearch =
+  isEducationalTopic(message);
+
+if (shouldSearch) {
+
+  webResources =
+    await trustedWebSearch(message);
+}
 
     combinedContext += `
 WEB SEARCH RESULTS:
@@ -312,8 +363,16 @@ if (!ragResult || !ragResult.context || ragResult.context.length < 80) {
 
 
 
-const webResources =
-  await trustedWebSearch(message);
+let webResources = [];
+
+const shouldSearch =
+  isEducationalTopic(message);
+
+if (shouldSearch) {
+
+  webResources =
+    await trustedWebSearch(message);
+}
 
   combinedContext += `
 
