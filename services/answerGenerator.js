@@ -61,11 +61,16 @@ STRICT RULES:
 - NEVER invent URLs.
 - NEVER invent references.
 - NEVER generate fake citations.
-- NEVER mention competitor universities or certifications.
 - NEVER mention CompTIA, Udemy, Coursera, or unrelated training providers.
 - NEVER provide broken or guessed links.
 
 WEB RESOURCE POLICY:
+
+- Additional verified learning resources may be appended automatically below the answer.
+- Do NOT mention specific websites unless explicitly provided in ECCU context.
+- If additional learning material exists:
+  → say only:
+  "Additional learning resources are available below."
 
 - Do NOT generate URLs
 - Do NOT generate hyperlinks
@@ -160,6 +165,10 @@ NEVER PROVIDE:
 - dark web marketplaces
 - onion links
 - anonymous illegal forums
+- fake resource names
+- fake documentation pages
+- guessed URLs
+- placeholder links
 
 
 
@@ -209,7 +218,7 @@ You must:
             content: prompt
           }
         ],
-        temperature: 0.1
+        temperature: 0.05
       },
       {
         headers: {
