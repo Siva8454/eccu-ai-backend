@@ -257,8 +257,7 @@ router.post("/", async (req, res) => {
 
     let webResources = [];
 
-    const shouldSearch =
-      isEducationalTopic(message);
+    const shouldSearch = true;
 
     if (shouldSearch) {
 
