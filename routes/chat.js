@@ -7,10 +7,15 @@ const { generateAnswer } = require("../services/localLLM");
 const { fetchUserEnrollments } = require("../services/canvasFetcher");
 const { saveQA, searchLearned } = require("../services/learningService");
 const { getLibraryResources } = require("../services/lirnResources");
+
 const {
   trustedWebSearch
 } = require("../services/trustedWebSearch");
-const { detectIntent } = require("../services/intentDetector");
+
+const {
+  detectIntent
+} = require("../services/intentDetector");
+
 const {
   getMemory,
   saveMemory
@@ -20,7 +25,7 @@ const {
 /* EDUCATIONAL TOPIC DETECTION */
 /* ===================================== */
 
-function isEducationalTopic(query) {
+function isEducationalTopic(query = "") {
 
   const text = query.toLowerCase();
 
@@ -31,30 +36,43 @@ function isEducationalTopic(query) {
     "define",
     "difference",
     "how does",
+
     "sql injection",
     "xss",
+    "csrf",
     "phishing",
     "malware",
+    "ransomware",
+
     "cybersecurity",
     "network",
     "firewall",
     "encryption",
     "linux",
+
     "ethical hacking",
     "vulnerability",
     "attack",
     "threat",
     "risk",
+
     "authentication",
     "authorization",
+
     "cloud security",
-    "penetration testing"
+    "penetration testing",
+
+    "ids",
+    "ips",
+    "siem",
+    "soc"
 
   ];
 
   return keywords.some(keyword =>
     text.includes(keyword)
   );
+
 }
 
 /* ===================================== */
@@ -72,17 +90,23 @@ function hasUsefulResources(resources = []) {
 
     return (
 
-      !text.includes("top 10") &&
-      !text.includes("cyberframework") &&
+      r.url &&
+      r.url.startsWith("http") &&
+
+      !text.includes("404") &&
+      !text.includes("not found") &&
       !text.includes("homepage") &&
       !text.includes("admission") &&
-      !text.includes("degree") &&
       !text.includes("apply now") &&
       !text.includes("course catalog") &&
+      !text.includes("degree") &&
       !text.includes("certification") &&
-
-      r.url &&
-      r.url.startsWith("http")
+      !text.includes("comptia") &&
+      !text.includes("udemy") &&
+      !text.includes("coursera") &&
+      !text.includes("edx") &&
+      !text.includes(".onion") &&
+      !text.includes("darkweb")
 
     );
 
@@ -97,23 +121,8 @@ router.post("/", async (req, res) => {
     const {
       message,
       currentPage,
-      pageText,
-      lastAnswer
+      pageText
     } = req.body;
-
-    const pageUrl = currentPage?.url || "";
-    const pageTitle = currentPage?.title || "";
-
-    const fullPageText =
-      currentPage?.text || pageText || "";
-
-    console.log("📄 Page Title:", pageTitle);
-    console.log("🔗 Page URL:", pageUrl);
-
-    const isSyllabusPage =
-      pageUrl.toLowerCase().includes("syllabus") ||
-      pageTitle.toLowerCase().includes("syllabus") ||
-      fullPageText.toLowerCase().includes("course syllabus");
 
     if (!message) {
 
@@ -125,6 +134,17 @@ router.post("/", async (req, res) => {
 
     console.log("💬 Student question:", message);
 
+    const pageUrl =
+      currentPage?.url || "";
+
+    const pageTitle =
+      currentPage?.title || "";
+
+    const fullPageText =
+      currentPage?.text ||
+      pageText ||
+      "";
+
     /* ===================================== */
     /* MEMORY */
     /* ===================================== */
@@ -132,22 +152,22 @@ router.post("/", async (req, res) => {
     const userId =
       req.body.userId || "default-user";
 
-    const memory = getMemory(userId);
+    const memory =
+      getMemory(userId);
 
-    const previousQuestion =
-      memory?.previousQuestion || "";
-
-    console.log("🧠 Previous question:", previousQuestion);
+    console.log(
+      "🧠 Previous question:",
+      memory?.previousQuestion || ""
+    );
 
     /* ===================================== */
     /* LEARNED KNOWLEDGE */
     /* ===================================== */
 
-    const learned = searchLearned(message);
+    const learned =
+      searchLearned(message);
 
     if (learned) {
-
-      console.log("⚡ Using learned knowledge");
 
       return res.json({
         reply: learned
@@ -156,10 +176,11 @@ router.post("/", async (req, res) => {
     }
 
     /* ===================================== */
-    /* STATIC ECCU KNOWLEDGE */
+    /* STATIC KNOWLEDGE */
     /* ===================================== */
 
-    const knowledgeAnswer = searchKnowledge(message);
+    const knowledgeAnswer =
+      searchKnowledge(message);
 
     if (knowledgeAnswer) {
 
@@ -171,113 +192,64 @@ router.post("/", async (req, res) => {
     }
 
     /* ===================================== */
-    /* FETCH ENROLLMENTS */
+    /* ENROLLMENTS */
     /* ===================================== */
 
     const enrollments =
       await fetchUserEnrollments();
 
-    if (!enrollments || !enrollments.length) {
+    if (!enrollments?.length) {
 
       return res.json({
         source: "enrollment-check",
-        reply: "No active enrollments found for this user."
+        reply:
+          "No active enrollments found."
       });
 
     }
 
-    const allowedCourseIds = enrollments
-      .filter(e => e.enrollment_state === "active")
-      .map(e => e.course_id);
-
-    if (!allowedCourseIds.length) {
-
-      return res.json({
-        source: "enrollment-check",
-        reply: "No active course enrollments found."
-      });
-
-    }
-
-    console.log("🎓 Allowed Courses:", allowedCourseIds);
+    const allowedCourseIds =
+      enrollments
+        .filter(e =>
+          e.enrollment_state === "active"
+        )
+        .map(e => e.course_id);
 
     /* ===================================== */
-    /* INTENT DETECTION */
+    /* INTENT */
     /* ===================================== */
 
-    const intent = detectIntent(message);
+    const intent =
+      detectIntent(message);
 
-    console.log("Detected intent:", intent);
+    console.log(
+      "Detected intent:",
+      intent
+    );
 
     /* ===================================== */
-    /* RESTRICTED / EXAM GUARDRAIL */
+    /* EXAM / CHEATING GUARDRAIL */
     /* ===================================== */
 
     if (intent === "restricted") {
 
-      console.log("🚫 Blocked restricted query");
-
       return res.json({
+
         source: "guardrail",
+
         reply:
           "Providing answers for exams or assessments is prohibited. Please refer to your course materials or contact your instructor."
+
       });
 
     }
 
     /* ===================================== */
-    /* PAGE-AWARE SYLLABUS */
+    /* LIRN RESOURCES */
     /* ===================================== */
-
-    if (
-      isSyllabusPage &&
-      message.toLowerCase().includes("syllabus")
-    ) {
-
-      return res.json({
-        source: "page-aware",
-        reply:
-          "You are currently on the course syllabus page. Please click the View button in the syllabus section to access the syllabus document."
-      });
-
-    }
-
-    /* ===================================== */
-    /* CONTEXTUAL MESSAGE */
-    /* ===================================== */
-
-    const contextualMessage = `
-CURRENT PAGE TITLE:
-${pageTitle}
-
-CURRENT PAGE URL:
-${pageUrl}
-
-CURRENT PAGE CONTENT:
-${fullPageText}
-
-USER QUESTION:
-${message}
-`;
 
     const lirnResources =
       getLibraryResources(message);
-
-    console.log(
-      "LIRN RESOURCES:",
-      JSON.stringify(lirnResources, null, 2)
-    );
-
-    const ragResult = await vectorSearch(
-      contextualMessage,
-      allowedCourseIds,
-      intent,
-      currentPage
-    );
-
-    console.log("📚 RAG RESULT:", ragResult);
-
-    let combinedContext = "";
 
     /* ===================================== */
     /* WEB SEARCH */
@@ -290,145 +262,53 @@ ${message}
 
     if (shouldSearch) {
 
-      webResources =
-        await trustedWebSearch(message);
-
-    }
-
-    /* ===================================== */
-    /* PAGE CONTEXT */
-    /* ===================================== */
-
-    if (
-      fullPageText &&
-      fullPageText.length > 500
-    ) {
-
-      console.log("✅ TRYING PAGE CONTEXT");
-
-      combinedContext += `
-PAGE TITLE:
-${pageTitle}
-
-PAGE CONTENT:
-${fullPageText.slice(0, 12000)}
-`;
-
-      combinedContext += `
-VERIFIED EDUCATIONAL RESOURCES:
-
-${webResources.map(r =>
-`TITLE: ${r.title}`
-).join("\n")}
-`;
-
       try {
 
-        const pageReply = await generateAnswer(
-          message,
-          combinedContext
+        webResources =
+          await trustedWebSearch(message);
+
+        console.log(
+          "🌐 WEB RESOURCES:",
+          webResources
         );
-
-        console.log("🧠 PAGE REPLY:", pageReply);
-
-        if (
-          pageReply &&
-          typeof pageReply === "string" &&
-          pageReply.trim().length > 20
-        ) {
-
-          let pageCompleteResponse = pageReply;
-
-          /* REMOVE AI REFERENCES */
-
-          pageCompleteResponse =
-            pageCompleteResponse.replace(
-
-/(\*\*)?(references|additional resources|course reference|online resources|further reading|resources|citations)(\*\*)?\s*:?\s*[\s\S]*$/i,
-
-""
-
-);
-
-          /* REMOVE BROKEN MARKDOWN */
-
-          pageCompleteResponse =
-            pageCompleteResponse
-              .replace(/\]\((https?:\/\/.*?)\)/g, "")
-              .replace(/\[(.*?)\]\((.*?)\)/g, "$1\n$2");
-
-          /* DDG RESOURCES */
-
-          if (
-            webResources &&
-            hasUsefulResources(webResources)
-          ) {
-
-            pageCompleteResponse += `
-
-Additional learning resources are available below:
-
-${webResources.map(r =>
-`• ${r.title}
-${r.url}`
-).join("\n\n")}
-`;
-
-          }
-
-          /* LIRN RESOURCES */
-
-          if (
-            intent === "general" &&
-            lirnResources &&
-            lirnResources.length > 0
-          ) {
-
-            pageCompleteResponse += `
-
-Search the following LIRN Library resources for more information on this topic:
-
-${lirnResources.map(r =>
-`• ${r.title}
-${r.url}`
-).join("\n\n")}
-`;
-
-          }
-
-          return res.json({
-            source: "page-context",
-            reply: pageCompleteResponse
-          });
-
-        }
 
       } catch (err) {
 
-        console.log("❌ PAGE CONTEXT ERROR:", err);
+        console.log(
+          "❌ WEB SEARCH ERROR:",
+          err.message
+        );
 
       }
 
     }
 
     /* ===================================== */
-    /* SUPPORT FALLBACK */
+    /* VECTOR SEARCH */
     /* ===================================== */
 
-    const supportKeywords = [
-      "ebook",
-      "popup",
-      "login",
-      "access",
-      "not opening",
-      "error",
-      "issue",
-      "problem"
-    ];
+    const contextualMessage = `
 
-    const isSupportQuery =
-      supportKeywords.some(k =>
-        message.toLowerCase().includes(k)
+CURRENT PAGE TITLE:
+${pageTitle}
+
+CURRENT PAGE URL:
+${pageUrl}
+
+CURRENT PAGE CONTENT:
+${fullPageText}
+
+USER QUESTION:
+${message}
+
+`;
+
+    const ragResult =
+      await vectorSearch(
+        contextualMessage,
+        allowedCourseIds,
+        intent,
+        currentPage
       );
 
     /* ===================================== */
@@ -441,22 +321,13 @@ ${r.url}`
       ragResult.context.length < 80
     ) {
 
-      console.log("⚠ Weak or no context");
-
-      if (isSupportQuery) {
-
-        return res.json({
-          source: "support-fallback",
-          reply:
-            "Please contact the ECCU support team for assistance with this issue."
-        });
-
-      }
-
       return res.json({
+
         source: "content-fallback",
+
         reply:
           "This topic is not available in your course materials. Please connect with your instructor for further clarification."
+
       });
 
     }
@@ -465,16 +336,7 @@ ${r.url}`
     /* FINAL CONTEXT */
     /* ===================================== */
 
-    combinedContext += `
-VERIFIED EDUCATIONAL RESOURCES:
-
-${webResources.map(r =>
-`TITLE: ${r.title}`
-).join("\n")}
-`;
-
     const finalContext = `
-${combinedContext}
 
 CURRENT CANVAS PAGE:
 ${pageText || "No page content available"}
@@ -484,31 +346,32 @@ ${currentPage?.url || "Unknown"}
 
 ECCU COURSE CONTENT:
 ${ragResult?.context || ""}
+
+VERIFIED EDUCATIONAL RESOURCES:
+
+${webResources.map(r =>
+`TITLE: ${r.title}`
+).join("\n")}
+
 `;
 
-    const finalAnswer =
+    /* ===================================== */
+    /* GENERATE ANSWER */
+    /* ===================================== */
+
+    const aiAnswer =
       await generateAnswer(
         message,
         finalContext,
         intent
       );
 
-    const shouldShowResources =
+    /* ===================================== */
+    /* CLEAN RESPONSE */
+    /* ===================================== */
 
-      intent === "general" &&
-
-      !finalAnswer
-        .toLowerCase()
-        .includes("cannot provide") &&
-
-      hasUsefulResources(webResources);
-
-    let completeResponse = finalAnswer;
-
-    console.log("BEFORE APPEND");
-    console.log("LIRN LENGTH:", lirnResources.length);
-
-    /* REMOVE AI REFERENCES */
+    let completeResponse =
+      aiAnswer || "";
 
     completeResponse =
       completeResponse.replace(
@@ -519,43 +382,100 @@ ${ragResult?.context || ""}
 
 );
 
-    /* REMOVE BROKEN MARKDOWN */
-
     completeResponse =
       completeResponse
         .replace(/\]\((https?:\/\/.*?)\)/g, "")
         .replace(/\[(.*?)\]\((.*?)\)/g, "$1\n$2");
 
-    /* DDG RESOURCES */
+    /* ===================================== */
+    /* WEB LEARNING RESOURCES */
+    /* ===================================== */
+
+    const shouldShowResources =
+
+      !completeResponse
+        .toLowerCase()
+        .includes("cannot provide") &&
+
+      Array.isArray(webResources) &&
+
+      webResources.length > 0 &&
+
+      hasUsefulResources(webResources);
 
     if (shouldShowResources) {
 
-      const resourcesText =
+      console.log(
+        "✅ APPENDING WEB RESOURCES"
+      );
+
+      const cleanedResources =
+
         webResources
-          .map((r) =>
+
+          .filter(r => {
+
+            const text =
+              `${r.title} ${r.url}`.toLowerCase();
+
+            return (
+
+              r.url &&
+              r.url.startsWith("http") &&
+
+              !text.includes("404") &&
+              !text.includes("not found") &&
+              !text.includes("homepage") &&
+              !text.includes("admission") &&
+              !text.includes("apply now") &&
+              !text.includes("course catalog") &&
+              !text.includes("degree") &&
+              !text.includes("certification") &&
+              !text.includes("comptia") &&
+              !text.includes("udemy") &&
+              !text.includes("coursera") &&
+              !text.includes("edx") &&
+              !text.includes(".onion") &&
+              !text.includes("darkweb")
+
+            );
+
+          })
+
+          .slice(0, 3);
+
+      if (cleanedResources.length > 0) {
+
+        completeResponse += `
+
+---
+
+Supporting Learning Resources
+
+${cleanedResources.map(r =>
 `• ${r.title}
 ${r.url}`
-          )
-          .join("\n\n");
+).join("\n\n")}
 
-      completeResponse += `
-
-Additional learning resources are available below:
-
-${resourcesText}
 `;
+
+      }
 
     }
 
+    /* ===================================== */
     /* LIRN RESOURCES */
+    /* ===================================== */
 
     if (
-      intent === "general" &&
+      isEducationalTopic(message) &&
       lirnResources &&
       lirnResources.length > 0
     ) {
 
-      console.log("APPENDING LIRN RESOURCES");
+      console.log(
+        "📚 APPENDING LIRN RESOURCES"
+      );
 
       completeResponse += `
 
@@ -565,6 +485,7 @@ ${lirnResources.map(r =>
 `• ${r.title}
 ${r.url}`
 ).join("\n\n")}
+
 `;
 
     }
@@ -574,14 +495,16 @@ ${r.url}`
     /* ===================================== */
 
     if (
-      finalAnswer &&
-      finalAnswer.length > 50 &&
+      aiAnswer &&
+      aiAnswer.length > 50 &&
       ragResult.confidence > 0.5
     ) {
 
-      saveQA(message, finalAnswer);
+      saveQA(message, aiAnswer);
 
-      console.log("🧠 Learned new Q&A");
+      console.log(
+        "🧠 Learned new Q&A"
+      );
 
     }
 
@@ -590,16 +513,26 @@ ${r.url}`
     /* ===================================== */
 
     return res.json({
+
       source: "rag+liveweb",
-      reply: completeResponse,
+
+      reply: completeResponse
+
     });
 
-  } catch (err) {
+  }
 
-    console.error("❌ Chat error:", err);
+  catch (err) {
 
-    res.status(500).json({
+    console.error(
+      "❌ Chat error:",
+      err
+    );
+
+    return res.status(500).json({
+
       error: err.toString()
+
     });
 
   }
