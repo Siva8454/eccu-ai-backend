@@ -201,16 +201,24 @@ tutorial
     /* DDG SEARCH */
     /* ===================================== */
 
-    let ddgResults;
+    let ddgResults = { results: [] };
 
 try {
 
   await new Promise(resolve =>
-    setTimeout(resolve, 1500)
+    setTimeout(resolve, 3000)
   );
 
   ddgResults = await search(
-    enhancedQuery
+    enhancedQuery,
+    {
+      safeSearch: "off"
+    }
+  );
+
+  console.log(
+    "DDG RAW RESULTS:",
+    ddgResults.results?.length || 0
   );
 
 } catch (err) {
@@ -220,7 +228,8 @@ try {
     err.message
   );
 
-  return [];
+  /* DO NOT RETURN HERE */
+  /* LET TAVILY FALLBACK RUN */
 
 }
 
