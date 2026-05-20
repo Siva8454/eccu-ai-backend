@@ -279,6 +279,24 @@ router.post("/", async (req, res) => {
         );
 
       }
+      let webResourcesText = "";
+
+if (
+  Array.isArray(webResources) &&
+  webResources.length > 0
+) {
+
+  webResourcesText =
+    "\n\nSupporting Learning Resources:\n\n";
+
+  webResources.forEach(resource => {
+
+    webResourcesText +=
+      `• ${resource.title}\n${resource.url}\n\n`;
+
+  });
+
+}
 
     }
 
@@ -511,11 +529,17 @@ ${r.url}`
     /* RESPONSE */
     /* ===================================== */
 
+    const finalAnswer =
+  completeResponse +
+  webResourcesText +
+  lirnResources;
+    
+    
     return res.json({
 
       source: "rag+liveweb",
 
-      reply: completeResponse
+      reply: finalAnswer
 
     });
 
