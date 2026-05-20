@@ -210,11 +210,8 @@ try {
   );
 
   ddgResults = await search(
-    enhancedQuery,
-    {
-      safeSearch: "off"
-    }
-  );
+  enhancedQuery
+);
 
   console.log(
     "DDG RAW RESULTS:",
