@@ -421,9 +421,12 @@ if (shouldShowResources) {
 
   /* REMOVE AI-GENERATED REFERENCES */
   completeResponse = completeResponse.replace(
-    /References:[\s\S]*?(?=Search the following LIRN Library resources for more information on this topic:|$)/i,
-    ""
-  );
+
+/(References|Additional Resources|Course Reference|Online Resources|Further Reading|Resources)\s*:?\s*[\s\S]*?(?=Search the following LIRN Library resources for more information on this topic:|$)/gi,
+
+""
+
+);
 
   completeResponse += `
 

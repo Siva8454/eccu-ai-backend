@@ -40,12 +40,25 @@ async function trustedWebSearch(query) {
         const title =
           (r.title || "").toLowerCase();
 
+          const blockedDomains = [
+
+  "wikipedia.org",
+  "comptia.org",
+  "udemy.com",
+  "coursera.org",
+  "edx.org"
+
+];
+
         return (
 
           trustedDomains.some(domain =>
             url.includes(domain)
           ) &&
 
+          !blockedDomains.some(domain =>
+    url.includes(domain)
+  ) &&
           !url.includes("404") &&
           !url.includes("/search") &&
           !url.includes("/tag/") &&
