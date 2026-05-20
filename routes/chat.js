@@ -256,6 +256,7 @@ router.post("/", async (req, res) => {
     /* ===================================== */
 
     let webResources = [];
+    let webResourcesText = "";
 
     const shouldSearch = true;
 
@@ -270,6 +271,23 @@ router.post("/", async (req, res) => {
           "🌐 WEB RESOURCES:",
           webResources
         );
+
+        if (
+  Array.isArray(webResources) &&
+  webResources.length > 0
+) {
+
+  webResourcesText =
+    "\n\nSupporting Learning Resources:\n\n";
+
+  webResources.forEach(resource => {
+
+    webResourcesText +=
+      `• ${resource.title}\n${resource.url}\n\n`;
+
+  });
+
+}
 
       } catch (err) {
 
