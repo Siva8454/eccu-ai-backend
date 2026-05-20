@@ -4,7 +4,6 @@ const {
   search
 } = require("duck-duck-scrape");
 
-
 /* ===================================== */
 /* BLOCKED DOMAINS */
 /* ===================================== */
@@ -16,6 +15,8 @@ const blockedDomains = [
   "udemy.com",
   "coursera.org",
   "edx.org",
+  "skillsoft.com",
+  "infosecinstitute.com",
 
   /* Unsafe */
   ".onion",
@@ -24,12 +25,13 @@ const blockedDomains = [
   "tor.link",
 
   /* Low Quality */
-  "wikipedia.org",
   "reddit.com",
-  "quora.com"
+  "quora.com",
+  "brainly",
+  "coursehero",
+  "chegg"
 
 ];
-
 
 /* ===================================== */
 /* TRUST SCORE */
@@ -50,16 +52,16 @@ function getTrustScore(url = "") {
   if (url.includes("google")) return 8;
   if (url.includes("cloudflare")) return 8;
   if (url.includes("cisco")) return 8;
-
-  if (url.includes("sans")) return 8;
-  if (url.includes("portswigger")) return 8;
-  if (url.includes("rapid7")) return 8;
+  if (url.includes("fortinet")) return 8;
+  if (url.includes("paloalto")) return 8;
   if (url.includes("crowdstrike")) return 8;
-  if (url.includes("paloaltonetworks")) return 8;
+  if (url.includes("rapid7")) return 8;
+  if (url.includes("splunk")) return 8;
+  if (url.includes("portswigger")) return 8;
+  if (url.includes("sans")) return 8;
 
   return 5;
 }
-
 
 /* ===================================== */
 /* TOPIC RELEVANCE */
@@ -96,15 +98,12 @@ function isTopicRelevant(title, query, url = "") {
       !stopWords.includes(word)
     );
 
-  const matches =
-    keywords.filter(keyword =>
-      text.includes(keyword)
-    );
+  /* REQUIRE AT LEAST ONE STRONG MATCH */
 
-  return matches.length >=
-    Math.max(1, Math.ceil(keywords.length * 0.6));
+  return keywords.some(keyword =>
+    text.includes(keyword)
+  );
 }
-
 
 /* ===================================== */
 /* VALID RESOURCE FILTER */
@@ -133,6 +132,11 @@ function isValidResource(url, title = "", query = "") {
     !url.includes("/login") &&
     !url.includes("/signup") &&
     !url.includes("javascript:void") &&
+    !url.includes("apply") &&
+    !url.includes("admission") &&
+    !url.includes("degree") &&
+    !url.includes("catalog") &&
+    !url.includes("certification") &&
 
     /* BLOCK GENERIC HOMEPAGES */
     !url.endsWith(".org/") &&
@@ -140,23 +144,37 @@ function isValidResource(url, title = "", query = "") {
     !url.endsWith(".gov/") &&
     !url.endsWith(".edu/") &&
 
-    /* BLOCK GENERIC TOP 10 PAGE */
+    /* BLOCK GENERIC TOP PAGES */
     !(
       title.includes("top 10") &&
       !query.includes("top 10")
     ) &&
+
+    !title.includes("cybersecurity framework") &&
 
     /* BLOCK BAD TITLES */
     !title.includes("not found") &&
     !title.includes("access denied") &&
     !title.includes("page not found") &&
 
-    /* TOPIC MATCH */
+    /* REQUIRE TOPIC MATCH */
     isTopicRelevant(title, query, url)
 
   );
 }
 
+/* ===================================== */
+/* CLEAN URL */
+/* ===================================== */
+
+function cleanUrl(url = "") {
+
+  return url
+    .split("](")[0]
+    .replace(/\)+$/, "")
+    .trim();
+
+}
 
 /* ===================================== */
 /* TRUSTED WEB SEARCH */
@@ -174,13 +192,13 @@ async function trustedWebSearch(query) {
 ${query}
 
 cybersecurity
-official documentation
 educational resources
+official documentation
 tutorial
 `;
 
     /* ===================================== */
-    /* DUCKDUCKGO SEARCH */
+    /* DDG SEARCH */
     /* ===================================== */
 
     const ddgResults = await search(
@@ -231,13 +249,14 @@ tutorial
 
         title: r.title,
 
-        url: (r.url || "")
-          .split("](")[0]
-          .replace(/\)+$/, "")
-          .trim()
+        url: cleanUrl(r.url)
 
       }));
 
+    console.log(
+      "DDG FILTERED RESULTS:",
+      filtered
+    );
 
     /* ===================================== */
     /* RETURN DDG RESULTS */
@@ -246,8 +265,8 @@ tutorial
     if (filtered.length > 0) {
 
       return filtered;
-    }
 
+    }
 
     /* ===================================== */
     /* TAVILY FALLBACK */
@@ -289,10 +308,8 @@ STRICT RULES:
 
     );
 
-
     const tavilyResults =
       response.data.results || [];
-
 
     filtered = tavilyResults
 
@@ -319,13 +336,14 @@ STRICT RULES:
 
         title: r.title,
 
-        url: (r.url || "")
-          .split("](")[0]
-          .replace(/\)+$/, "")
-          .trim()
+        url: cleanUrl(r.url)
 
       }));
 
+    console.log(
+      "TAVILY FILTERED RESULTS:",
+      filtered
+    );
 
     return filtered;
 
@@ -339,6 +357,7 @@ STRICT RULES:
     );
 
     return [];
+
   }
 
 }
