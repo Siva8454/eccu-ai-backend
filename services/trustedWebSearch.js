@@ -4,33 +4,102 @@ const {
   search
 } = require("duck-duck-scrape");
 
+
+/* ===================================== */
+/* VALID RESOURCE FILTER */
+/* ===================================== */
+
+function isValidResource(url, title = "") {
+
+  url = (url || "").toLowerCase();
+  title = (title || "").toLowerCase();
+
+  return (
+
+    /* BLOCK BAD PAGES */
+    !url.includes("404") &&
+    !url.includes("/search") &&
+    !url.includes("/tag/") &&
+    !url.includes("/category/") &&
+    !url.includes("/author/") &&
+    !url.includes("/contributors/") &&
+
+    /* BLOCK WIKIPEDIA / COMPETITORS */
+    !url.includes("wikipedia.org") &&
+    !url.includes("comptia.org") &&
+    !url.includes("udemy.com") &&
+    !url.includes("coursera.org") &&
+    !url.includes("edx.org") &&
+    !url.includes("reddit.com") &&
+
+    /* BLOCK GENERIC HOMEPAGES */
+    !url.endsWith(".org/") &&
+    !url.endsWith(".com/") &&
+    !url.endsWith(".gov/") &&
+    !url.endsWith(".edu/") &&
+
+    /* BLOCK BAD TITLES */
+    !title.includes("not found") &&
+    !title.includes("access denied") &&
+    !title.includes("page not found")
+
+  );
+}
+
+
+/* ===================================== */
+/* TRUSTED WEB SEARCH */
+/* ===================================== */
+
 async function trustedWebSearch(query) {
 
   try {
 
-    /* ===================================== */
-    /* DUCKDUCKGO SEARCH */
-    /* ===================================== */
-
-    const ddgResults = await search(query, {
-
-      safeSearch: false
-
-    });
-
     const trustedDomains = [
 
       "eccu.edu",
+      "eccouncil.org",
       "owasp.org",
       "nist.gov",
       "cisa.gov",
       "portswigger.net",
       "sans.org",
-      "tryhackme.com"
+      "tryhackme.com",
+      "cloudflare.com",
+      "learn.microsoft.com",
+      "aws.amazon.com"
 
     ];
 
-    const filtered = (ddgResults.results || [])
+
+    /* ===================================== */
+    /* ENHANCED DDG QUERY */
+    /* ===================================== */
+
+    const enhancedQuery = `
+${query}
+
+cybersecurity
+OWASP
+NIST
+CISA
+official resources
+`;
+
+
+    /* ===================================== */
+    /* DUCKDUCKGO SEARCH */
+    /* ===================================== */
+
+    const ddgResults = await search(
+      enhancedQuery,
+      {
+        safeSearch: false
+      }
+    );
+
+
+    let filtered = (ddgResults.results || [])
 
       .filter(r => {
 
@@ -40,36 +109,26 @@ async function trustedWebSearch(query) {
         const title =
           (r.title || "").toLowerCase();
 
-          const blockedDomains = [
-
-  "wikipedia.org",
-  "comptia.org",
-  "udemy.com",
-  "coursera.org",
-  "edx.org"
-
-];
-
         return (
 
           trustedDomains.some(domain =>
             url.includes(domain)
           ) &&
 
-          !blockedDomains.some(domain =>
-    url.includes(domain)
-  ) &&
-          !url.includes("404") &&
-          !url.includes("/search") &&
-          !url.includes("/tag/") &&
-          !url.includes("/category/") &&
-
-          !title.includes("not found") &&
-          !title.includes("access denied")
+          isValidResource(url, title)
 
         );
 
       })
+
+      /* REMOVE DUPLICATES */
+      .filter((item, index, self) =>
+
+        index === self.findIndex(t =>
+          t.url === item.url
+        )
+
+      )
 
       .slice(0, 5)
 
@@ -111,10 +170,15 @@ async function trustedWebSearch(query) {
         query: `
 ${query}
 
-Find cybersecurity educational resources.
+Find trusted cybersecurity educational resources.
 
-Return direct topic-specific pages only.
-Avoid homepage links.
+STRICT RULES:
+- Return direct topic-specific pages only
+- Avoid homepage links
+- Avoid Wikipedia
+- Avoid competitor certifications
+- Avoid broken URLs
+- Prefer OWASP/NIST/CISA/ECCU resources
 `,
 
         search_depth: "advanced",
@@ -129,15 +193,69 @@ Avoid homepage links.
 
     );
 
+
     const tavilyResults =
       response.data.results || [];
 
-    return tavilyResults.map(r => ({
 
-      title: r.title,
-      url: r.url
+    filtered = tavilyResults
 
-    }));
+      .filter(r =>
+
+        isValidResource(
+          r.url,
+          r.title
+        )
+
+      )
+
+      .slice(0, 5)
+
+      .map(r => ({
+
+        title: r.title,
+        url: r.url
+
+      }));
+
+
+    /* ===================================== */
+    /* FALLBACK STATIC RESOURCES */
+    /* ===================================== */
+
+    if (filtered.length === 0) {
+
+      filtered = [
+
+        {
+          title:
+            "OWASP Top 10",
+
+          url:
+            "https://owasp.org/www-project-top-ten/"
+        },
+
+        {
+          title:
+            "NIST Cybersecurity Framework",
+
+          url:
+            "https://www.nist.gov/cyberframework"
+        },
+
+        {
+          title:
+            "CISA Cybersecurity Resources",
+
+          url:
+            "https://www.cisa.gov/cybersecurity"
+        }
+
+      ];
+
+    }
+
+    return filtered;
 
   }
 
@@ -148,8 +266,28 @@ Avoid homepage links.
       err.message
     );
 
-    return [];
+    return [
+
+      {
+        title:
+          "OWASP Top 10",
+
+        url:
+          "https://owasp.org/www-project-top-ten/"
+      },
+
+      {
+        title:
+          "NIST Cybersecurity Framework",
+
+        url:
+          "https://www.nist.gov/cyberframework"
+      }
+
+    ];
+
   }
+
 }
 
 module.exports = {
