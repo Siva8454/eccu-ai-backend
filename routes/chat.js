@@ -511,16 +511,40 @@ ${r.url}`
     /* RESPONSE */
     /* ===================================== */
 
-   const finalAnswer = completeResponse;
-    
-    
-    return res.json({
+   if (
+  Array.isArray(webResources) &&
+  webResources.length > 0
+) {
 
-      source: "rag+liveweb",
+  const cleanedResources =
+    webResources.slice(0, 4);
 
-      reply: finalAnswer
+  completeResponse += `
 
-    });
+---
+
+Supporting Learning Resources
+
+${cleanedResources.map(r =>
+`• ${r.title}
+${r.url}`
+).join("\n\n")}
+
+`;
+
+}
+
+const finalAnswer =
+  completeResponse +
+  lirnResources;
+
+return res.json({
+
+  source: "rag+liveweb",
+
+  reply: finalAnswer
+
+});
 
   }
 
