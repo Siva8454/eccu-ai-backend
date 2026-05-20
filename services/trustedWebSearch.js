@@ -204,7 +204,7 @@ tutorial
     const ddgResults = await search(
       enhancedQuery,
       {
-        safeSearch: false
+        safeSearch: "off"
       }
     );
 
