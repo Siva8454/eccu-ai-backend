@@ -414,9 +414,8 @@ console.log("LIRN LENGTH:", lirnResources.length);
 if (shouldShowResources) {
 
   const resourcesText = webResources
-    .map((r) => `
-• ${r.title}
-${r.url}
+   .map((r) => `
+• [${r.title}](${r.url})
 `)
     .join("\n\n");
 
