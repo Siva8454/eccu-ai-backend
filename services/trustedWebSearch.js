@@ -202,11 +202,8 @@ tutorial
     /* ===================================== */
 
     const ddgResults = await search(
-      enhancedQuery,
-      {
-        safeSearch: "off"
-      }
-    );
+  enhancedQuery
+);
 
     let filtered = (ddgResults.results || [])
 

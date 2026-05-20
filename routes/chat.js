@@ -252,71 +252,35 @@ router.post("/", async (req, res) => {
       getLibraryResources(message);
 
     /* ===================================== */
-    /* WEB SEARCH */
-    /* ===================================== */
+/* WEB SEARCH */
+/* ===================================== */
 
-    let webResources = [];
-    let webResourcesText = "";
+let webResources = [];
 
-    const shouldSearch = true;
+const shouldSearch = true;
 
-    if (shouldSearch) {
+if (shouldSearch) {
 
-      try {
+  try {
 
-        webResources =
-          await trustedWebSearch(message);
+    webResources =
+      await trustedWebSearch(message);
 
-        console.log(
-          "🌐 WEB RESOURCES:",
-          webResources
-        );
+    console.log(
+      "🌐 WEB RESOURCES:",
+      webResources
+    );
 
-        if (
-  Array.isArray(webResources) &&
-  webResources.length > 0
-) {
+  } catch (err) {
 
-  webResourcesText =
-    "\n\nSupporting Learning Resources:\n\n";
+    console.log(
+      "❌ WEB SEARCH ERROR:",
+      err.message
+    );
 
-  webResources.forEach(resource => {
-
-    webResourcesText +=
-      `• ${resource.title}\n${resource.url}\n\n`;
-
-  });
+  }
 
 }
-
-      } catch (err) {
-
-        console.log(
-          "❌ WEB SEARCH ERROR:",
-          err.message
-        );
-
-      }
-      let webResourcesText = "";
-
-if (
-  Array.isArray(webResources) &&
-  webResources.length > 0
-) {
-
-  webResourcesText =
-    "\n\nSupporting Learning Resources:\n\n";
-
-  webResources.forEach(resource => {
-
-    webResourcesText +=
-      `• ${resource.title}\n${resource.url}\n\n`;
-
-  });
-
-}
-
-    }
 
     /* ===================================== */
     /* VECTOR SEARCH */
@@ -422,66 +386,66 @@ ${webResources.map(r =>
         .replace(/\]\((https?:\/\/.*?)\)/g, "")
         .replace(/\[(.*?)\]\((.*?)\)/g, "$1\n$2");
 
-    /* ===================================== */
-    /* WEB LEARNING RESOURCES */
-    /* ===================================== */
+   /* ===================================== */
+/* WEB LEARNING RESOURCES */
+/* ===================================== */
 
-    const shouldShowResources =
+const shouldShowResources =
 
-      !completeResponse
-        .toLowerCase()
-        .includes("cannot provide") &&
+  !completeResponse
+    .toLowerCase()
+    .includes("cannot provide") &&
 
-      Array.isArray(webResources) &&
+  Array.isArray(webResources) &&
 
-      webResources.length > 0 &&
+  webResources.length > 0 &&
 
-      hasUsefulResources(webResources);
+  hasUsefulResources(webResources);
 
-    if (shouldShowResources) {
+if (shouldShowResources) {
 
-      console.log(
-        "✅ APPENDING WEB RESOURCES"
-      );
+  console.log(
+    "✅ APPENDING WEB RESOURCES"
+  );
 
-      const cleanedResources =
+  const cleanedResources =
 
-        webResources
+    webResources
 
-          .filter(r => {
+      .filter(r => {
 
-            const text =
-              `${r.title} ${r.url}`.toLowerCase();
+        const text =
+          `${r.title} ${r.url}`.toLowerCase();
 
-            return (
+        return (
 
-              r.url &&
-              r.url.startsWith("http") &&
+          r.url &&
+          r.url.startsWith("http") &&
 
-              !text.includes("404") &&
-              !text.includes("not found") &&
-              !text.includes("homepage") &&
-              !text.includes("admission") &&
-              !text.includes("apply now") &&
-              !text.includes("course catalog") &&
-              !text.includes("degree") &&
-              !text.includes("certification") &&
-              !text.includes("comptia") &&
-              !text.includes("udemy") &&
-              !text.includes("coursera") &&
-              !text.includes("edx") &&
-              !text.includes(".onion") &&
-              !text.includes("darkweb")
+          !text.includes("404") &&
+          !text.includes("not found") &&
+          !text.includes("homepage") &&
+          !text.includes("admission") &&
+          !text.includes("apply now") &&
+          !text.includes("course catalog") &&
+          !text.includes("degree") &&
+          !text.includes("certification") &&
+          !text.includes("comptia") &&
+          !text.includes("udemy") &&
+          !text.includes("coursera") &&
+          !text.includes("edx") &&
+          !text.includes(".onion") &&
+          !text.includes("darkweb")
 
-            );
+        );
 
-          })
+      })
 
-          .slice(0, 3);
+      .slice(0, 3);
 
-      if (cleanedResources.length > 0) {
+  if (cleanedResources.length > 0) {
 
-        completeResponse += `
+    completeResponse += `
 
 ---
 
@@ -494,9 +458,9 @@ ${r.url}`
 
 `;
 
-      }
+  }
 
-    }
+}
 
     /* ===================================== */
     /* LIRN RESOURCES */
@@ -547,10 +511,7 @@ ${r.url}`
     /* RESPONSE */
     /* ===================================== */
 
-    const finalAnswer =
-  completeResponse +
-  webResourcesText +
-  lirnResources;
+   const finalAnswer = completeResponse;
     
     
     return res.json({
