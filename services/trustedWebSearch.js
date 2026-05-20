@@ -1,11 +1,15 @@
 const axios = require("axios");
 const SEARX_INSTANCES = [
 
-  "https://searx.be/search",
+  "https://search.bus-hit.me/search",
 
-  "https://search.inetol.net/search",
+  "https://searxng.site/search",
 
-  "https://priv.au/search"
+  "https://northboot.xyz/search",
+
+  "https://search.ononoki.org/search",
+
+  "https://xo.wtf/search"
 
 ];
 
@@ -196,15 +200,22 @@ async function searxSearch(query) {
       );
 
       const response = await axios.get(
-        instance,
-        {
-          params: {
-            q: query,
-            format: "json"
-          },
-          timeout: 10000
-        }
-      );
+  instance,
+  {
+    params: {
+      q: query,
+      format: "json",
+      language: "en"
+    },
+
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0"
+    },
+
+    timeout: 15000
+  }
+);
 
       const results =
         response.data.results || [];
