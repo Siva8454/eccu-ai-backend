@@ -60,6 +60,27 @@ function isEducationalTopic(query) {
   );
 }
 
+function hasUsefulResources(resources = []) {
+
+  if (!resources.length) return false;
+
+  return resources.some(r => {
+
+    const text =
+      `${r.title} ${r.url}`.toLowerCase();
+
+    return (
+
+      !text.includes("top 10") &&
+      !text.includes("cyberframework") &&
+      !text.includes("homepage")
+
+    );
+
+  });
+
+}
+
 router.post("/", async (req, res) => {
   try {
     const {
@@ -265,8 +286,11 @@ if (shouldSearch) {
 }
 
     combinedContext += `
-WEB SEARCH RESULTS:
-${JSON.stringify(webResources, null, 2)}
+VERIFIED EDUCATIONAL RESOURCES:
+
+${webResources.map(r =>
+`TITLE: ${r.title}`
+).join("\n")}
 `;
 
     const pageReply = await generateAnswer(
@@ -402,10 +426,14 @@ const finalAnswer = await generateAnswer(
 );
 
 const shouldShowResources =
+
   intent === "general" &&
-  !finalAnswer.toLowerCase().includes("cannot provide") &&
-  webResources &&
-  webResources.length > 0;
+
+  !finalAnswer
+    .toLowerCase()
+    .includes("cannot provide") &&
+
+  hasUsefulResources(webResources);
 
   let completeResponse = finalAnswer;
   console.log("BEFORE APPEND");
@@ -435,7 +463,7 @@ ${r.url}`
 
 completeResponse = completeResponse
   .replace(/\]\((https?:\/\/.*?)\)/g, "")
-  .replace(/\[(https?:\/\/.*?)\]/g, "$1");
+  .replace(/\[(.*?)\]\((.*?)\)/g, "$1\n$2");
 
 
   completeResponse += `
