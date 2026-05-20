@@ -201,9 +201,28 @@ tutorial
     /* DDG SEARCH */
     /* ===================================== */
 
-    const ddgResults = await search(
-  enhancedQuery
-);
+    let ddgResults;
+
+try {
+
+  await new Promise(resolve =>
+    setTimeout(resolve, 1500)
+  );
+
+  ddgResults = await search(
+    enhancedQuery
+  );
+
+} catch (err) {
+
+  console.log(
+    "DDG SEARCH FAILED:",
+    err.message
+  );
+
+  return [];
+
+}
 
     let filtered = (ddgResults.results || [])
 
