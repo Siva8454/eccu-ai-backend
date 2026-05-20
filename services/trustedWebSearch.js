@@ -1,8 +1,13 @@
 const axios = require("axios");
+const SEARX_INSTANCES = [
 
-const {
-  search
-} = require("duck-duck-scrape");
+  "https://searx.be/search",
+
+  "https://search.inetol.net/search",
+
+  "https://priv.au/search"
+
+];
 
 /* ===================================== */
 /* BLOCKED DOMAINS */
@@ -179,13 +184,68 @@ function cleanUrl(url = "") {
 /* ===================================== */
 /* TRUSTED WEB SEARCH */
 /* ===================================== */
+async function searxSearch(query) {
+
+  for (const instance of SEARX_INSTANCES) {
+
+    try {
+
+      console.log(
+        "Trying Searx instance:",
+        instance
+      );
+
+      const response = await axios.get(
+        instance,
+        {
+          params: {
+            q: query,
+            format: "json"
+          },
+          timeout: 10000
+        }
+      );
+
+      const results =
+        response.data.results || [];
+
+      if (results.length > 0) {
+
+        console.log(
+          "Searx success:",
+          results.length
+        );
+
+        return results
+          .slice(0, 10)
+          .map(r => ({
+            title: r.title,
+            url: r.url
+          }));
+
+      }
+
+    } catch (err) {
+
+      console.log(
+        "Searx instance failed:",
+        instance
+      );
+
+    }
+
+  }
+
+  return [];
+
+}
 
 async function trustedWebSearch(query) {
 
   try {
 
     /* ===================================== */
-    /* ENHANCED DDG QUERY */
+   /* ENHANCED SEARCH QUERY */
     /* ===================================== */
 
     const enhancedQuery = `
@@ -198,90 +258,60 @@ tutorial
 `;
 
     /* ===================================== */
-    /* DDG SEARCH */
-    /* ===================================== */
+/* SEARX SEARCH */
+/* ===================================== */
 
-    let ddgResults = { results: [] };
-
-try {
-
-  await new Promise(resolve =>
-    setTimeout(resolve, 3000)
-  );
-
-  ddgResults = await search(
-  enhancedQuery
+console.log(
+  "RUNNING SEARX SEARCH..."
 );
 
-  console.log(
-    "DDG RAW RESULTS:",
-    ddgResults.results?.length || 0
-  );
+let filtered =
+  await searxSearch(enhancedQuery);
 
-} catch (err) {
+filtered = filtered
 
-  console.log(
-    "DDG SEARCH FAILED:",
-    err.message
-  );
+  .filter(r =>
 
-  /* DO NOT RETURN HERE */
-  /* LET TAVILY FALLBACK RUN */
+    isValidResource(
+      r.url,
+      r.title,
+      query
+    )
 
-}
+  )
 
-    let filtered = (ddgResults.results || [])
+  .filter((item, index, self) =>
 
-      .filter(r => {
+    index === self.findIndex(t =>
+      t.url === item.url
+    )
 
-        const url =
-          (r.url || "").toLowerCase();
+  )
 
-        const title =
-          (r.title || "").toLowerCase();
+  .sort((a, b) =>
 
-        return isValidResource(
-          url,
-          title,
-          query
-        );
+    getTrustScore(b.url) -
+    getTrustScore(a.url)
 
-      })
+  )
 
-      /* REMOVE DUPLICATES */
-      .filter((item, index, self) =>
+  .slice(0, 5)
 
-        index === self.findIndex(t =>
-          t.url === item.url
-        )
+  .map(r => ({
 
-      )
+    title: r.title,
 
-      /* SORT BY TRUST */
-      .sort((a, b) =>
+    url: cleanUrl(r.url)
 
-        getTrustScore(b.url) -
-        getTrustScore(a.url)
+  }));
 
-      )
-
-      .slice(0, 5)
-
-      .map(r => ({
-
-        title: r.title,
-
-        url: cleanUrl(r.url)
-
-      }));
-
-    console.log(
-      "DDG FILTERED RESULTS:",
-      filtered
-    );
+console.log(
+  "SEARX FILTERED RESULTS:",
+  filtered
+);
 
     /* ===================================== */
-    /* RETURN DDG RESULTS */
+    /* RETURN SEARCH RESULTS */
     /* ===================================== */
 
     if (filtered.length > 0) {
@@ -295,7 +325,7 @@ try {
     /* ===================================== */
 
     console.log(
-      "DDG failed. Using Tavily fallback..."
+      "Searx failed. Using Tavily fallback..."
     );
 
     const response = await axios.post(
