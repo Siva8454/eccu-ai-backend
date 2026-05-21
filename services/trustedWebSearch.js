@@ -109,8 +109,10 @@ function isTopicRelevant(title, query, url = "") {
 
   /* REQUIRE AT LEAST ONE STRONG MATCH */
 
-  return keywords.some(keyword =>
-    text.includes(keyword)
+  return keywords.length === 0 ||
+
+  keywords.some(keyword =>
+  text.includes(keyword)
   );
 }
 
@@ -124,6 +126,12 @@ function isValidResource(url, title = "", query = "") {
   title = (title || "").toLowerCase();
   query = (query || "").toLowerCase();
 
+  console.log(
+  "VALIDATING:",
+  title,
+  url
+  );
+
   return (
 
     /* BLOCK BAD DOMAINS */
@@ -131,27 +139,7 @@ function isValidResource(url, title = "", query = "") {
       url.includes(domain)
     ) &&
 
-    /* BLOCK BAD PAGES */
-    !url.includes("404") &&
-    !url.includes("/search") &&
-    !url.includes("/tag/") &&
-    !url.includes("/category/") &&
-    !url.includes("/author/") &&
-    !url.includes("/contributors/") &&
-    !url.includes("/login") &&
-    !url.includes("/signup") &&
-    !url.includes("javascript:void") &&
-    !url.includes("apply") &&
-    !url.includes("admission") &&
-    !url.includes("degree") &&
-    !url.includes("catalog") &&
-    !url.includes("certification") &&
-
-    /* BLOCK GENERIC HOMEPAGES */
-    !url.endsWith(".org/") &&
-    !url.endsWith(".com/") &&
-    !url.endsWith(".gov/") &&
-    !url.endsWith(".edu/") &&
+    
 
     /* BLOCK GENERIC TOP PAGES */
     !(
@@ -159,7 +147,6 @@ function isValidResource(url, title = "", query = "") {
       !query.includes("top 10")
     ) &&
 
-    !title.includes("cybersecurity framework") &&
 
     /* BLOCK BAD TITLES */
     !title.includes("not found") &&
@@ -238,10 +225,11 @@ async function searxSearch(query) {
 
     } catch (err) {
 
-      console.log(
-        "Searx instance failed:",
-        instance
-      );
+        console.log(
+    "Searx instance failed:",
+    instance,
+    err.message
+  );
 
     }
 
@@ -327,6 +315,11 @@ console.log(
 
     if (filtered.length > 0) {
 
+      console.log(
+  "FINAL FILTERED:",
+  filtered
+);
+
       return filtered;
 
     }
@@ -373,6 +366,11 @@ STRICT RULES:
 
     const tavilyResults =
       response.data.results || [];
+
+      console.log(
+  "RAW TAVILY RESULTS:",
+  tavilyResults
+);
 
     filtered = tavilyResults
 
