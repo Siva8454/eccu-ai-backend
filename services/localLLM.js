@@ -4,9 +4,37 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
+
+function cleanCanvasText(text = "") {
+  return text
+    .replace(/Published/g, "")
+    .replace(/Settings/g, "")
+    .replace(/Home Instructor Syllabus/g, "")
+    .replace(/Click to unpublish/g, "")
+    .replace(/Manage/g, "")
+    .replace(/View All Pages/g, "")
+    .replace(/Copyright.*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 async function generateAnswer(question, context) {
 
+  
+
   try {
+
+    const formattedContext = `
+
+CURRENT PAGE TITLE:
+${context?.pageTitle || "No page title"}
+
+CURRENT PAGE CONTENT:
+${cleanCanvasText(context?.currentPage || "").slice(0, 4000)}
+
+ADDITIONAL COURSE CONTEXT:
+${cleanCanvasText(context?.extraContext || "").slice(0, 2000)}
+
+`;
 
     const prompt = `
 You are an ECCU AI Tutor.
@@ -15,27 +43,31 @@ Student Question:
 ${question}
 
 Course Content:
-${context}
+${formattedContext}
 
 Instructions:
 
-1. If the question is about a COURSE TOPIC:
-   - Clearly explain the concept in simple terms
-   - Use structured explanation (steps / points if needed)
-   - If module references, links, or resources are present, include them
-
-2. If the question is a SUPPORT ISSUE (lab, ebook, login, etc):
-   - Provide only a direct solution
-   - DO NOT include course references
-
-3. If the answer is NOT found in the provided course content:
-   - Say:
-   "This topic is not available in your course materials. Please connect with your instructor for further clarification."
-
-4. Do NOT invent information
+1. ALWAYS prioritize CURRENT PAGE CONTENT first.
+2. The student is actively viewing the CURRENT PAGE.
+3. If the answer exists in CURRENT PAGE CONTENT, answer directly from it.
+4. Recognize:
+   - module names
+   - assignment names
+   - labs
+   - topics
+   from the CURRENT PAGE CONTENT.
+5. NEVER say:
+   - "I don't see course content"
+   - "Please provide more information"
+   if CURRENT PAGE CONTENT exists.
+6. Use ADDITIONAL COURSE CONTEXT only as secondary support.
+7. Do NOT invent information.
 
 Make the answer clear, structured, and student-friendly.
 `;
+
+    console.log("FORMATTED CONTEXT:");
+console.log(formattedContext);
 
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
