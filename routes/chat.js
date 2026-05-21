@@ -348,10 +348,10 @@ const structuredContext = {
     currentPage?.pageTitle || "",
 
   currentPage:
-    currentPage?.text || "",
+  currentPage?.text?.slice(0, 3000) || "",
 
   extraContext:
-  finalContext || ""
+  finalContext?.slice(0, 2500) || ""
 
 };
     const aiAnswer =

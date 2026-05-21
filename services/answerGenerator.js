@@ -150,13 +150,13 @@ STYLE:
 If labs are mentioned:
 - explain what the student will learn.
 
-CURRENT PAGE TITLE:
+CURRENT ACTIVE COURSE PAGE:
 ${context?.pageTitle || "Unknown Page"}
 
-CURRENT PAGE CONTENT:
+ACTIVE PAGE CONTENT:
 ${context?.currentPage || "No page content available"}
 
-ADDITIONAL CONTEXT:
+ADDITIONAL ECCU COURSE CONTEXT:
 ${context?.extraContext || "None"}
 
 QUESTION:
