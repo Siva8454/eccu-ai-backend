@@ -7,6 +7,8 @@ const { generateAnswer } = require("../services/localLLM");
 const { fetchUserEnrollments } = require("../services/canvasFetcher");
 const { saveQA, searchLearned } = require("../services/learningService");
 const { getLibraryResources } = require("../services/lirnResources");
+const detectCourse =
+  require("../utils/detectCourse");
 
 const {
   trustedWebSearch
@@ -116,6 +118,14 @@ function hasUsefulResources(resources = []) {
 router.post("/", async (req, res) => {
 
   try {
+
+    const currentCourse =
+  detectCourse();
+
+console.log(
+  "CURRENT COURSE:",
+  currentCourse
+);
 
     const {
       message,
