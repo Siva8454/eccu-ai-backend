@@ -1,7 +1,33 @@
 const axios = require("axios");
+const NodeCache = require("node-cache");
+const webCache = new NodeCache({
+
+  stdTTL: 604800,
+
+  checkperiod: 120
+
+});
 async function scrapingDogSearch(query) {
+  
 
   try {
+
+    const cacheKey =
+  query.toLowerCase().trim();
+
+const cached =
+  webCache.get(cacheKey);
+
+if (cached) {
+
+  console.log(
+    "CACHE HIT:",
+    query
+  );
+
+  return cached;
+
+}
 
     console.log(
       "RUNNING SCRAPINGDOG SEARCH..."
@@ -299,6 +325,10 @@ console.log(
   filtered
 );
 
+    webCache.set(
+  cacheKey,
+  filtered
+);
       return filtered;
 
     }
@@ -384,6 +414,11 @@ STRICT RULES:
       "TAVILY FILTERED RESULTS:",
       filtered
     );
+
+    webCache.set(
+  cacheKey,
+  filtered
+);
 
     return filtered;
 
