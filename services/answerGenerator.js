@@ -150,8 +150,14 @@ STYLE:
 If labs are mentioned:
 - explain what the student will learn.
 
-CONTEXT:
-${context || "No context available"}
+CURRENT PAGE TITLE:
+${context?.pageTitle || "Unknown Page"}
+
+CURRENT PAGE CONTENT:
+${context?.currentPage || "No page content available"}
+
+ADDITIONAL CONTEXT:
+${context?.extraContext || "None"}
 
 QUESTION:
 ${question}
@@ -191,6 +197,22 @@ CORE RULES:
 - Never generate resource sections.
 - Never recommend competitor training providers.
 - Be concise, clear, and professional.
+
+IMPORTANT CONTEXT RULES:
+
+- PRIORITIZE the CURRENT PAGE content above everything else.
+
+- ONLY discuss the CURRENT PAGE unless the user explicitly asks about another module or topic.
+
+- DO NOT mention previous modules, labs, assignments, or pages unless they are visible in the current page content.
+
+- If the user says only "hi", "hello", or gives a generic greeting:
+  - Introduce ONLY the CURRENT PAGE.
+  - DO NOT invent module numbers.
+  - DO NOT reference previous conversations.
+  - Keep the introduction short.
+
+- Use CURRENT PAGE TITLE as the primary learning context.
 `
 
           },

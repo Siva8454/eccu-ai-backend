@@ -342,13 +342,24 @@ ${r.url}`
     /* ===================================== */
     /* GENERATE ANSWER */
     /* ===================================== */
+const structuredContext = {
 
+  pageTitle:
+    currentPage?.pageTitle || "",
+
+  currentPage:
+    currentPage?.text || "",
+
+  extraContext:
+    vectorContext || ""
+
+};
     const aiAnswer =
-      await generateAnswer(
-        message,
-        finalContext,
-        intent
-      );
+  await generateAnswer(
+    message,
+    structuredContext,
+    intent
+  );
 
     /* ===================================== */
     /* CLEAN RESPONSE */
