@@ -228,12 +228,28 @@ function cleanUrl(url = "") {
 
 }
 
+function normalizeCacheKey(query = "") {
 
+  return query
+    .toLowerCase()
+
+    /* REMOVE COMMON QUESTION WORDS */
+    .replace(
+      /\b(what|is|explain|define|tell|me|about|how|does|do|can|you)\b/g,
+      ""
+    )
+
+    /* REMOVE EXTRA SPACES */
+    .replace(/\s+/g, " ")
+
+    .trim();
+
+}
 
 async function trustedWebSearch(query) {
 
   const cacheKey =
-  query.toLowerCase().trim();
+  normalizeCacheKey(query);
 
   const cached =
   webCache.get(cacheKey);
