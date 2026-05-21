@@ -12,22 +12,6 @@ async function scrapingDogSearch(query) {
 
   try {
 
-    const cacheKey =
-  query.toLowerCase().trim();
-
-const cached =
-  webCache.get(cacheKey);
-
-if (cached) {
-
-  console.log(
-    "CACHE HIT:",
-    query
-  );
-
-  return cached;
-
-}
 
     console.log(
       "RUNNING SCRAPINGDOG SEARCH..."
@@ -247,6 +231,23 @@ function cleanUrl(url = "") {
 
 
 async function trustedWebSearch(query) {
+
+  const cacheKey =
+  query.toLowerCase().trim();
+
+  const cached =
+  webCache.get(cacheKey);
+
+if (cached) {
+
+  console.log(
+    "CACHE HIT:",
+    query
+  );
+
+  return cached;
+
+}
 
   try {
 
