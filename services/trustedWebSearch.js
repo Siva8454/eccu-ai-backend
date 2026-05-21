@@ -123,6 +123,18 @@ function isTopicRelevant(title, query, url = "") {
   const q =
     query.toLowerCase();
 
+  /* XSS SPECIAL HANDLING */
+
+  if (
+    q.includes("xss") &&
+    (
+      text.includes("xss") ||
+      text.includes("cross-site scripting")
+    )
+  ) {
+    return true;
+  }
+
   const stopWords = [
 
     "what",
@@ -146,13 +158,13 @@ function isTopicRelevant(title, query, url = "") {
       !stopWords.includes(word)
     );
 
-  /* REQUIRE AT LEAST ONE STRONG MATCH */
+  if (keywords.length === 0)
+    return true;
 
-  return keywords.length === 0 ||
-
-  keywords.some(keyword =>
-  text.includes(keyword)
+  return keywords.some(keyword =>
+    text.includes(keyword)
   );
+
 }
 
 /* ===================================== */
@@ -182,16 +194,9 @@ function isValidResource(url, title = "", query = "") {
 
     
 
-    /* BLOCK GENERIC TOP PAGES */
-    !(
-      title.includes("top 10") &&
-      !query.includes("top 10")
-    ) &&
-
 
     /* BLOCK BAD TITLES */
     !title.includes("not found") &&
-    !title.includes("access denied") &&
     !title.includes("page not found") &&
 
     /* REQUIRE TOPIC MATCH */
