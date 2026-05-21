@@ -351,7 +351,7 @@ const structuredContext = {
     currentPage?.text || "",
 
   extraContext:
-    vectorContext || ""
+  finalContext || ""
 
 };
     const aiAnswer =
