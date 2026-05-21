@@ -1,17 +1,54 @@
 const axios = require("axios");
-const SEARX_INSTANCES = [
+async function scrapingDogSearch(query) {
 
-  "https://search.bus-hit.me/search",
+  try {
 
-  "https://searxng.site/search",
+    console.log(
+      "RUNNING SCRAPINGDOG SEARCH..."
+    );
 
-  "https://northboot.xyz/search",
+    const response = await axios.get(
+      "https://api.scrapingdog.com/google",
+      {
+        params: {
+          api_key:
+            process.env.SCRAPINGDOG_API_KEY,
+          query
+        },
+        timeout: 15000
+      }
+    );
 
-  "https://search.ononoki.org/search",
+    const results =
+      response.data || [];
 
-  "https://xo.wtf/search"
+    console.log(
+      "RAW SCRAPINGDOG RESULTS:",
+      results.length
+    );
 
-];
+    return results.map(r => ({
+
+      title:
+        r.title || "",
+
+      url:
+        r.link || ""
+
+    }));
+
+  } catch (err) {
+
+    console.log(
+      "ScrapingDog failed:",
+      err.message
+    );
+
+    return [];
+
+  }
+
+}
 
 /* ===================================== */
 /* BLOCKED DOMAINS */
@@ -257,15 +294,13 @@ tutorial
 `;
 
     /* ===================================== */
-/* SEARX SEARCH */
+/* SCRAPINGDOG SEARCH */
 /* ===================================== */
 
-console.log(
-  "RUNNING SEARX SEARCH..."
-);
-
 let filtered =
-  await searxSearch(enhancedQuery);
+  await scrapingDogSearch(
+    enhancedQuery
+  );
 
 filtered = filtered
 
@@ -305,7 +340,7 @@ filtered = filtered
   }));
 
 console.log(
-  "SEARX FILTERED RESULTS:",
+  "SCRAPINGDOG FILTERED RESULTS:",
   filtered
 );
 
@@ -329,7 +364,7 @@ console.log(
     /* ===================================== */
 
     console.log(
-      "Searx failed. Using Tavily fallback..."
+      "ScrapingDog failed. Using Tavily fallback..."
     );
 
     const response = await axios.post(
