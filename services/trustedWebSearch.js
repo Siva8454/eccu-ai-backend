@@ -11,16 +11,18 @@ async function scrapingDogSearch(query) {
       "https://api.scrapingdog.com/google",
       {
         params: {
-          api_key:
-            process.env.SCRAPINGDOG_API_KEY,
-          query
-        },
+  api_key:
+    process.env.SCRAPINGDOG_API_KEY,
+
+  query:
+    `${query} cybersecurity tutorial documentation`
+},
         timeout: 15000
       }
     );
 
     const results =
-      response.data || [];
+      response.data.organic_results || [];
 
     console.log(
       "RAW SCRAPINGDOG RESULTS:",
@@ -33,7 +35,7 @@ async function scrapingDogSearch(query) {
         r.title || "",
 
       url:
-        r.link || ""
+        r.link || r.url || ""
 
     }));
 
@@ -159,6 +161,8 @@ function isTopicRelevant(title, query, url = "") {
 
 function isValidResource(url, title = "", query = "") {
 
+  if (!url) return false;
+
   url = (url || "").toLowerCase();
   title = (title || "").toLowerCase();
   query = (query || "").toLowerCase();
@@ -209,72 +213,7 @@ function cleanUrl(url = "") {
 
 }
 
-/* ===================================== */
-/* TRUSTED WEB SEARCH */
-/* ===================================== */
-async function searxSearch(query) {
 
-  for (const instance of SEARX_INSTANCES) {
-
-    try {
-
-      console.log(
-        "Trying Searx instance:",
-        instance
-      );
-
-      const response = await axios.get(
-  instance,
-  {
-    params: {
-      q: query,
-      format: "json",
-      language: "en"
-    },
-
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0"
-    },
-
-    timeout: 15000
-  }
-);
-
-      const results =
-        response.data.results || [];
-
-      if (results.length > 0) {
-
-        console.log(
-          "Searx success:",
-          results.length
-        );
-
-        return results
-          .slice(0, 10)
-          .map(r => ({
-            title: r.title,
-            url: r.url
-          }));
-
-      }
-
-    } catch (err) {
-
-        console.log(
-    "Searx instance failed:",
-    instance,
-    err.message
-  );
-
-    }
-
-  }
-
-  return [];
-
-}
 
 async function trustedWebSearch(query) {
 
