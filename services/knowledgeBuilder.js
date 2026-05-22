@@ -13,7 +13,7 @@ const client = new QdrantClient({
   checkCompatibility: false
 });
 
-const COLLECTION = "eccu_knowledge";
+const COLLECTION = "eccu_501";
 
 console.log("Knowledge builder started...");
 

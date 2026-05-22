@@ -48,11 +48,7 @@ async function createCollection(name) {
 async function setup() {
 
   await createCollection(
-    "eccu_knowledge"
-  );
-
-  await createCollection(
-    "trusted_cyber_knowledge"
+    "eccu_501"
   );
 
 }

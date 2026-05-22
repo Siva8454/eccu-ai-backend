@@ -1,7 +1,7 @@
 {
-  "name": "eccu-ai-backend",
+  "name": "eccu-course-aware-tutor-backend",
   "version": "1.0.0",
-  "description": "ECCU AI Tutor Backend",
+  "description": "ECCU Course Aware Tutor Backend",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

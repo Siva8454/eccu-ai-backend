@@ -1,14 +1,13 @@
 const { QdrantClient } = require("@qdrant/js-client-rest");
 const { getLocalEmbedding } = require("./localEmbedding");
-const { detectIntent } = require("./intentDetector");
-const { rerank } = require("./reranker");
+
 
 const client = new QdrantClient({
   url: process.env.QDRANT_URL,
   apiKey: process.env.QDRANT_API_KEY
 });
 
-const COLLECTION = "eccu_knowledge";
+const COLLECTION = "eccu_501";
 
 /* ---------------- MODULE DETECTOR ---------------- */
 
@@ -59,7 +58,7 @@ console.log(question.slice(0, 3000));
 
   let results = await client.search(COLLECTION, {
     vector: embedding,
-    limit: 25, // ⭐ deeper search
+    limit: 40, // ⭐ deeper search
   });
 
   if (!results.length) {
@@ -89,11 +88,11 @@ console.log("Filtered results:", results.length);
 
     /* ⭐ PRIORITY 1 — CURRENT PAGE MATCH */
 
-    if (
-      currentPage &&
-      p.pageUrl &&
-      (currentPage?.url || "").includes(p.pageUrl)
-    ) {
+        if (
+    currentPage?.url &&
+    p.pageUrl &&
+    currentPage.url === p.pageUrl
+  ){
       score += 0.4;
     }
 
@@ -114,6 +113,18 @@ console.log("Filtered results:", results.length);
     ) {
       score += 0.2;
     }
+
+    /* ⭐ PRIORITY 4 — CURRENT PAGE TITLE */
+
+      if (
+        currentPage?.title &&
+        p.title &&
+        currentPage.title
+          .toLowerCase()
+          .includes(p.title.toLowerCase())
+      ) {
+        score += 0.35;
+      }
 
     return {
       ...r,

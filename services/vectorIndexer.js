@@ -7,7 +7,7 @@ const qdrant = new QdrantClient({
   apiKey: process.env.QDRANT_API_KEY
 });
 
-const COLLECTION = "eccu_knowledge";
+const COLLECTION = "eccu_501";
 
 async function indexKnowledgeStore() {
   const store = JSON.parse(
@@ -27,17 +27,29 @@ async function indexKnowledgeStore() {
       const title = item.title || item.name;
       const content = item.content || item.description || "";
 
-      const text = `${title}\n${content}`;
+            const text = `
+      Course: ${course.courseName}
+
+      Module: ${module.moduleName}
+
+      Title: ${title}
+
+      Content:
+      ${content}
+      `;
 
       points.push({
         id: id++,
-        payload: {
-          courseId: course.courseId,
-          courseName: course.courseName,
-          moduleName: module.moduleName,
-          title,
-          content
-        },
+              payload: {
+        courseId: course.courseId,
+        courseName: course.courseName,
+        moduleName: module.moduleName,
+        title,
+        content,
+        pageUrl: item.url || "",
+        type: item.type || "content",
+        links: item.links || []
+      },
         text
       });
     });
@@ -63,7 +75,7 @@ store.courses.forEach(c => {
     });
   }
 
-  await client.upsert(COLLECTION, {
+ await qdrant.upsert(COLLECTION, {
     wait: true,
     points: vectors
   });

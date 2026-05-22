@@ -86,7 +86,7 @@ async function fetchUserEnrollments() {
 /* FETCH ONLY SELECTED COURSES (DEV MODE) */
 /* -------------------------------------------------- */
 
-const DEV_COURSES = [2213, 2281]; // ✅ Only index these courses
+const DEV_COURSES = [2213]; // ✅ Only index these courses
 
 async function fetchCourses() {
 

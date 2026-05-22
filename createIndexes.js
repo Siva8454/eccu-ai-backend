@@ -7,7 +7,7 @@ const client = new QdrantClient({
   apiKey: process.env.QDRANT_API_KEY
 });
 
-const COLLECTION = "eccu_knowledge";
+const COLLECTION = "eccu_501";
 
 async function createIndexes() {
 
