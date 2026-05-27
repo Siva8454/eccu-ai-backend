@@ -10,7 +10,7 @@ async function createCollection(name) {
       `${process.env.QDRANT_URL}/collections/${name}`,
       {
         vectors: {
-          size: 768,
+          size: 384,
           distance: "Cosine"
         }
       },
@@ -42,13 +42,51 @@ async function createCollection(name) {
     }
 
   }
+}
+
+  async function createCourseIdIndex() {
+
+  try {
+
+    await axios.put(
+      `${process.env.QDRANT_URL}/collections/eccu_knowledge_v7/index`,
+      {
+        field_name: "courseId",
+        field_schema: "integer"
+      },
+      {
+        headers: {
+          "api-key": process.env.QDRANT_API_KEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log(
+      "✅ courseId index created"
+    );
+
+  } catch (err) {
+
+    console.log(
+      err.response?.data || err.message
+    );
+
+  }
 
 }
 
 async function setup() {
 
   await createCollection(
-    "eccu_501"
+    "eccu_knowledge_v7"
+  );
+
+await createCourseIdIndex();
+
+  
+  console.log(
+    "✅ courseCode index created"
   );
 
 }

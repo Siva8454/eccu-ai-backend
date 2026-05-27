@@ -1,7 +1,11 @@
 require("dotenv").config();
 
-const { QdrantClient } = require("@qdrant/js-client-rest");
-const { getLocalEmbedding } = require("./localEmbedding");
+const { QdrantClient } =
+  require("@qdrant/js-client-rest");
+
+const {
+  getLocalEmbedding
+} = require("./localEmbedding");
 
 /* -------------------------------------------------- */
 /* QDRANT CLIENT */
@@ -13,12 +17,137 @@ const client = new QdrantClient({
   checkCompatibility: false
 });
 
-const COLLECTION = "eccu_501";
+const COLLECTION = "eccu_knowledge_v7";
 
 console.log("Knowledge builder started...");
 
 /* -------------------------------------------------- */
-/* EXTRACT LINKS FROM HTML */
+/* CLEAN CANVAS CONTENT */
+/* -------------------------------------------------- */
+
+function cleanCanvasContent(text = "") {
+
+  return String(text)
+
+    // remove escaped quotes
+    .replace(/\\"/g, " ")
+
+    // remove escaped newlines
+    .replace(/\\n/g, " ")
+
+    // remove unicode html chars
+    .replace(/\\u003c/g, " ")
+    .replace(/\\u003e/g, " ")
+
+    // remove scripts/styles
+    .replace(
+      /<script[\s\S]*?<\/script>/gi,
+      " "
+    )
+
+    .replace(
+      /<style[\s\S]*?<\/style>/gi,
+      " "
+    )
+
+    // remove all html tags
+    .replace(/<[^>]*>/g, " ")
+
+    // remove href/src junk
+    .replace(/href="[^"]*"/g, " ")
+    .replace(/src="[^"]*"/g, " ")
+
+    // remove canvas attributes
+    .replace(/class="[^"]*"/g, " ")
+    .replace(/style="[^"]*"/g, " ")
+    .replace(/loading="[^"]*"/g, " ")
+
+    .replace(
+      /data-api-endpoint="[^"]*"/g,
+      " "
+    )
+
+    .replace(
+      /data-api-returntype="[^"]*"/g,
+      " "
+    )
+
+    // remove urls
+    .replace(/https?:\/\/\S+/g, " ")
+
+    // remove file/img leftovers
+    .replace(/\bFile\b/g, " ")
+    .replace(/\bimg\b/g, " ")
+
+    // html entities
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+
+    // normalize spaces
+    .replace(/\s+/g, " ")
+
+    .trim();
+
+}
+
+    /* -------------------------------------------------- */
+    /* LOW VALUE CONTENT FILTER */
+    /* -------------------------------------------------- */
+
+    function isLowValueContent(text = "") {
+
+      const lower = text.toLowerCase();
+
+      const badPatterns = [
+
+        "copyright",
+        "all rights reserved",
+        "submit your discussion",
+        "discussion comments",
+        "post a full and complete initial response",
+        "minimum word count",
+        "reply to at least",
+        "reproduction is strictly prohibited",
+        "click the end button",
+        "home instructor syllabus",
+        "canvas student android guide",
+        "helpful video",
+        "apa paper template",
+        "apa sample paper",
+        "in-text citation",
+        "grammarly",
+        "turnitin",
+        "syllabus",
+        "course overview",
+        "student guide",
+        "academic integrity",
+        "late submission",
+        "netiquette",
+        "attendance policy",
+        "grading policy",
+        "weekly objectives",
+        "play_video",
+        "objective_m",
+        ".svg",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        "course issues",
+        "help faq",
+        "write to us",
+        "support center"
+
+      ];
+
+      return badPatterns.some(pattern =>
+        lower.includes(pattern)
+      );
+    }
+
+
+/* -------------------------------------------------- */
+/* EXTRACT LINKS */
 /* -------------------------------------------------- */
 
 function extractLinks(html) {
@@ -26,7 +155,9 @@ function extractLinks(html) {
   if (!html) return [];
 
   const links = [];
-  const regex = /<a[^>]+href="([^"]+)"[^>]*>(.*?)<\/a>/gi;
+
+  const regex =
+    /<a[^>]+href="([^"]+)"[^>]*>(.*?)<\/a>/gi;
 
   let match;
 
@@ -34,16 +165,20 @@ function extractLinks(html) {
 
     links.push({
       url: match[1],
-      text: match[2].replace(/<[^>]+>/g, "")
+
+      text: match[2]
+        .replace(/<[^>]+>/g, "")
+        .trim()
     });
 
   }
 
   return links;
+
 }
 
 /* -------------------------------------------------- */
-/* ENSURE COLLECTION EXISTS */
+/* ENSURE COLLECTION */
 /* -------------------------------------------------- */
 
 async function ensureCollection() {
@@ -51,18 +186,26 @@ async function ensureCollection() {
   try {
 
     await client.getCollection(COLLECTION);
-    console.log("📦 Collection already exists");
+
+    console.log(
+      "📦 Collection already exists"
+    );
 
   } catch {
 
-    console.log("🆕 Creating Qdrant collection...");
+    console.log(
+      "🆕 Creating Qdrant collection..."
+    );
 
-    await client.createCollection(COLLECTION, {
-      vectors: {
-        size: 768,
-        distance: "Cosine"
+    await client.createCollection(
+      COLLECTION,
+      {
+        vectors: {
+          size: 384,
+          distance: "Cosine"
+        }
       }
-    });
+    );
 
     console.log("✅ Collection created");
 
@@ -74,7 +217,7 @@ async function ensureCollection() {
 /* TEXT CHUNKER */
 /* -------------------------------------------------- */
 
-function chunkText(text, size = 600) {
+function chunkText(text, size = 1200) {
 
   if (!text) return [];
 
@@ -84,12 +227,16 @@ function chunkText(text, size = 600) {
 
   while (i < text.length) {
 
-    chunks.push(text.slice(i, i + size));
+    chunks.push(
+      text.slice(i, i + size)
+    );
+
     i += size;
 
   }
 
   return chunks;
+
 }
 
 /* -------------------------------------------------- */
@@ -98,21 +245,27 @@ function chunkText(text, size = 600) {
 
 function generateId() {
 
-  return Date.now() + Math.floor(Math.random() * 100000);
+  return (
+    Date.now() +
+    Math.floor(Math.random() * 100000)
+  );
 
 }
 
 /* -------------------------------------------------- */
-/* MODULE NUMBER DETECTOR */
+/* MODULE NUMBER */
 /* -------------------------------------------------- */
 
 function detectModuleNumber(name) {
 
   if (!name) return null;
 
-  const match = name.match(/module\s*0*(\d+)/i);
+  const match =
+    name.match(/module\s*0*(\d+)/i);
 
-  if (match) return Number(match[1]);
+  if (match) {
+    return Number(match[1]);
+  }
 
   return null;
 
@@ -122,7 +275,11 @@ function detectModuleNumber(name) {
 /* UPSERT VECTOR */
 /* -------------------------------------------------- */
 
-async function upsertPoint(id, embedding, payload) {
+async function upsertPoint(
+  id,
+  embedding,
+  payload
+) {
 
   await client.upsert(COLLECTION, {
 
@@ -144,58 +301,116 @@ async function upsertPoint(id, embedding, payload) {
 /* MAIN BUILDER */
 /* -------------------------------------------------- */
 
-async function buildKnowledgeStore(canvasData) {
+async function buildKnowledgeStore(
+  canvasData
+) {
 
   await ensureCollection();
 
-  console.log("🚀 Building ECCU vector knowledge...");
+  console.log(
+    "🚀 Building ECCU vector knowledge..."
+  );
 
   let totalIndexed = 0;
 
-  for (const course of canvasData || []) {
+  for (const course of (canvasData || [])) {
 
-    const courseId = Number(course.id);
+    const courseId =
+      Number(course.id);
 
-    console.log(`📘 Course: ${course.name}`);
+    console.log(
+      `📘 Course: ${course.name}`
+    );
 
     /* ================= MODULE ITEMS ================= */
 
-    for (const module of (course.modules || [])) {
+    for (const module of (
+      course.modules || []
+    )) {
 
-      const moduleNumber = detectModuleNumber(module.name);
+      const moduleNumber =
+        detectModuleNumber(
+          module.name
+        );
 
-      for (const item of (module.items || [])) {
+      for (const item of (
+        module.items || []
+      )) {
 
-        const text = `
-Course: ${course.name}
+        const rawContent =
+        item.content ||
+        item.body ||
+        item.description ||
+        "";
 
-Module: ${module.name}
+        const cleanedContent =
+          cleanCanvasContent(
+            rawContent
+          );
 
-Module Number: ${moduleNumber || "Unknown"}
+          if (
+          isLowValueContent(
+            cleanedContent
+          )
+        ) {
+          continue;
+        }
 
-Item Title: ${item.title || ""}
+        const text = [
 
-Description:
-${item.content || item.body || item.description || item.title || ""}
-`;
+          item.title,
 
-        const chunks = chunkText(text);
+          cleanedContent
+
+        ]
+        .filter(Boolean)
+        .join("\n\n");
+
+        // skip garbage chunks
+        if (
+          !text ||
+          text.length < 180
+        ) {
+          continue;
+        }
+
+        const chunks =
+          chunkText(text);
 
         for (const chunk of chunks) {
 
-          const embedding = await getLocalEmbedding(chunk);
+          const embedding =
+            await getLocalEmbedding(
+              chunk
+            );
 
-          await upsertPoint(generateId(), embedding, {
+          await upsertPoint(
 
-            type: "module_item",
-            courseId,
-            courseName: course.name,
-            moduleName: module.name,
-            moduleNumber,
-            title: item.title,
-            content: chunk
+            generateId(),
 
-          });
+            embedding,
+
+            {
+              type: "module_item",
+
+              courseId,
+
+              courseName:
+                course.name,
+
+              moduleName:
+                module.name,
+
+              moduleNumber,
+
+              title:
+                item.title,
+
+              content:
+                chunk
+            }
+
+          );
 
           totalIndexed++;
 
@@ -207,36 +422,72 @@ ${item.content || item.body || item.description || item.title || ""}
 
     /* ================= PAGES ================= */
 
-    for (const page of (course.pages || [])) {
+    for (const page of (
+      course.pages || []
+    )) {
 
-      const links = extractLinks(page.body);
+      const links =
+        extractLinks(page.body);
 
-      const text = `
-Course: ${course.name}
+      const cleanedPage =
+        cleanCanvasContent(
+          page.body || ""
+        );
 
-Page: ${page.title}
+      const text = [
 
-Content:
-${page.body || ""}
-`;
+        page.title,
 
-      const chunks = chunkText(text);
+        cleanedPage
+
+      ]
+      .filter(Boolean)
+      .join("\n\n");
+
+      if (
+        !text ||
+        text.length < 180
+      ) {
+        continue;
+      }
+
+      const chunks =
+        chunkText(text);
 
       for (const chunk of chunks) {
 
-        const embedding = await getLocalEmbedding(chunk);
+        const embedding =
+          await getLocalEmbedding(
+            chunk
+          );
 
-        await upsertPoint(generateId(), embedding, {
+        await upsertPoint(
 
-          type: "page",
-          courseId,
-          courseName: course.name,
-          title: page.title,
-          content: chunk,
-          links,
-          pageUrl: page.url
+          generateId(),
 
-        });
+          embedding,
+
+          {
+            type: "page",
+
+            courseId,
+
+            courseName:
+              course.name,
+
+            title:
+              page.title,
+
+            content:
+              chunk,
+
+            links,
+
+            pageUrl:
+              page.url
+          }
+
+        );
 
         totalIndexed++;
 
@@ -246,32 +497,64 @@ ${page.body || ""}
 
     /* ================= ASSIGNMENTS ================= */
 
-    for (const a of (course.assignments || [])) {
+    for (const a of (
+      course.assignments || []
+    )) {
 
-      const text = `
-Course: ${course.name}
+      const cleanedAssignment =
+        cleanCanvasContent(
+          a.description || ""
+        );
 
-Assignment: ${a.name}
+      const text = [
 
-Description:
-${a.description || ""}
-`;
+        a.name,
 
-      const chunks = chunkText(text);
+        cleanedAssignment
+
+      ]
+      .filter(Boolean)
+      .join("\n\n");
+
+      if (
+        !text ||
+        text.length < 180
+      ) {
+        continue;
+      }
+
+      const chunks =
+        chunkText(text);
 
       for (const chunk of chunks) {
 
-        const embedding = await getLocalEmbedding(chunk);
+        const embedding =
+          await getLocalEmbedding(
+            chunk
+          );
 
-        await upsertPoint(generateId(), embedding, {
+        await upsertPoint(
 
-          type: "assignment",
-          courseId,
-          courseName: course.name,
-          title: a.name,
-          content: chunk
+          generateId(),
 
-        });
+          embedding,
+
+          {
+            type: "assignment",
+
+            courseId,
+
+            courseName:
+              course.name,
+
+            title:
+              a.name,
+
+            content:
+              chunk
+          }
+
+        );
 
         totalIndexed++;
 
@@ -281,32 +564,64 @@ ${a.description || ""}
 
     /* ================= DISCUSSIONS ================= */
 
-    for (const d of (course.discussions || [])) {
+    for (const d of (
+      course.discussions || []
+    )) {
 
-      const text = `
-Course: ${course.name}
+      const cleanedDiscussion =
+        cleanCanvasContent(
+          d.message || ""
+        );
 
-Discussion Topic: ${d.title}
+      const text = [
 
-Content:
-${d.message || ""}
-`;
+        d.title,
 
-      const chunks = chunkText(text);
+        cleanedDiscussion
+
+      ]
+      .filter(Boolean)
+      .join("\n\n");
+
+      if (
+        !text ||
+        text.length < 180
+      ) {
+        continue;
+      }
+
+      const chunks =
+        chunkText(text);
 
       for (const chunk of chunks) {
 
-        const embedding = await getLocalEmbedding(chunk);
+        const embedding =
+          await getLocalEmbedding(
+            chunk
+          );
 
-        await upsertPoint(generateId(), embedding, {
+        await upsertPoint(
 
-          type: "discussion",
-          courseId,
-          courseName: course.name,
-          title: d.title,
-          content: chunk
+          generateId(),
 
-        });
+          embedding,
+
+          {
+            type: "discussion",
+
+            courseId,
+
+            courseName:
+              course.name,
+
+            title:
+              d.title,
+
+            content:
+              chunk
+          }
+
+        );
 
         totalIndexed++;
 
@@ -316,34 +631,79 @@ ${d.message || ""}
 
     /* ================= FILES ================= */
 
-    for (const f of (course.files || [])) {
+    /* ================= FILES ================= */
 
-      const text = `
-Course: ${course.name}
+      for (const f of (
+        course.files || []
+      )) {
 
-File:
-${f.display_name}
-`;
+        const fileName =
+          (
+            f.display_name || ""
+          ).toLowerCase();
 
-      const embedding = await getLocalEmbedding(text);
+        // SKIP MEDIA / GARBAGE FILES
+        if (
 
-      await upsertPoint(generateId(), embedding, {
+          fileName.endsWith(".svg") ||
+          fileName.endsWith(".png") ||
+          fileName.endsWith(".jpg") ||
+          fileName.endsWith(".jpeg") ||
+          fileName.endsWith(".gif") ||
+          fileName.includes("play_video") ||
+          fileName.includes("objective_m")
 
-        type: "file",
-        courseId,
-        courseName: course.name,
-        title: f.display_name,
-        content: text
+        ) {
+          continue;
+        }
 
-      });
+        const text =
+          f.display_name;
 
-      totalIndexed++;
+        if (
+          !text ||
+          text.length < 8
+        ) {
+          continue;
+        }
 
-    }
+        const embedding =
+          await getLocalEmbedding(
+            text
+          );
+
+        await upsertPoint(
+
+          generateId(),
+
+          embedding,
+
+          {
+            type: "file",
+
+            courseId,
+
+            courseName:
+              course.name,
+
+            title:
+              f.display_name,
+
+            content:
+              text
+          }
+
+        );
+
+        totalIndexed++;
+
+      }
 
   }
 
-  console.log(`🎉 Vector build complete. Indexed: ${totalIndexed}`);
+  console.log(
+    `🎉 Vector build complete. Indexed: ${totalIndexed}`
+  );
 
 }
 
@@ -351,7 +711,9 @@ ${f.display_name}
 /* EXPORT */
 /* -------------------------------------------------- */
 
-module.exports = { buildKnowledgeStore };
+module.exports = {
+  buildKnowledgeStore
+};
 
 /* -------------------------------------------------- */
 /* PREVENT DIRECT RUN */
@@ -359,6 +721,8 @@ module.exports = { buildKnowledgeStore };
 
 if (require.main === module) {
 
-  console.log("⚠ knowledgeBuilder should be called from sync.js with Canvas data");
+  console.log(
+    "⚠ knowledgeBuilder should be called from sync.js with Canvas data"
+  );
 
 }

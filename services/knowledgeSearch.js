@@ -52,7 +52,17 @@ function searchKnowledge(query) {
             courseName: course.courseName,
             moduleName: module.moduleName,
             title: item.title,
-            content: item.content,
+            content: (
+            item.content ||
+            item.body ||
+            item.description ||
+            ""
+          )
+            .replace(/\\n/g, " ")
+            .replace(/\\"/g, "")
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim(),
             score
           });
         }

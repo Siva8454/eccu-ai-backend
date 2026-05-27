@@ -1,6 +1,13 @@
 const axios = require("axios");
 
+const {
+  analyzeQuery
+} = require("./queryAnalyzer");
+
 async function generateAnswer(question, context, intent) {
+
+  const queryAnalysis =
+  analyzeQuery(question);
 
   let prompt = "";
 
@@ -204,6 +211,16 @@ IMPORTANT:
 CURRENT PAGE is the highest priority source.
 
 Be concise, educational, and accurate.
+
+QUERY ANALYSIS:
+
+Detected Type:
+${queryAnalysis.type || "general"}
+
+Detected Module:
+${queryAnalysis.moduleName || "none"}
+
+Use this analysis to better understand the student's intent.
 
 `
 

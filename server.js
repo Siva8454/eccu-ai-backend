@@ -11,11 +11,15 @@ const path = require("path");
 const chatRoutes = require("./routes/chat");
 const syncRoutes = require("./routes/sync");
 
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+const testRetriever = require("./routes/testRetriever");
+
+app.use("/test-retriever", testRetriever);
 /* -------------------------------------------------- */
 /* SERVE WIDGET STATIC FILES */
 /* -------------------------------------------------- */

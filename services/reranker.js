@@ -1,26 +1,104 @@
-function rerank(question, results) {
+function rerankDocuments(question, docs) {
 
-  const q = question.toLowerCase();
+  const q =
+    question.toLowerCase();
 
-  return results
-    .map(r => {
+  const keywords =
+    q.split(/\s+/);
 
-      const text = (r.payload.content || "").toLowerCase();
+  const scored = docs.map(doc => {
 
-      let score = r.score;
+    const text =
+      (doc.pageContent || "")
+        .toLowerCase();
 
-      if (text.includes(q)) score += 0.3;
+    let score = 0;
 
-      if (text.includes("module")) score += 0.1;
+    /* ----------------------------- */
+    /* KEYWORD MATCHING */
+    /* ----------------------------- */
 
-      return {
-        ...r,
-        score
-      };
+    keywords.forEach(word => {
 
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3); // return best 3 chunks
+      if (
+        word.length > 3 &&
+        text.includes(word)
+      ) {
+        score += 2;
+      }
+
+    });
+
+    /* ----------------------------- */
+    /* TYPE PRIORITY */
+    /* ----------------------------- */
+
+    const type =
+      doc.metadata?.type || "";
+
+    if (type === "page") score += 5;
+
+    if (type === "assignment") score += 4;
+
+    if (type === "discussion") score += 3;
+
+    if (type === "module") score += 2;
+
+    if (type === "file") score += 1;
+
+    /* ----------------------------- */
+    /* CONTENT QUALITY */
+    /* ----------------------------- */
+
+    const length =
+      text.length;
+
+    if (length > 300)
+      score += 2;
+
+    if (length > 1000)
+      score += 1;
+
+    /* ----------------------------- */
+    /* EDUCATIONAL BOOST */
+    /* ----------------------------- */
+
+    if (
+      text.includes("learning") ||
+      text.includes("objective") ||
+      text.includes("security") ||
+      text.includes("vulnerability") ||
+      text.includes("attack")
+    ) {
+      score += 2;
+    }
+
+    /* ----------------------------- */
+    /* PENALIZE GARBAGE */
+    /* ----------------------------- */
+
+    if (
+      text.includes("copyright") ||
+      text.includes("all rights reserved")
+    ) {
+      score -= 10;
+    }
+
+    return {
+      ...doc,
+      rerankScore: score
+    };
+
+  });
+
+  scored.sort(
+    (a, b) =>
+      b.rerankScore - a.rerankScore
+  );
+
+  return scored.slice(0, 5);
 }
 
-module.exports = { rerank };
+module.exports = {
+  rerankDocuments
+};

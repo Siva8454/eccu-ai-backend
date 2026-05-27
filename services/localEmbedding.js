@@ -2,7 +2,7 @@ const crypto = require("crypto")
 
 function getLocalEmbedding(text) {
 
-  const dimension = 768
+  const dimension = 384
   const vector = new Array(dimension).fill(0)
 
   const hash = crypto.createHash("sha512").update(text).digest()

@@ -61,7 +61,11 @@ function isAllowedCourse() {
 
   const courseId = getCourseId()
 
+<<<<<<< HEAD
   const allowedCourses = [2213]
+=======
+  const allowedCourses = [2213, 2460]
+>>>>>>> 8acbfc2 (Agentic RAG upgrade)
 
   return allowedCourses.includes(courseId)
 }
@@ -82,6 +86,7 @@ if (!isAllowedCourse()) {
 
 const CANVAS_CONTEXT = getCanvasContext()
 let conversationHistory = []
+let currentRequest = null;
 
 /* ---------- FORMAT LINKS ---------- */
 
@@ -381,7 +386,10 @@ chatBody.appendChild(loading)
 
 try{
 
-const currentUserId = getCourseId() + "-student"; 
+const currentUserId =
+  window.ENV?.current_user_id
+    ? `${getCourseId()}-${window.ENV.current_user_id}`
+    : `${getCourseId()}-student`;
 
 const mainContent =
   document.querySelector("#content") ||
@@ -390,28 +398,87 @@ const mainContent =
   document.querySelector(".quiz") ||
   document.body;
 
-const pageText = mainContent.innerText.slice(0, 25000);
+const pageText =
+  mainContent.innerText
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 25000);
+
+let pageType = "general";
+
+if (
+  window.location.pathname.includes("/assignments/")
+) {
+  pageType = "assignment";
+}
+
+else if (
+  window.location.pathname.includes("/discussion_topics/")
+) {
+  pageType = "discussion";
+}
+
+else if (
+  window.location.pathname.includes("/quizzes/")
+) {
+  pageType = "quiz";
+}
+
+else if (
+  window.location.pathname.includes("/modules")
+) {
+  pageType = "module";
+}
 
 const currentPage = {
   url: window.location.href,
   title: document.title,
-  text: pageText
+  text: pageText,
+  type: pageType
 };
+
+console.log("📤 Sending Request:", {
+
+  message: msg,
+
+  currentPage,
+
+  courseId: getCourseId(),
+
+  userId: currentUserId,
+
+  history:
+    conversationHistory.slice(-12)
+
+});
+
+  /* -------------------------- */
+/* ABORT PREVIOUS REQUEST */
+/* -------------------------- */
+
+if (currentRequest) {
+  currentRequest.abort();
+}
+
+currentRequest =
+  new AbortController();
 
 const res = await fetch("https://eccu-ai-backend.onrender.com/chat", {
 
 method:"POST",
 headers:{ "Content-Type":"application/json" },
+signal: currentRequest.signal,
 
 body: JSON.stringify({
   message: msg,
-  history: conversationHistory.slice(-6),
+  history: conversationHistory.slice(-12),
   courseId: getCourseId(),
   currentPage: {
   url: window.location.href,
   pageTitle: document.title,
   title: document.title,
-  text: pageText
+  text: pageText,
+  type: pageType
 },
   pageText,
   userId: currentUserId
@@ -420,6 +487,12 @@ body: JSON.stringify({
 })
 
 const data = await res.json()
+currentRequest = null;
+
+console.log(
+  "🤖 AI Response:",
+  data
+);
 
 loading.remove()
 
@@ -436,7 +509,16 @@ content:data.reply
 }catch(e){
 
 loading.remove()
-addMessage("⚠ AI service not reachable.", "bot-msg")
+
+if (e.name === "AbortError") {
+  console.log("⛔ Previous request aborted");
+  return;
+}
+
+addMessage(
+  "⚠ AI service not reachable.",
+  "bot-msg"
+);
 
 }
 

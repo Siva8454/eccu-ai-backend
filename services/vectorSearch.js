@@ -7,7 +7,7 @@ const client = new QdrantClient({
   apiKey: process.env.QDRANT_API_KEY
 });
 
-const COLLECTION = "eccu_501";
+const COLLECTION = "eccu_knowledge_v7";
 
 /* ---------------- MODULE DETECTOR ---------------- */
 
