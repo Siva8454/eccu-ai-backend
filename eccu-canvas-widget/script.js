@@ -61,11 +61,7 @@ function isAllowedCourse() {
 
   const courseId = getCourseId()
 
-<<<<<<< HEAD
-  const allowedCourses = [2213]
-=======
   const allowedCourses = [2213, 2460]
->>>>>>> 8acbfc2 (Agentic RAG upgrade)
 
   return allowedCourses.includes(courseId)
 }
@@ -111,18 +107,16 @@ function formatLinks(text) {
 }
 
 /* ---------- SCROLL MESSAGE TOP ---------- */
-function scrollToMessage(element) {
-  setTimeout(() => {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  }, 50);
-}
+
 function scrollToBottom() {
-  setTimeout(() => {
-    chatBody.scrollTop = chatBody.scrollHeight;
-  }, 50);
+
+  requestAnimationFrame(() => {
+
+    chatBody.scrollTop =
+      chatBody.scrollHeight;
+
+  });
+
 }
 
 /* ---------- UI ---------- */
@@ -131,12 +125,26 @@ const root = document.createElement("div")
 root.id="eccu-chatbot"
 
 root.innerHTML = `
-<div id="eccu-avatar">💬</div>
+<div id="eccu-avatar">🤖</div>
 
 <div id="eccu-chat">
 
   <div id="eccu-chat-header">
-    <span class="eccu-title">ECCU AI Tutor</span>
+    <div class="eccu-header-left">
+
+    <div class="eccu-title-row">
+
+  <span class="eccu-title">
+    ECCU AI Tutor
+  </span>
+
+  <span class="eccu-beta">
+    BETA
+  </span>
+
+</div>
+
+  </div>
 
     <div class="eccu-actions">
       <button id="eccu-max">⛶</button>
@@ -147,7 +155,7 @@ root.innerHTML = `
   <div id="eccu-chat-body"></div>
 
   <div id="eccu-chat-footer">
-    <input id="eccu-input" placeholder="Ask me anything..." />
+    <input id="eccu-input" placeholder="Ask ECCU AI Tutor..." />
     <button id="eccu-send">➤</button>
   </div>
 
@@ -183,8 +191,8 @@ function addMessage(text, cls){
   }
 
    if (cls === "bot-msg") {
-    scrollToMessage(div)
-  }
+  scrollToBottom()
+}
 
   return div
 }
@@ -193,8 +201,13 @@ function addMessage(text, cls){
 
 function showFAQs(){
 
+  if (
+  chatBody.querySelector(".eccu-faq")
+) return;
+
 const container = document.createElement("div")
 container.className = "eccu-faq"
+
 
 const options = [
   {
@@ -222,11 +235,22 @@ const options = [
 options.forEach(opt => {
 
   const btn = document.createElement("button")
-  btn.innerText = opt.label
+  const icons = {
+  "Course / Topic": "📖",
+  "Labs": "🧪",
+  "Assignments / Research Project / Case Study": "📄",
+  "Help & Support": "❓",
+  "Other": "⚙️"
+};
+
+btn.innerHTML = `
+<span>${icons[opt.label]}</span>
+<span>${opt.label}</span>
+`;
 
   btn.onclick = () => {
     addMessage(opt.label, "user-msg")
-    addMessage(opt.reply, "bot-msg")
+    processMessage(opt.label)
   }
 
   container.appendChild(btn)
@@ -247,7 +271,13 @@ console.log("pageTitle:", context.pageTitle);
 
 avatar.onclick = () => {
 
-chat.style.display = "flex"
+  chat.classList.add("open");
+
+  setTimeout(() => {
+    input.focus();
+  }, 120);
+
+  scrollToBottom();
 
 if(!chatBody.hasChildNodes()){
 
@@ -274,11 +304,12 @@ else {
     "this page";
 }
 
-  addMessage(`Hi 👋 You're on ${displayText}`, "bot-msg");
+  addMessage(`Hi 👋 You're on ${displayText}`, "welcome-msg");
 
-addMessage("What do you need help with today?", "bot-msg")
+addMessage("What do you need help with today?", "welcome-msg");
 
 showFAQs()
+
 
 }
 
@@ -287,14 +318,51 @@ showFAQs()
 /* ---------- CLOSE ---------- */
 
 closeBtn.onclick = () => {
-chat.style.display = "none"
+
+  chat.classList.remove("open");
+
+  chat.classList.remove("fullscreen");
+
+  maxBtn.innerText = "⛶";
 }
 
 /* ---------- MAXIMIZE ---------- */
 
 maxBtn.onclick = () => {
-chat.classList.toggle("fullscreen")
+
+  chat.style.transformOrigin = "center center";
+
+  const isFullscreen =
+    chat.classList.toggle("fullscreen");
+
+if (isFullscreen) {
+
+    document.body.style.overflow = "hidden";
+
+} else {
+
+    document.body.style.overflow = "";
+
 }
+
+  maxBtn.innerText =
+    isFullscreen ? "❐" : "⛶";
+
+  scrollToBottom();
+}
+
+/* ---------- ESC CLOSE ---------- */
+
+document.addEventListener("keydown", e => {
+
+  if (
+    e.key === "Escape" &&
+    chat.classList.contains("open")
+  ) {
+
+    closeBtn.click();
+  }
+});
 
 /* ---------- SEND ---------- */
 
@@ -377,10 +445,17 @@ return
 /* LOADING */
 
 const loading = document.createElement("div")
-loading.className = "bot-msg"
-loading.innerText = "Typing..."
+loading.className = "bot-msg typing-bubble"
+loading.innerHTML = `
+<div class="typing">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+`
 
 chatBody.appendChild(loading)
+scrollToBottom()
 
 /* API CALL */
 
@@ -496,10 +571,12 @@ console.log(
 
 loading.remove()
 
-addMessage(
+const botReply = addMessage(
   data.reply || "Please contact your instructor or ECCU support.",
   "bot-msg"
 )
+
+scrollToBottom()
 
 conversationHistory.push({
 role:"assistant",
@@ -510,15 +587,12 @@ content:data.reply
 
 loading.remove()
 
-if (e.name === "AbortError") {
-  console.log("⛔ Previous request aborted");
-  return;
-}
-
 addMessage(
   "⚠ AI service not reachable.",
   "bot-msg"
-);
+)
+
+scrollToBottom()
 
 }
 

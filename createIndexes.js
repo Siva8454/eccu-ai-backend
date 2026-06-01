@@ -7,11 +7,7 @@ const client = new QdrantClient({
   apiKey: process.env.QDRANT_API_KEY
 });
 
-<<<<<<< HEAD
-const COLLECTION = "eccu_501";
-=======
 const COLLECTION = "eccu_knowledge_v7";
->>>>>>> 8acbfc2 (Agentic RAG upgrade)
 
 async function createIndexes() {
 
