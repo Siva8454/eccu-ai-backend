@@ -48,12 +48,12 @@ res.send(`
 if(window.parent){
 
 const script = window.parent.document.createElement("script");
-script.src = "https://eccu-ai-backend.onrender.com/widget/script.js";
+script.src = "https://aitutor.eccu.edu/widget/script.js";
 window.parent.document.head.appendChild(script);
 
 const css = window.parent.document.createElement("link");
 css.rel = "stylesheet";
-css.href = "https://eccu-ai-backend.onrender.com/widget/styles.css";
+css.href = "https://aitutor.eccu.edu/widget/styles.css";
 window.parent.document.head.appendChild(css);
 
 }
