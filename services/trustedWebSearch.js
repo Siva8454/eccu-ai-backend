@@ -24,8 +24,7 @@ async function scrapingDogSearch(query) {
   api_key:
     process.env.SCRAPINGDOG_API_KEY,
 
-  query:
-    `${query} cybersecurity tutorial documentation`
+  query: `${query} educational resources`
 },
         timeout: 15000
       }
@@ -99,26 +98,20 @@ function getTrustScore(url = "") {
 
   url = url.toLowerCase();
 
+  if (url.includes(".edu")) return 10;
   if (url.includes(".gov")) return 10;
 
-  if (url.includes("owasp")) return 9;
-  if (url.includes("nist")) return 9;
-  if (url.includes("cisa")) return 9;
+  if (url.includes("britannica")) return 9;
+  if (url.includes("khanacademy")) return 9;
+
+  if (url.includes("apa.org")) return 9;
+  if (url.includes("nih.gov")) return 9;
 
   if (url.includes("microsoft")) return 8;
   if (url.includes("aws")) return 8;
   if (url.includes("google")) return 8;
-  if (url.includes("cloudflare")) return 8;
-  if (url.includes("cisco")) return 8;
-  if (url.includes("fortinet")) return 8;
-  if (url.includes("paloalto")) return 8;
-  if (url.includes("crowdstrike")) return 8;
-  if (url.includes("rapid7")) return 8;
-  if (url.includes("splunk")) return 8;
-  if (url.includes("portswigger")) return 8;
-  if (url.includes("sans")) return 8;
 
-  return 5;
+  return 6;
 }
 
 /* ===================================== */
@@ -274,10 +267,10 @@ if (cached) {
     const enhancedQuery = `
 ${query}
 
-cybersecurity
 educational resources
-official documentation
+learning material
 tutorial
+reference
 `;
 
     /* ===================================== */
@@ -370,7 +363,15 @@ console.log(
         query: `
 ${query}
 
-Find trusted cybersecurity educational resources.
+Find trusted educational resources related to the topic.
+
+STRICT RULES:
+- Return direct topic-specific pages only
+- Prioritize educational and authoritative sources
+- Avoid homepage links
+- Avoid discussion forums
+- Avoid spam websites
+- Avoid broken URLs
 
 STRICT RULES:
 - Return direct topic-specific pages only

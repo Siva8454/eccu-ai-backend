@@ -538,7 +538,7 @@ if (currentRequest) {
 currentRequest =
   new AbortController();
 
-const res = await fetch("https://eccu-ai-backend.onrender.com/chat", {
+const res = await fetch("https://aitutor.eccu.edu/chat", {
 
 method:"POST",
 headers:{ "Content-Type":"application/json" },
