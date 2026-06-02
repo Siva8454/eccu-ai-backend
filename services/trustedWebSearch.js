@@ -7,34 +7,30 @@ const webCache = new NodeCache({
   checkperiod: 120
 
 });
-async function scrapingDogSearch(query) {
-  
+async function searxngSearch(query) {
 
   try {
 
-
     console.log(
-      "RUNNING SCRAPINGDOG SEARCH..."
+      "RUNNING SEARXNG SEARCH..."
     );
 
     const response = await axios.get(
-      "https://api.scrapingdog.com/google",
+      "https://search.eccu.edu/search",
       {
         params: {
-  api_key:
-    process.env.SCRAPINGDOG_API_KEY,
-
-  query: `${query} educational resources`
-},
+          q: query,
+          format: "json"
+        },
         timeout: 15000
       }
     );
 
     const results =
-      response.data.organic_results || [];
+      response.data.results || [];
 
     console.log(
-      "RAW SCRAPINGDOG RESULTS:",
+      "RAW SEARXNG RESULTS:",
       results.length
     );
 
@@ -44,14 +40,17 @@ async function scrapingDogSearch(query) {
         r.title || "",
 
       url:
-        r.link || r.url || ""
+        r.url || "",
+
+      content:
+        r.content || ""
 
     }));
 
   } catch (err) {
 
     console.log(
-      "ScrapingDog failed:",
+      "SearXNG failed:",
       err.message
     );
 
@@ -278,7 +277,7 @@ reference
 /* ===================================== */
 
 let filtered =
-  await scrapingDogSearch(
+  await searxngSearch(
     enhancedQuery
   );
 
@@ -320,7 +319,7 @@ filtered = filtered
   }));
 
 console.log(
-  "SCRAPINGDOG FILTERED RESULTS:",
+  "SEARXNG FILTERED RESULTS:",
   filtered
 );
 
@@ -348,7 +347,7 @@ console.log(
     /* ===================================== */
 
     console.log(
-      "ScrapingDog failed. Using Tavily fallback..."
+      "SearXNG failed. Using Tavily fallback..."
     );
 
     const response = await axios.post(
