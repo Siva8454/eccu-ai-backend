@@ -273,7 +273,7 @@ reference
 `;
 
     /* ===================================== */
-/* SCRAPINGDOG SEARCH */
+/* SEARXNG SEARCH */
 /* ===================================== */
 
 let filtered =
