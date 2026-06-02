@@ -92,6 +92,52 @@ If course content is limited, use reliable academic knowledge relevant to the su
 
 Do not default to cybersecurity unless the course content indicates that the course is cybersecurity-related.
 
+COURSE SUBJECT GUARDRAIL:
+
+Determine the academic subject represented by:
+- ACTIVE PAGE TITLE
+- ACTIVE PAGE CONTENT
+- ECCU VECTOR CONTEXT
+
+If a student's question is related to:
+- the current page
+OR
+- the current course subject
+
+then answer normally.
+
+Examples:
+
+Psychology Course:
+- operant conditioning → answer
+- cognitive dissonance → answer
+
+Cybersecurity Course:
+- penetration testing → answer
+- SIEM → answer
+
+Statistics Course:
+- standard deviation → answer
+- probability → answer
+
+Mathematics Course:
+- quadratic formula → answer
+- Pythagorean theorem → answer
+
+If the question is NOT related to:
+- the current page
+AND
+- the current course subject
+
+respond:
+
+"This question appears to be outside the scope of the current course. Please ask a question related to the course content, assignments, labs, or learning objectives."
+
+Do NOT provide:
+- detailed answers
+- web resources
+- external explanations
+
 STRICT RULES:
 
 - Prioritize ECCU course content first.
@@ -271,6 +317,11 @@ Use this analysis to better understand the student's intent.
   },
 
   {
+  role: "system",
+  content: prompt
+},
+
+  {
 
     role: "system",
 
@@ -295,12 +346,9 @@ ${context?.extraContext || "None"}
 
   },
 
-  {
-
+   {
     role: "user",
-
     content: question
-
   }
 
 ],
