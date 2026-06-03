@@ -249,38 +249,7 @@ console.log(
     const lirnResources =
       getLibraryResources(message);
 
-    /* ===================================== */
-    /* WEB SEARCH */
-    /* ===================================== */
-
-    let webResources = [];
-
-    const shouldSearch =
-  isEducationalTopic(message) &&
-  isCourseRelated;
-
-    if (shouldSearch) {
-
-      try {
-
-        webResources =
-          await trustedWebSearch(message);
-
-        console.log(
-          "🌐 WEB RESOURCES:",
-          webResources
-        );
-
-      } catch (err) {
-
-        console.log(
-          "❌ WEB SEARCH ERROR:",
-          err.message
-        );
-
-      }
-
-    }
+    
 
     /* ===================================== */
     /* VECTOR SEARCH */
@@ -324,26 +293,47 @@ ${message}
 
     if (!isCourseRelated) {
 
-      return res.json({
+  return res.json({
 
-        source: "course-guardrail",
+    source: "course-guardrail",
 
-        reply:
-          "This question does not appear to be related to the current course content. I can assist with course concepts, module content, assignments, discussions, labs, and learning resources. Please ask a question related to the course material."
+    reply:
+      "This question does not appear to be related to the current course content. I can assist with course concepts, module content, assignments, discussions, labs, and learning resources. Please ask a question related to the course material."
 
-      });
+  });
 
-    } 
-    {
+}
 
-      return res.json({
+    /* ===================================== */
+    /* WEB SEARCH */
+    /* ===================================== */
 
-        source: "content-fallback",
+    let webResources = [];
 
-        reply:
-          "This topic is not available in your course materials. Please connect with your instructor for further clarification."
+    const shouldSearch =
+  isEducationalTopic(message) &&
+  isCourseRelated;
 
-      });
+    if (shouldSearch) {
+
+      try {
+
+        webResources =
+          await trustedWebSearch(message);
+
+        console.log(
+          "🌐 WEB RESOURCES:",
+          webResources
+        );
+
+      } catch (err) {
+
+        console.log(
+          "❌ WEB SEARCH ERROR:",
+          err.message
+        );
+
+      }
 
     }
 
