@@ -120,7 +120,11 @@ router.post("/", async (req, res) => {
   try {
 
     const currentCourse =
-  detectCourse();
+  detectCourse(courseCode);
+  
+  console.log("Course Code:", courseCode);
+console.log("Course Name:", courseName);
+console.log("Detected Course:", currentCourse?.courseName);
 
 console.log(
   "CURRENT COURSE:",
@@ -128,10 +132,15 @@ console.log(
 );
 
     const {
-      message,
-      currentPage,
-      pageText
-    } = req.body;
+  message,
+  currentPage,
+  pageText,
+  history,
+  userId,
+  courseId,
+  courseCode,
+  courseName
+} = req.body;
 
     if (!message) {
 

@@ -1,9 +1,16 @@
 const courseConfigs =
   require("../config/courseConfig");
 
-function detectCourse() {
+function detectCourse(courseCode) {
 
-  return courseConfigs.CEH;
+  if (!courseCode) {
+    return null;
+  }
+
+  return (
+    courseConfigs[courseCode] ||
+    null
+  );
 
 }
 

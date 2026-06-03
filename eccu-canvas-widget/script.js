@@ -54,6 +54,39 @@ return match ? Number(match[1]) : null
 
 }
 
+function getCourseCode() {
+
+  const text = `
+    ${document.title}
+    ${document.body.innerText.slice(0, 5000)}
+  `;
+
+  const match =
+    text.match(/[A-Z]{2,5}\s?\d{3}/i);
+
+  if (!match) return null;
+
+  return match[0]
+    .replace(/\s+/g, "")
+    .toUpperCase();
+}
+
+function getCourseName() {
+
+  return (
+    document.querySelector(".ellipsible")
+      ?.innerText
+      ?.trim() ||
+
+    document.title
+      ?.replace(" - Canvas", "")
+      ?.trim() ||
+
+    null
+  );
+
+}
+
 /* -------------------------------------------------- */
 /* COURSE FILTER */
 /* -------------------------------------------------- */
@@ -520,6 +553,10 @@ console.log("📤 Sending Request:", {
 
   courseId: getCourseId(),
 
+  courseCode: getCourseCode(),
+
+  courseName: getCourseName(),
+
   userId: currentUserId,
 
   history:
@@ -546,8 +583,19 @@ signal: currentRequest.signal,
 
 body: JSON.stringify({
   message: msg,
-  history: conversationHistory.slice(-12),
-  courseId: getCourseId(),
+
+  history:
+    conversationHistory.slice(-12),
+
+  courseId:
+    getCourseId(),
+
+  courseCode:
+    getCourseCode(),
+
+  courseName:
+    getCourseName(),
+
   currentPage: {
   url: window.location.href,
   pageTitle: document.title,
