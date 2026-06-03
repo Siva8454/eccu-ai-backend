@@ -29,10 +29,10 @@ CURRENT PAGE TITLE:
 ${context?.pageTitle || "No page title"}
 
 CURRENT PAGE CONTENT:
-${cleanCanvasText(context?.currentPage || "").slice(0, 4000)}
+${cleanCanvasText(context?.currentPage || "").slice(0, 8000)}
 
 ADDITIONAL COURSE CONTEXT:
-${cleanCanvasText(context?.extraContext || "").slice(0, 2000)}
+${cleanCanvasText(context?.extraContext || "").slice(0, 4000)}
 
 `;
 
@@ -47,31 +47,43 @@ ${formattedContext}
 
 Instructions:
 
-1. ALWAYS prioritize CURRENT PAGE CONTENT first.
-2. The student is actively viewing the CURRENT PAGE.
-3. If the answer exists in CURRENT PAGE CONTENT, answer directly from it.
-4. Recognize:
-   - module names
-   - assignment names
-   - labs
-   - topics
-   from the CURRENT PAGE CONTENT.
-5. NEVER say:
-   - "I don't see course content"
-   - "Please provide more information"
-   if CURRENT PAGE CONTENT exists.
-6. Use ADDITIONAL COURSE CONTEXT only as secondary support.
-7. Do NOT invent information.
+1. ALWAYS use CURRENT PAGE CONTENT as the primary source.
+2. The student is currently viewing this page.
+3. If the page contains the answer, explain it completely.
+4. If the student asks:
+   - explain this
+   - explain it
+   - simplify this
+   - I don't understand
+   - help me understand
 
-Make the answer clear, structured, and student-friendly.
+   then explain the CURRENT PAGE CONTENT in simpler language.
 
-Do not create your own Sources, References, Citations,
-Further Reading, Learning Resources, Recommended Links,
-Course Materials, or resource sections.
+5. For assignments:
+   - explain the purpose
+   - explain the requirements
+   - explain the steps
+   - explain what must be submitted
+   - explain grading expectations if available
 
-Provide only the answer to the student's question.
+6. For research projects:
+   - break the instructions into numbered steps
+   - explain each step clearly
+   - summarize what the student must do
 
-External resources will be added separately if needed.
+7. Never stop mid-sentence.
+8. Never provide partial answers.
+9. Do not invent information that is not present in the page content.
+10. Use ADDITIONAL COURSE CONTEXT only if the page content is insufficient.
+
+Response Style:
+
+- Use headings.
+- Use bullet points.
+- Use numbered steps when explaining assignments.
+- Be concise but complete.
+- Do NOT include sources, references, citations, resource lists, links, or additional reading sections.
+- Answer only the student's question.
 `;
 
     console.log("FORMATTED CONTEXT:");
@@ -80,7 +92,7 @@ console.log(formattedContext);
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
       temperature: 0.3,
-      max_tokens: 800,
+      max_tokens: 2000,
       messages: [
         {
           role: "user",

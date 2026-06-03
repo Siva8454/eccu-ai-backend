@@ -294,6 +294,9 @@ should be marked NOT_RELATED.
     NOT_RELATED
     `;
 
+  
+
+
     const relevanceResult =
       await generateAnswer(
         relevancePrompt,
@@ -360,15 +363,23 @@ should be marked NOT_RELATED.
     /* VECTOR SEARCH */
     /* ===================================== */
 
-    const contextualMessage = `
+    const recentHistory = (history || [])
+  .slice(-6)
+  .map(h => `${h.role}: ${h.content}`)
+  .join("\n");
 
-USER QUESTION:
+const contextualMessage = `
+
+CONVERSATION HISTORY:
+${recentHistory}
+
+CURRENT QUESTION:
 ${message}
 
 `;
 
 const shouldUseRAG =
-
+  !!currentPage ||
   message.toLowerCase().includes("module") ||
   message.toLowerCase().includes("assignment") ||
   message.toLowerCase().includes("discussion") ||
@@ -462,9 +473,20 @@ const structuredContext = {
   finalContext?.slice(0, 5000) || ""
 
 };
+  const isClarification =
+    /explain it|explain this|simplify|i don't understand|i didnt understand|i didn't understand/i
+      .test(message);
+
+  if (isClarification && currentPage?.text) {
+
+    structuredContext.currentPage =
+      currentPage.text;
+
+  }
+
     const aiAnswer =
   await generateAnswer(
-    message,
+    contextualMessage,
     structuredContext,
     intent
   );
@@ -571,12 +593,13 @@ ${r.url}`
     /* ===================================== */
 
         if (
-        !isGreeting(message) &&
-        isCourseRelated &&
-        isEducationalTopic(message) &&
-        lirnResources &&
-        lirnResources.length > 0
-      )
+      !isGreeting(message) &&
+      !isClarification &&
+      isCourseRelated &&
+      isEducationalTopic(message) &&
+      lirnResources &&
+      lirnResources.length > 0
+    )
 {
 
       console.log(
