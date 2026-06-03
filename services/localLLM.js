@@ -64,6 +64,14 @@ Instructions:
 7. Do NOT invent information.
 
 Make the answer clear, structured, and student-friendly.
+
+Do not create your own Sources, References, Citations,
+Further Reading, Learning Resources, Recommended Links,
+Course Materials, or resource sections.
+
+Provide only the answer to the student's question.
+
+External resources will be added separately if needed.
 `;
 
     console.log("FORMATTED CONTEXT:");

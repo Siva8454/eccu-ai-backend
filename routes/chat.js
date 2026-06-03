@@ -30,49 +30,35 @@ function isEducationalTopic(query = "") {
 
   const text = query.toLowerCase();
 
-  const keywords = [
-
-    "what is",
-    "explain",
-    "define",
-    "difference",
-    "how does",
-
-    "sql injection",
-    "xss",
-    "csrf",
-    "phishing",
-    "malware",
-    "ransomware",
-
-    "cybersecurity",
-    "network",
-    "firewall",
-    "encryption",
-    "linux",
-
-    "ethical hacking",
-    "vulnerability",
-    "attack",
-    "threat",
-    "risk",
-
-    "authentication",
-    "authorization",
-
-    "cloud security",
-    "penetration testing",
-
-    "ids",
-    "ips",
-    "siem",
-    "soc"
-
-  ];
-
-  return keywords.some(keyword =>
-    text.includes(keyword)
+  return (
+    text.includes("what is") ||
+    text.includes("explain") ||
+    text.includes("define") ||
+    text.includes("difference") ||
+    text.includes("how does") ||
+    text.includes("why") ||
+    text.includes("describe") ||
+    text.includes("compare") ||
+    text.includes("discuss")
   );
+
+}
+
+function isGreeting(message = "") {
+
+  const text = message.trim().toLowerCase();
+
+  return [
+    "hi",
+    "hello",
+    "hey",
+    "good morning",
+    "good afternoon",
+    "good evening",
+    "how are you",
+    "thanks",
+    "thank you"
+  ].some(greeting => text.startsWith(greeting));
 
 }
 
@@ -238,6 +224,20 @@ console.log("CURRENT COURSE:", currentCourse);
       intent
     );
 
+if (isGreeting(message)) {
+
+  return res.json({
+
+    source: "greeting",
+
+    reply: `Hello! I'm your ECCU AI Tutor.
+
+I can help you with course concepts, assignments, labs, discussions, module content, and learning materials related to ${currentCourse.courseName}.`
+
+  });
+
+}
+
     /* ===================================== */
     /* COURSE RELEVANCE CHECK */
     /* ===================================== */
@@ -252,6 +252,20 @@ console.log("CURRENT COURSE:", currentCourse);
     ${message}
 
     Determine whether this question belongs to the academic subject area of this course.
+
+    Greetings, introductions, thanks, and normal conversation
+    messages such as:
+
+    Hi
+    Hello
+    Hey
+    Good morning
+    Thank you
+
+    should be considered RELATED.
+
+    Only questions clearly outside the course subject
+should be marked NOT_RELATED.
 
     Examples:
 
@@ -353,23 +367,31 @@ ${message}
 
 `;
 
-    const ragResult =
-      await vectorSearch(
-        contextualMessage,
-        allowedCourseIds,
-        intent,
-        currentPage
-      );
+const shouldUseRAG =
 
-      console.log(
-      "Raw Score:",
-      ragResult?.rawScore
+  message.toLowerCase().includes("module") ||
+  message.toLowerCase().includes("assignment") ||
+  message.toLowerCase().includes("discussion") ||
+  message.toLowerCase().includes("quiz") ||
+  message.toLowerCase().includes("lab") ||
+  message.length > 20;
+
+    let ragResult = {
+  context: "",
+  confidence: 0
+};
+
+if (shouldUseRAG) {
+
+  ragResult =
+    await vectorSearch(
+      contextualMessage,
+      allowedCourseIds,
+      intent,
+      currentPage
     );
 
-    console.log(
-      "Boosted Score:",
-      ragResult?.confidence
-    );
+}
 
     
 
@@ -380,6 +402,7 @@ ${message}
     let webResources = [];
 
     const shouldSearch =
+  !isGreeting(message) &&
   isEducationalTopic(message) &&
   isCourseRelated;
 
@@ -433,10 +456,10 @@ const structuredContext = {
     currentPage?.pageTitle || "",
 
   currentPage:
-  currentPage?.text?.slice(0, 3000) || "",
+  currentPage?.text?.slice(0, 5000) || "",
 
   extraContext:
-  finalContext?.slice(0, 2500) || ""
+  finalContext?.slice(0, 5000) || ""
 
 };
     const aiAnswer =
@@ -454,9 +477,9 @@ const structuredContext = {
       aiAnswer || "";
 
     completeResponse =
-      completeResponse.replace(
+  completeResponse.replace(
 
-/(\*\*)?(references|additional resources|course reference|online resources|further reading|resources|citations)(\*\*)?\s*:?\s*[\s\S]*$/i,
+/(\*\*)?(sources|references|additional resources|course reference|online resources|further reading|resources|citations|additional tips)(\*\*)?\s*:?\s*[\s\S]*$/i,
 
 ""
 
@@ -548,11 +571,12 @@ ${r.url}`
     /* ===================================== */
 
         if (
-      isCourseRelated &&
-      isEducationalTopic(message) &&
-      lirnResources &&
-      lirnResources.length > 0
-    ) 
+        !isGreeting(message) &&
+        isCourseRelated &&
+        isEducationalTopic(message) &&
+        lirnResources &&
+        lirnResources.length > 0
+      )
 {
 
       console.log(
