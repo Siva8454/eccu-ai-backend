@@ -70,9 +70,27 @@ console.log(question.slice(0, 3000));
 
   // ✅ Manual course filtering (since Qdrant index not available)
 if (allowedCourseIds.length) {
-  results = results.filter(r =>
-    allowedCourseIds.includes(r.payload.courseId)
-  );
+
+  console.log("BEFORE FILTER:", results.length);
+
+  results = results.filter(r => {
+
+    const match =
+      allowedCourseIds.includes(r.payload.courseId);
+
+    console.log(
+      "VECTOR COURSE:",
+      r.payload.courseId,
+      "MATCH:",
+      match
+    );
+
+    return match;
+
+  });
+
+  console.log("AFTER FILTER:", results.length);
+
 }
 
 console.log("Filtered results:", results.length);
