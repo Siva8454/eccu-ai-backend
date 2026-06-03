@@ -2,7 +2,7 @@ const courseConfigs = {
 
   ECCU501_CONFIG: {
     collection: "ceh_vectors",
-    courseName: "Certified Ethical Hacking",
+    courseName: "Ethical Hacking and Countermeasures",
     shortName: "ECCU501",
     promptType: "ceh",
     webSearchContext: "ethical hacking cybersecurity pentesting",
