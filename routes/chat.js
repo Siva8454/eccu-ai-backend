@@ -256,7 +256,8 @@ console.log(
     let webResources = [];
 
     const shouldSearch =
-      isEducationalTopic(message);
+  isEducationalTopic(message) &&
+  isCourseRelated;
 
     if (shouldSearch) {
 
@@ -300,15 +301,40 @@ ${message}
         currentPage
       );
 
+      console.log(
+      "Raw Score:",
+      ragResult?.rawScore
+    );
+
+    console.log(
+      "Boosted Score:",
+      ragResult?.confidence
+    );
+
     /* ===================================== */
     /* WEAK CONTEXT */
     /* ===================================== */
 
-    if (
-      !ragResult ||
-      !ragResult.context ||
-      ragResult.context.length < 80
-    ) {
+    const isCourseRelated =
+
+      ragResult &&
+      ragResult.context &&
+      ragResult.context.length > 80 &&
+      ragResult.rawScore > 0.35;
+
+    if (!isCourseRelated) {
+
+      return res.json({
+
+        source: "course-guardrail",
+
+        reply:
+          "This question does not appear to be related to the current course content. I can assist with course concepts, module content, assignments, discussions, labs, and learning resources. Please ask a question related to the course material."
+
+      });
+
+    } 
+    {
 
       return res.json({
 
@@ -462,11 +488,13 @@ ${r.url}`
     /* LIRN RESOURCES */
     /* ===================================== */
 
-    if (
+        if (
+      isCourseRelated &&
       isEducationalTopic(message) &&
       lirnResources &&
       lirnResources.length > 0
-    ) {
+    ) 
+{
 
       console.log(
         "📚 APPENDING LIRN RESOURCES"

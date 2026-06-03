@@ -179,9 +179,10 @@ Type: ${p.type}
   console.log("Final context size:", context.length);
 
   return {
-    context,
-    confidence: topResults[0].boostedScore
-  };
+  context,
+  confidence: topResults[0].boostedScore,
+  rawScore: topResults[0].score
+};
 
 }
 
