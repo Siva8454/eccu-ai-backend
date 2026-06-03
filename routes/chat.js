@@ -119,18 +119,6 @@ router.post("/", async (req, res) => {
 
   try {
 
-    const currentCourse =
-  detectCourse(courseCode);
-  
-  console.log("Course Code:", courseCode);
-console.log("Course Name:", courseName);
-console.log("Detected Course:", currentCourse?.courseName);
-
-console.log(
-  "CURRENT COURSE:",
-  currentCourse
-);
-
     const {
   message,
   currentPage,
@@ -141,6 +129,22 @@ console.log(
   courseCode,
   courseName
 } = req.body;
+
+const currentCourse =
+  detectCourse(courseCode);
+
+  if (!currentCourse) {
+  return res.json({
+    source: "course-detection",
+    reply:
+      `Course configuration not found for ${courseCode}.`
+  });
+}
+
+console.log("Course Code:", courseCode);
+console.log("Course Name:", courseName);
+console.log("Detected Course:", currentCourse?.courseName);
+console.log("CURRENT COURSE:", currentCourse);
 
     if (!message) {
 
@@ -156,11 +160,11 @@ console.log(
     /* MEMORY */
     /* ===================================== */
 
-    const userId =
-      req.body.userId || "default-user";
+    const currentUserId =
+  userId || "default-user";
 
     const memory =
-      getMemory(userId);
+  getMemory(currentUserId);
 
     console.log(
       "🧠 Previous question:",
