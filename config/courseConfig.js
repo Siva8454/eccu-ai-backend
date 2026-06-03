@@ -1,9 +1,9 @@
 const courseConfigs = {
 
-  CEH: {
+  ECCU501_CONFIG: {
     collection: "ceh_vectors",
     courseName: "Certified Ethical Hacking",
-    shortName: "CEH",
+    shortName: "ECCU501",
     promptType: "ceh",
     webSearchContext: "ethical hacking cybersecurity pentesting",
     trustedDomains: [
@@ -14,7 +14,7 @@ const courseConfigs = {
     ]
   },
 
-  PSY360: {
+  PSY360_CONFIG: {
     collection: "psy360_vectors",
     courseName: "Introduction to Social Psychology",
     shortName: "PSY360",

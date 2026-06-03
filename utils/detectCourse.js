@@ -7,8 +7,16 @@ function detectCourse(courseCode) {
     return null;
   }
 
+  const normalizedCode = courseCode
+    .replace(/\s+/g, "")
+    .toUpperCase();
+
+  // DEBUG LOGS
+  console.log("Course Code:", courseCode);
+  console.log("Looking for:", `${normalizedCode}_CONFIG`);
+
   return (
-    courseConfigs[courseCode] ||
+    courseConfigs[`${normalizedCode}_CONFIG`] ||
     null
   );
 
