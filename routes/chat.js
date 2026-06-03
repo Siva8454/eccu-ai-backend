@@ -238,6 +238,99 @@ I can help you with course concepts, assignments, labs, discussions, module cont
 
 }
 
+/* ===================================== */
+/* QUICK ACTIONS */
+/* ===================================== */
+
+const quickAction =
+  message.trim().toLowerCase();
+
+  console.log("Quick Action:", quickAction);
+
+if (
+  quickAction === "course / topic" ||
+  quickAction === "course/topic"
+) {
+
+  return res.json({
+
+    source: "quick-action",
+
+    reply: `You are currently enrolled in ${currentCourse.courseName}.
+
+I can help explain:
+
+• Course concepts
+• Module content
+• Assignments
+• Discussions
+• Labs
+• Research projects
+
+Ask any course-related question and I'll help you understand the material.`
+
+  });
+
+}
+
+if (quickAction === "labs") {
+
+  return res.json({
+
+    source: "quick-action",
+
+    reply:
+      "Tell me which lab you need help with, or ask me to explain the lab instructions on the current page."
+
+  });
+
+}
+
+if (
+  quickAction === "assignments / research project / case study"
+) {
+
+  return res.json({
+
+    source: "quick-action",
+
+    reply:
+      "Tell me which assignment or research project you need help with, or ask me to explain the current assignment page."
+
+  });
+
+}
+
+if (
+  quickAction === "help & support" ||
+  quickAction === "help/support"
+) {
+
+  return res.json({
+
+    source: "quick-action",
+
+    reply:
+      "I can help explain course content, assignments, labs, discussions, navigation, and general course-related questions."
+
+  });
+
+}
+
+if (quickAction === "other") {
+
+  return res.json({
+
+    source: "quick-action",
+
+    reply:
+      "Ask any course-related question and I'll do my best to help."
+
+  });
+
+}
+
+
     /* ===================================== */
     /* COURSE RELEVANCE CHECK */
     /* ===================================== */
