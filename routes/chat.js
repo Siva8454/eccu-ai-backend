@@ -226,6 +226,84 @@ console.log(
     );
 
     /* ===================================== */
+    /* COURSE RELEVANCE CHECK */
+    /* ===================================== */
+
+    const relevancePrompt = `
+    You are an academic course relevance classifier.
+
+    Course:
+    ${currentCourse.courseName}
+
+    Student Question:
+    ${message}
+
+    Determine whether this question belongs to the academic subject area of this course.
+
+    Examples:
+
+    Course: Psychology
+    Question: What is social cognition?
+    RELATED
+
+    Course: Psychology
+    Question: What is photosynthesis?
+    NOT_RELATED
+
+    Course: Psychology
+    Question: What is aura farming?
+    NOT_RELATED
+
+    Course: Psychology
+    Question: Explain attribution theory.
+    RELATED
+
+    Respond ONLY with:
+
+    RELATED
+
+    or
+
+    NOT_RELATED
+    `;
+
+    const relevanceResult =
+      await generateAnswer(
+        relevancePrompt,
+        {},
+        "classifier"
+      );
+
+    const isCourseRelated =
+      relevanceResult
+        ?.trim()
+        ?.toUpperCase()
+        ?.includes("RELATED") &&
+      !relevanceResult
+        ?.trim()
+        ?.toUpperCase()
+        ?.includes("NOT_RELATED");
+
+    console.log(
+      "Course relevance:",
+      relevanceResult
+    );
+
+    if (!isCourseRelated) {
+
+  return res.json({
+
+    source: "course-guardrail",
+
+    reply:
+      `This question does not appear to be related to ${currentCourse.courseName}.
+
+      I can assist with course concepts, assignments, labs, discussions, module content, and learning materials related to this course.`
+
+        });
+
+      }
+    /* ===================================== */
     /* EXAM / CHEATING GUARDRAIL */
     /* ===================================== */
 
@@ -280,29 +358,7 @@ ${message}
       ragResult?.confidence
     );
 
-    /* ===================================== */
-    /* WEAK CONTEXT */
-    /* ===================================== */
-
-    const isCourseRelated =
-
-      ragResult &&
-      ragResult.context &&
-      ragResult.context.length > 80 &&
-      ragResult.rawScore > 0.35;
-
-    if (!isCourseRelated) {
-
-  return res.json({
-
-    source: "course-guardrail",
-
-    reply:
-      "This question does not appear to be related to the current course content. I can assist with course concepts, module content, assignments, discussions, labs, and learning resources. Please ask a question related to the course material."
-
-  });
-
-}
+    
 
     /* ===================================== */
     /* WEB SEARCH */
