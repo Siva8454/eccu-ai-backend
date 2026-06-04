@@ -4,6 +4,26 @@
 
 (function(){
 
+/* -------------------------------- */
+/* DISABLE AI TUTOR ON QUIZ ATTEMPTS */
+/* -------------------------------- */
+
+const currentUrl =
+  window.location.href.toLowerCase();
+
+const isQuizAttemptPage =
+  currentUrl.includes("/quizzes/") &&
+  currentUrl.includes("/take");
+
+if (isQuizAttemptPage) {
+
+  console.log(
+    "🚫 Quiz/Exam attempt detected - AI Tutor disabled"
+  );
+
+  return;
+}
+
 if(window.eccuChatLoaded) return;
 window.eccuChatLoaded = true;
 
