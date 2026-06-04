@@ -52,6 +52,7 @@ function isGreeting(message = "") {
   const text = message.trim().toLowerCase();
 
   return [
+
     "hi",
     "hello",
     "hey",
@@ -61,7 +62,8 @@ function isGreeting(message = "") {
     "how are you",
     "thanks",
     "thank you"
-  ].some(greeting => text.startsWith(greeting));
+
+  ].includes(text);
 
 }
 
