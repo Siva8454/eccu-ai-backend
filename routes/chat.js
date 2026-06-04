@@ -740,23 +740,30 @@ ${r.url}`
     /* RESPONSE */
     /* ===================================== */
 
-    if (
-  isTechnicalIssue(message)
-) {
+   
 
-  answer += `
+    let finalAnswer = completeResponse;
+
+if (isTechnicalIssue(message)) {
+
+  const helpUrl =
+    `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
+
+  finalAnswer += `
+
+---
 
 If the issue is still not resolved after following the troubleshooting steps, please visit the course Help page:
 
 ${helpUrl}
 
-The Help page contains FAQs, course support resources, and instructions for reporting technical issues.
+The Help page contains:
+• FAQs
+• Report Course Issues
+• Support Contact Information
+
 `;
-
 }
-
-    const finalAnswer =
-      completeResponse;
 
     return res.json({
 
