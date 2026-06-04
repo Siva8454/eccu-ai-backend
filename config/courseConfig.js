@@ -21,6 +21,15 @@ const courseConfigs = {
     promptType: "psychology",
     webSearchContext: "social psychology cognition perception behavior",
     trustedDomains: []
+  },
+
+  MGMT511_CONFIG: {
+    collection: "mgmt511_vectors",
+    courseName: "Financial Management",
+    shortName: "MGMT511",
+    promptType: "finance",
+    webSearchContext: "financial management corporate finance budgeting capital investment financial analysis",
+    trustedDomains: []
   }
 
 };

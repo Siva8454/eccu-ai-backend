@@ -4,14 +4,17 @@
 
 (function(){
 
+  console.log("ECCU CHAT SCRIPT LOADED");
+console.log("CURRENT URL:", window.location.href);
 /* -------------------------------- */
 /* DISABLE AI TUTOR ON QUIZ ATTEMPTS */
 /* -------------------------------- */
 
 function isQuizAttemptPage() {
 
-  const url =
-    window.location.href.toLowerCase();
+  const url = window.location.href.toLowerCase();
+
+  console.log("QUIZ CHECK URL:", url);
 
   return (
     url.includes("/quizzes/") &&
@@ -126,7 +129,7 @@ function isAllowedCourse() {
 
   const courseId = getCourseId()
 
-  const allowedCourses = [2213, 2460]
+  const allowedCourses = [2213, 2460, 2360]
 
   return allowedCourses.includes(courseId)
 }
@@ -694,7 +697,18 @@ scrollToBottom()
 
 /* INIT */
 
-initChatbot()
+setTimeout(() => {
+
+  console.log(
+    "Quiz detection result:",
+    isQuizAttemptPage()
+  );
+
+  if (!isQuizAttemptPage()) {
+    initChatbot();
+  }
+
+}, 1000);
 
 /* OBSERVER */
 
@@ -709,12 +723,19 @@ const observer = new MutationObserver(() => {
       existingWidget.remove();
     }
 
+    window.eccuChatLoaded = false;
+
     return;
   }
 
-  initChatbot();
+  if (
+    !document.getElementById("eccu-chatbot") &&
+    !window.eccuChatLoaded
+  ) {
+    initChatbot();
+  }
 
-})
+});
 
 observer.observe(document.body,{
 childList:true,
