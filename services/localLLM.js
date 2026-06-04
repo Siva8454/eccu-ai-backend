@@ -45,6 +45,14 @@ ${question}
 Course Content:
 ${formattedContext}
 
+IMPORTANT:
+
+- Answer ONLY using the current course content.
+- Ignore references to any other course that may appear in memory, history, or context.
+- Never mention another course unless it explicitly appears in CURRENT PAGE CONTENT.
+- If the student is in PSY360, do not mention ECCU501.
+- If the student is in ECCU501, do not mention PSY360.
+
 Instructions:
 
 1. ALWAYS use CURRENT PAGE CONTENT as the primary source.
@@ -86,8 +94,17 @@ Response Style:
 - Answer only the student's question.
 `;
 
-    console.log("FORMATTED CONTEXT:");
+    console.log("================================");
+console.log("FORMATTED CONTEXT");
+console.log("================================");
 console.log(formattedContext);
+console.log("================================");
+
+console.log("================================");
+console.log("FINAL PROMPT");
+console.log("================================");
+console.log(prompt);
+console.log("================================");
 
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
