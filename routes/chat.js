@@ -22,6 +22,9 @@ const {
   getMemory
 } = require("../services/memoryStore");
 
+const isTechnicalIssue =
+  require("../utils/isTechnicalIssue");
+
 /* ===================================== */
 /* EDUCATIONAL TOPIC DETECTION */
 /* ===================================== */
@@ -115,6 +118,9 @@ router.post("/", async (req, res) => {
   courseCode,
   courseName
 } = req.body;
+
+const helpUrl =
+  `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
 
 const currentCourse =
   detectCourse(courseCode);
@@ -733,6 +739,21 @@ ${r.url}`
     /* ===================================== */
     /* RESPONSE */
     /* ===================================== */
+
+    if (
+  isTechnicalIssue(message)
+) {
+
+  answer += `
+
+If the issue is still not resolved after following the troubleshooting steps, please visit the course Help page:
+
+${helpUrl}
+
+The Help page contains FAQs, course support resources, and instructions for reporting technical issues.
+`;
+
+}
 
     const finalAnswer =
       completeResponse;
