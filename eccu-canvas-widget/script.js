@@ -8,18 +8,30 @@
 /* DISABLE AI TUTOR ON QUIZ ATTEMPTS */
 /* -------------------------------- */
 
-const currentUrl =
-  window.location.href.toLowerCase();
+function isQuizAttemptPage() {
 
-const isQuizAttemptPage =
-  currentUrl.includes("/quizzes/") &&
-  currentUrl.includes("/take");
+  const url =
+    window.location.href.toLowerCase();
 
-if (isQuizAttemptPage) {
+  return (
+    url.includes("/quizzes/") &&
+    url.includes("/take")
+  );
+
+}
+
+if (isQuizAttemptPage()) {
 
   console.log(
     "🚫 Quiz/Exam attempt detected - AI Tutor disabled"
   );
+
+  const existingWidget =
+    document.getElementById("eccu-chatbot");
+
+  if (existingWidget) {
+    existingWidget.remove();
+  }
 
   return;
 }
@@ -125,6 +137,18 @@ function isAllowedCourse() {
 /* -------------------------------------------------- */
 
 function initChatbot(){
+
+  if (isQuizAttemptPage()) {
+
+    const existingWidget =
+      document.getElementById("eccu-chatbot");
+
+    if (existingWidget) {
+      existingWidget.remove();
+    }
+
+    return;
+  }
 
 if(document.getElementById("eccu-chatbot")) return;
 
@@ -675,7 +699,21 @@ initChatbot()
 /* OBSERVER */
 
 const observer = new MutationObserver(() => {
-initChatbot()
+
+  if (isQuizAttemptPage()) {
+
+    const existingWidget =
+      document.getElementById("eccu-chatbot");
+
+    if (existingWidget) {
+      existingWidget.remove();
+    }
+
+    return;
+  }
+
+  initChatbot();
+
 })
 
 observer.observe(document.body,{
