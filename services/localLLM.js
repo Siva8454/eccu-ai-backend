@@ -158,7 +158,7 @@ console.log("Prompt Length:", prompt.length);
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
       temperature: 0.3,
-      max_tokens: 2000,
+      max_tokens: 4000,
       messages: [
         {
           role: "user",
