@@ -410,7 +410,9 @@ closeBtn.onclick = () => {
 
 maxBtn.onclick = () => {
 
-  chat.style.transformOrigin = "center center";
+  console.log(chat.getBoundingClientRect());
+
+  chat.style.transformOrigin = "bottom right";
 
   const isFullscreen =
     chat.classList.toggle("fullscreen");

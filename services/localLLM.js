@@ -153,6 +153,7 @@ console.log("FINAL PROMPT");
 console.log("================================");
 console.log(prompt);
 console.log("================================");
+console.log("Prompt Length:", prompt.length);
 
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
@@ -166,7 +167,17 @@ console.log("================================");
       ]
     });
 
+    console.log(
+  "Finish Reason:",
+  response?.choices?.[0]?.finish_reason
+);
+
     const answer = response?.choices?.[0]?.message?.content;
+
+    console.log(
+  "Answer Length:",
+  answer?.length
+);
 
     return answer || "AI could not generate a response.";
 
