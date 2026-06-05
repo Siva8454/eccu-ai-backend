@@ -58,7 +58,7 @@ console.log(question.slice(0, 3000));
 
   let results = await client.search(COLLECTION, {
     vector: embedding,
-    limit: 40, // ⭐ deeper search
+    limit: 20, // ⭐ deeper search
   });
 
   if (!results.length) {
@@ -161,7 +161,7 @@ console.log("Filtered results:", results.length);
   /* TAKE TOP RESULTS */
   /* -------------------------------------------------- */
 
-  const topResults = results.slice(0, 5);
+  const topResults = results.slice(0, 3);
 
   /* -------------------------------------------------- */
   /* BUILD CONTEXT */
@@ -184,7 +184,7 @@ Module: ${p.moduleName || "N/A"}
 Title: ${p.title || ""}
 
 Content:
-${p.content || ""}
+${(p.content || "").slice(0, 1200)}
 
 Resources:
 ${links}
