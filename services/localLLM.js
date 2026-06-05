@@ -29,10 +29,10 @@ CURRENT PAGE TITLE:
 ${context?.pageTitle || "No page title"}
 
 CURRENT PAGE CONTENT:
-${cleanCanvasText(context?.currentPage || "").slice(0, 8000)}
+${cleanCanvasText(context?.currentPage || "").slice(0, 5000)}
 
 ADDITIONAL COURSE CONTEXT:
-${cleanCanvasText(context?.extraContext || "").slice(0, 4000)}
+${cleanCanvasText(context?.extraContext || "").slice(0, 1500)}
 
 `;
 
@@ -157,7 +157,7 @@ console.log("Prompt Length:", prompt.length);
 
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
-      temperature: 0.3,
+      temperature: 0.2,
       max_tokens: 4000,
       messages: [
         {
@@ -178,6 +178,9 @@ console.log("Prompt Length:", prompt.length);
   "Answer Length:",
   answer?.length
 );
+
+console.log("FULL ANSWER:");
+console.log(answer);
 
     return answer || "AI could not generate a response.";
 
