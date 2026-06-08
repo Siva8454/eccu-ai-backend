@@ -711,15 +711,17 @@ feedback
 
       body: JSON.stringify({
 
-        question: msg,
+      question: msg,
 
-        rating: "helpful",
+      answer: data.reply,
 
-        courseId: getCourseId(),
+      rating: "helpful",
 
-        userId: currentUserId
+      courseId: getCourseId(),
 
-      })
+      userId: currentUserId
+
+    })
 
     }
   );
@@ -747,15 +749,17 @@ feedback
 
       body: JSON.stringify({
 
-        question: msg,
+      question: msg,
 
-        rating: "not_helpful",
+      answer: data.reply,
 
-        courseId: getCourseId(),
+      rating: "not_helpful",
 
-        userId: currentUserId
+      courseId: getCourseId(),
 
-      })
+      userId: currentUserId
+
+    })
 
     }
   );

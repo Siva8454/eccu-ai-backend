@@ -21,11 +21,12 @@ router.post("/", (req, res) => {
   }
 
   const {
-    question,
-    rating,
-    courseId,
-    userId
-  } = req.body;
+  question,
+  answer,
+  rating,
+  courseId,
+  userId
+} = req.body;
 
   const data = JSON.parse(
     fs.readFileSync(
@@ -36,18 +37,20 @@ router.post("/", (req, res) => {
 
   data.push({
 
-    timestamp:
-      new Date().toISOString(),
+  timestamp:
+    new Date().toISOString(),
 
-    question,
+  question,
 
-    rating,
+  answer,
 
-    courseId,
+  rating,
 
-    userId
+  courseId,
 
-  });
+  userId
+
+});
 
   fs.writeFileSync(
     file,
