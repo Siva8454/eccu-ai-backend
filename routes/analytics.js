@@ -56,6 +56,13 @@ router.get("/", (req, res) => {
     )
   );
 
+
+  const recentFeedback =
+  feedbackData
+    .slice(-10)
+    .reverse();
+
+
   /* ------------------------- */
   /* BASIC STATS */
   /* ------------------------- */
@@ -168,7 +175,9 @@ router.get("/", (req, res) => {
 
     totalFeedback,
 
-    records: data
+    records: data,
+
+    recentFeedback
 
   });
 
