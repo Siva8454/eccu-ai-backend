@@ -12,13 +12,22 @@ router.get("/", (req,res)=>{
       "../data/analytics.json"
     );
 
-  const data =
-    JSON.parse(
-      fs.readFileSync(
-        file,
-        "utf8"
-      )
-    );
+  if (!fs.existsSync(file)) {
+
+  fs.writeFileSync(
+    file,
+    "[]"
+  );
+
+}
+
+const data =
+  JSON.parse(
+    fs.readFileSync(
+      file,
+      "utf8"
+    )
+  );
 
   const totalQuestions =
     data.length;
