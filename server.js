@@ -10,6 +10,8 @@ const path = require("path");
 
 const chatRoutes = require("./routes/chat");
 const syncRoutes = require("./routes/sync");
+const analyticsRoutes = require("./routes/analytics");
+console.log("Analytics Route Loaded");
 
 
 const app = express();
@@ -32,6 +34,7 @@ app.use("/widget", express.static(path.join(__dirname, "eccu-canvas-widget")));
 
 app.use("/chat", chatRoutes);
 app.use("/sync", syncRoutes);
+app.use("/analytics", analyticsRoutes);
 
 /* -------------------------------------------------- */
 /* WIDGET LOADER FOR CANVAS */

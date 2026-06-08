@@ -25,6 +25,12 @@ const {
 const isTechnicalIssue =
   require("../utils/isTechnicalIssue");
 
+  const {
+  logAnalytics
+} = require(
+  "../services/analyticsService"
+);
+
 /* ===================================== */
 /* EDUCATIONAL TOPIC DETECTION */
 /* ===================================== */
@@ -109,6 +115,8 @@ function hasUsefulResources(resources = []) {
 router.post("/", async (req, res) => {
 
   try {
+
+    const startTime = Date.now();
 
     const {
   message,
@@ -766,6 +774,27 @@ The Help page contains:
 
 `;
 }
+
+logAnalytics({
+
+  courseId,
+  courseCode,
+
+  userId: currentUserId,
+
+  question: message,
+
+  intent,
+
+  source: "rag+liveweb",
+
+  responseTime:
+    Date.now() - startTime,
+
+  confidence:
+    ragResult?.confidence || 0
+
+});
 
     return res.json({
 
