@@ -555,6 +555,34 @@ let webResources = [];
 
 let skipWebSearch = false;
 
+const needsExternalResources =
+
+  message.toLowerCase().includes("resource") ||
+
+  message.toLowerCase().includes("resources") ||
+
+  message.toLowerCase().includes("reference") ||
+
+  message.toLowerCase().includes("references") ||
+
+  message.toLowerCase().includes("real world") ||
+
+  message.toLowerCase().includes("example") ||
+
+  message.toLowerCase().includes("examples") ||
+
+  message.toLowerCase().includes("case study") ||
+
+  message.toLowerCase().includes("case studies") ||
+
+  message.toLowerCase().includes("latest") ||
+
+  message.toLowerCase().includes("current") ||
+
+  message.toLowerCase().includes("trend") ||
+
+  message.toLowerCase().includes("research");
+
 /*
 HIGH CONFIDENCE COURSE CONTENT
 =
@@ -570,7 +598,9 @@ if (
   (
     currentPage?.text?.length > 500 ||
     ragResult?.context?.length > 1000
-  )
+  ) &&
+
+  !needsExternalResources
 
 ) {
 
@@ -594,9 +624,23 @@ const pageSpecificQuestion =
   message.toLowerCase().includes("from this module") ||
   message.toLowerCase().includes("from this page");
 
-if (pageSpecificQuestion) {
+if (
+  pageSpecificQuestion &&
+  !needsExternalResources
+) {
 
   skipWebSearch = true;
+
+}
+
+
+if (needsExternalResources) {
+
+  skipWebSearch = false;
+
+  console.log(
+    "🌐 Forcing web search for enrichment request"
+  );
 
 }
 
