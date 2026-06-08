@@ -62,6 +62,28 @@ router.get("/", (req, res) => {
     .slice(-10)
     .reverse();
 
+    const recordsWithFeedback = data.map(record => {
+
+  const feedback = feedbackData.find(
+    f =>
+      f.question === record.question &&
+      f.courseId === record.courseId
+  );
+
+  return {
+
+    ...record,
+
+    feedback:
+      feedback?.rating || null,
+
+    feedbackTimestamp:
+      feedback?.timestamp || null
+
+  };
+
+});
+
 
   /* ------------------------- */
   /* BASIC STATS */
@@ -175,7 +197,7 @@ router.get("/", (req, res) => {
 
     totalFeedback,
 
-    records: data,
+    records: recordsWithFeedback,
 
     recentFeedback
 

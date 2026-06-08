@@ -16,6 +16,9 @@ console.log("Analytics Route Loaded");
 const feedbackRoutes =
   require("./routes/feedback");
 
+  const dashboardRoutes =
+  require("./routes/dashboard");
+
 
 const app = express();
 
@@ -23,6 +26,8 @@ app.use(cors());
 app.use(express.json());
 
 const testRetriever = require("./routes/testRetriever");
+
+
 
 app.use("/test-retriever", testRetriever);
 /* -------------------------------------------------- */
@@ -41,6 +46,10 @@ app.use("/analytics", analyticsRoutes);
 app.use(
   "/feedback",
   feedbackRoutes
+);
+app.use(
+  "/dashboard",
+  dashboardRoutes
 );
 
 /* -------------------------------------------------- */
