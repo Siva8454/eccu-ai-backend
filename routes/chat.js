@@ -40,15 +40,47 @@ function isEducationalTopic(query = "") {
   const text = query.toLowerCase();
 
   return (
+
     text.includes("what is") ||
+
     text.includes("explain") ||
+
     text.includes("define") ||
+
     text.includes("difference") ||
+
     text.includes("how does") ||
+
     text.includes("why") ||
+
     text.includes("describe") ||
+
     text.includes("compare") ||
-    text.includes("discuss")
+
+    text.includes("discuss") ||
+
+    text.includes("example") ||
+
+    text.includes("examples") ||
+
+    text.includes("provide examples") ||
+
+    text.includes("give examples") ||
+
+    text.includes("sample") ||
+
+    text.includes("illustrate") ||
+
+    text.includes("overview") ||
+
+    text.includes("summarize") ||
+
+    text.includes("summary") ||
+
+    text.includes("help me understand") ||
+
+    text.includes("explain this")
+
   );
 
 }
@@ -519,35 +551,85 @@ if (shouldUseRAG) {
     /* WEB SEARCH */
     /* ===================================== */
 
-    let webResources = [];
+let webResources = [];
 
-    const shouldSearch =
+let skipWebSearch = false;
+
+/*
+HIGH CONFIDENCE COURSE CONTENT
+=
+Do NOT search the web if
+the module/page already contains
+enough information.
+*/
+
+if (
+
+  ragResult?.confidence >= 0.75 &&
+
+  (
+    currentPage?.text?.length > 500 ||
+    ragResult?.context?.length > 1000
+  )
+
+) {
+
+  skipWebSearch = true;
+
+  console.log(
+    "✅ Skipping web search - strong ECCU content found"
+  );
+
+}
+
+const pageSpecificQuestion =
+
+  !!currentPage?.text ||
+
+  message.toLowerCase().includes("this module") ||
+  message.toLowerCase().includes("this page") ||
+  message.toLowerCase().includes("this assignment") ||
+  message.toLowerCase().includes("this discussion") ||
+  message.toLowerCase().includes("this lab") ||
+  message.toLowerCase().includes("from this module") ||
+  message.toLowerCase().includes("from this page");
+
+if (pageSpecificQuestion) {
+
+  skipWebSearch = true;
+
+}
+
+const shouldSearch =
+
+  !skipWebSearch &&
+
   !isGreeting(message) &&
-  isEducationalTopic(message) &&
+
   isCourseRelated;
 
-    if (shouldSearch) {
+if (shouldSearch) {
 
-      try {
+  try {
 
-        webResources =
-          await trustedWebSearch(message);
+    webResources =
+      await trustedWebSearch(message);
 
-        console.log(
-          "🌐 WEB RESOURCES:",
-          webResources
-        );
+    console.log(
+      "🌐 WEB RESOURCES:",
+      webResources
+    );
 
-      } catch (err) {
+  } catch (err) {
 
-        console.log(
-          "❌ WEB SEARCH ERROR:",
-          err.message
-        );
+    console.log(
+      "❌ WEB SEARCH ERROR:",
+      err.message
+    );
 
-      }
+  }
 
-    }
+}
 
     /* ===================================== */
     /* FINAL CONTEXT */

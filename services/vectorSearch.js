@@ -161,7 +161,9 @@ console.log("Filtered results:", results.length);
   /* TAKE TOP RESULTS */
   /* -------------------------------------------------- */
 
-  const topResults = results.slice(0, 3);
+  const topResults = results
+  .filter(r => r.boostedScore > 0.7)
+  .slice(0, 3);
 
   /* -------------------------------------------------- */
   /* BUILD CONTEXT */

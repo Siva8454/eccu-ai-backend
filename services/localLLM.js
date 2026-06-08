@@ -29,10 +29,10 @@ CURRENT PAGE TITLE:
 ${context?.pageTitle || "No page title"}
 
 CURRENT PAGE CONTENT:
-${cleanCanvasText(context?.currentPage || "").slice(0, 8000)}
+${cleanCanvasText(context?.currentPage || "").slice(0, 3000)}
 
 ADDITIONAL COURSE CONTEXT:
-${cleanCanvasText(context?.extraContext || "").slice(0, 4000)}
+${cleanCanvasText(context?.extraContext || "").slice(0, 1500)}
 
 `;
 
@@ -74,6 +74,8 @@ Do NOT include:
 - document submission requirements
 
 unless the student specifically asks about them.
+
+
 
 Instructions:
 
@@ -131,6 +133,12 @@ Instructions:
    unless the student's question is specifically about those topics.
 
    Do not invent fixes.
+   
+12. If the student asks for examples:
+
+- Provide 3-5 real-world examples.
+- Explain each example.
+- Do not give only a definition.
 
 Response Style:
 
