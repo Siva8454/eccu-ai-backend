@@ -79,6 +79,73 @@ router.get("/", (req, res) => {
         ).toFixed(1)
       : 0;
 
+  /* TOP COURSES */
+
+  const topCourses = {};
+
+  analyticsData.forEach(r => {
+
+    const course =
+      r.courseCode || "Unknown";
+
+    topCourses[course] =
+      (topCourses[course] || 0) + 1;
+
+  });
+
+  const courseHtml =
+    Object.entries(topCourses)
+
+      .sort((a, b) => b[1] - a[1])
+
+      .map(([course, count]) => `
+        <tr>
+          <td>${course}</td>
+          <td>${count}</td>
+        </tr>
+      `)
+
+      .join("");
+
+  /* TOP INTENTS */
+
+  const topIntents = {};
+
+  analyticsData.forEach(r => {
+
+    const intent =
+      r.intent || "Unknown";
+
+    topIntents[intent] =
+      (topIntents[intent] || 0) + 1;
+
+  });
+
+  function formatIntent(intent) {
+
+    return intent
+      .replace(/_/g, " ")
+      .replace(
+        /\b\w/g,
+        c => c.toUpperCase()
+      );
+
+  }
+
+  const intentHtml =
+    Object.entries(topIntents)
+
+      .sort((a, b) => b[1] - a[1])
+
+      .map(([intent, count]) => `
+        <tr>
+          <td>${formatIntent(intent)}</td>
+          <td>${count}</td>
+        </tr>
+      `)
+
+      .join("");
+
   res.send(`
 
 <html>
@@ -107,32 +174,31 @@ h1{
 }
 
 .card{
-
   background:white;
-
   padding:25px;
-
   border-radius:12px;
-
   box-shadow:
   0 2px 10px rgba(0,0,0,.08);
-
 }
 
 .metric{
-
   font-size:40px;
-
   font-weight:bold;
-
   margin-top:10px;
-
 }
 
 .label{
-
   color:#666;
+}
 
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #eee;
 }
 
 </style>
@@ -146,76 +212,74 @@ h1{
 <div class="grid">
 
 <div class="card">
-
-<div class="label">
-Total Questions
-</div>
-
-<div class="metric">
-${totalQuestions}
-</div>
-
+<div class="label">Total Questions</div>
+<div class="metric">${totalQuestions}</div>
 </div>
 
 <div class="card">
-
-<div class="label">
-Student Satisfaction
-</div>
-
-<div class="metric">
-${helpfulPercent}%
-</div>
-
+<div class="label">Student Satisfaction</div>
+<div class="metric">${helpfulPercent}%</div>
 </div>
 
 <div class="card">
-
-<div class="label">
-Helpful Responses
-</div>
-
-<div class="metric">
-👍 ${helpful}
-</div>
-
+<div class="label">Helpful Responses</div>
+<div class="metric">👍 ${helpful}</div>
 </div>
 
 <div class="card">
-
-<div class="label">
-Not Helpful Responses
-</div>
-
-<div class="metric">
-👎 ${notHelpful}
-</div>
-
+<div class="label">Not Helpful Responses</div>
+<div class="metric">👎 ${notHelpful}</div>
 </div>
 
 <div class="card">
-
-<div class="label">
-Average Response Time
-</div>
-
-<div class="metric">
-${avgResponseTime} ms
-</div>
-
+<div class="label">Average Response Time</div>
+<div class="metric">${avgResponseTime} ms</div>
 </div>
 
 <div class="card">
-
-<div class="label">
-Average Confidence
-</div>
-
-<div class="metric">
-${avgConfidence}
+<div class="label">Average Confidence</div>
+<div class="metric">${avgConfidence}</div>
 </div>
 
 </div>
+
+<div
+class="card"
+style="margin-top:30px;"
+>
+
+<h2>Top Courses</h2>
+
+<table>
+
+<tr>
+<th align="left">Course</th>
+<th align="left">Questions</th>
+</tr>
+
+${courseHtml}
+
+</table>
+
+</div>
+
+<div
+class="card"
+style="margin-top:30px;"
+>
+
+<h2>Top Intents</h2>
+
+<table>
+
+<tr>
+<th align="left">Intent</th>
+<th align="left">Questions</th>
+</tr>
+
+${intentHtml}
+
+</table>
 
 </div>
 
