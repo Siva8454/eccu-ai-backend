@@ -6,6 +6,9 @@ const path = require("path");
 
 router.post("/", (req, res) => {
 
+    console.log("FEEDBACK RECEIVED");
+  console.log(req.body);
+
   const file = path.join(
     __dirname,
     "../data/feedback.json"
