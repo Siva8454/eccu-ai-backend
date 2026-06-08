@@ -6,17 +6,19 @@ const path = require("path");
 
 router.get("/", (req, res) => {
 
-  const file = path.join(
+  /* ------------------------- */
+  /* ANALYTICS FILE */
+  /* ------------------------- */
+
+  const analyticsFile = path.join(
     __dirname,
     "../data/analytics.json"
   );
 
-  /* Create file if missing */
-
-  if (!fs.existsSync(file)) {
+  if (!fs.existsSync(analyticsFile)) {
 
     fs.writeFileSync(
-      file,
+      analyticsFile,
       "[]"
     );
 
@@ -24,10 +26,39 @@ router.get("/", (req, res) => {
 
   const data = JSON.parse(
     fs.readFileSync(
-      file,
+      analyticsFile,
       "utf8"
     )
   );
+
+  /* ------------------------- */
+  /* FEEDBACK FILE */
+  /* ------------------------- */
+
+  const feedbackFile = path.join(
+    __dirname,
+    "../data/feedback.json"
+  );
+
+  if (!fs.existsSync(feedbackFile)) {
+
+    fs.writeFileSync(
+      feedbackFile,
+      "[]"
+    );
+
+  }
+
+  const feedbackData = JSON.parse(
+    fs.readFileSync(
+      feedbackFile,
+      "utf8"
+    )
+  );
+
+  /* ------------------------- */
+  /* BASIC STATS */
+  /* ------------------------- */
 
   const totalQuestions =
     data.length;
@@ -44,7 +75,21 @@ router.get("/", (req, res) => {
         ).toFixed(0)
       : 0;
 
+  const avgConfidence =
+    totalQuestions
+      ? (
+          data.reduce(
+            (a, b) =>
+              a + (b.confidence || 0),
+            0
+          ) /
+          totalQuestions
+        ).toFixed(2)
+      : 0;
+
+  /* ------------------------- */
   /* TOP COURSES */
+  /* ------------------------- */
 
   const topCourses = {};
 
@@ -58,7 +103,9 @@ router.get("/", (req, res) => {
 
   });
 
+  /* ------------------------- */
   /* TOP INTENTS */
+  /* ------------------------- */
 
   const topIntents = {};
 
@@ -72,19 +119,34 @@ router.get("/", (req, res) => {
 
   });
 
-  /* AVERAGE CONFIDENCE */
+  /* ------------------------- */
+  /* FEEDBACK STATS */
+  /* ------------------------- */
 
-  const avgConfidence =
-    totalQuestions
+  const helpful =
+    feedbackData.filter(
+      f => f.rating === "helpful"
+    ).length;
+
+  const notHelpful =
+    feedbackData.filter(
+      f => f.rating === "not_helpful"
+    ).length;
+
+  const totalFeedback =
+    helpful + notHelpful;
+
+  const helpfulPercent =
+    totalFeedback
       ? (
-          data.reduce(
-            (a, b) =>
-              a + (b.confidence || 0),
-            0
-          ) /
-          totalQuestions
-        ).toFixed(2)
+          helpful /
+          totalFeedback * 100
+        ).toFixed(1)
       : 0;
+
+  /* ------------------------- */
+  /* RESPONSE */
+  /* ------------------------- */
 
   res.json({
 
@@ -94,9 +156,17 @@ router.get("/", (req, res) => {
 
     avgConfidence,
 
+    helpful,
+
+    notHelpful,
+
+    helpfulPercent,
+
     topCourses,
 
     topIntents,
+
+    totalFeedback,
 
     records: data
 
