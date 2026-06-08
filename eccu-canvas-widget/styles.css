@@ -987,3 +987,35 @@ backdrop-filter:
     opacity: 1;
   }
 }
+
+.eccu-feedback {
+
+  margin-top: 8px;
+
+  display: flex;
+
+  gap: 8px;
+
+}
+
+.eccu-feedback button {
+
+  background: transparent;
+
+  border: none;
+
+  cursor: pointer;
+
+  font-size: 18px;
+
+  padding: 4px;
+
+  transition: transform .2s ease;
+
+}
+
+.eccu-feedback button:hover {
+
+  transform: scale(1.2);
+
+}

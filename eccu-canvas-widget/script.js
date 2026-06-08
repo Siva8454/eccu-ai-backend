@@ -673,6 +673,98 @@ const botReply = addMessage(
   "bot-msg"
 )
 
+/* -------------------------------- */
+/* FEEDBACK BUTTONS */
+/* -------------------------------- */
+
+const feedback = document.createElement("div");
+
+feedback.className = "eccu-feedback";
+
+feedback.innerHTML = `
+<button class="thumb-up" title="Helpful">
+👍
+</button>
+
+<button class="thumb-down" title="Not Helpful">
+👎
+</button>
+`;
+
+botReply.appendChild(feedback);
+
+/* 👍 Helpful */
+
+feedback
+.querySelector(".thumb-up")
+.addEventListener("click", async () => {
+
+  await fetch(
+    "https://aitutor.eccu.edu/feedback",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+
+        question: msg,
+
+        rating: "helpful",
+
+        courseId: getCourseId(),
+
+        userId: currentUserId
+
+      })
+
+    }
+  );
+
+  feedback.innerHTML =
+    "✅ Thank you for your feedback";
+
+});
+
+/* 👎 Not Helpful */
+
+feedback
+.querySelector(".thumb-down")
+.addEventListener("click", async () => {
+
+  await fetch(
+    "https://aitutor.eccu.edu/feedback",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+
+        question: msg,
+
+        rating: "not_helpful",
+
+        courseId: getCourseId(),
+
+        userId: currentUserId
+
+      })
+
+    }
+  );
+
+  feedback.innerHTML =
+    "✅ Thank you for your feedback";
+
+});
+
 scrollToBottom()
 
 conversationHistory.push({
