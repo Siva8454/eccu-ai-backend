@@ -410,8 +410,8 @@ if (quickAction === "other") {
 
     should be considered RELATED.
 
-    Only questions clearly outside the course subject
-should be marked NOT_RELATED.
+    A question is RELATED only if it belongs to
+the academic subject area of the course.
 
     Examples:
 
@@ -430,6 +430,26 @@ should be marked NOT_RELATED.
     Course: Psychology
     Question: Explain attribution theory.
     RELATED
+
+    Course: Psychology
+    Question: What is SQL Injection?
+    NOT_RELATED
+
+    Course: Psychology
+    Question: What is Social Cognition?
+    RELATED
+
+    Course: Financial Management
+    Question: What is SQL Injection?
+    NOT_RELATED
+
+    Course: Ethical Hacking
+    Question: What is SQL Injection?
+    RELATED
+
+    Course: Ethical Hacking
+    Question: What is Financial Management?
+    NOT_RELATED
 
     Respond ONLY with:
 
@@ -522,10 +542,16 @@ should be marked NOT_RELATED.
     /* VECTOR SEARCH */
     /* ===================================== */
 
-    const recentHistory = (history || [])
-  .slice(-6)
-  .map(h => `${h.role}: ${h.content}`)
-  .join("\n");
+    const isFollowUp =
+/explain( this)?|simplify|tell me more|i don't understand|i didnt understand|give examples?|example|elaborate|continue/i
+.test(message);
+
+    const recentHistory = isFollowUp
+  ? (history || [])
+      .slice(-2)
+      .map(h => `${h.role}: ${h.content}`)
+      .join("\n")
+  : "";
 
 const contextualMessage = `
 
@@ -554,9 +580,9 @@ const shouldUseRAG =
 if (shouldUseRAG) {
 
   ragResult =
-  await vectorSearch(
+    await vectorSearch(
     message,
-    allowedCourseIds,
+    [Number(courseId)],
     intent,
     currentPage
   );

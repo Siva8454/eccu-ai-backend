@@ -23,10 +23,31 @@ function isQuizAttemptPage() {
 
 }
 
-if (isQuizAttemptPage()) {
+function isBlockedPage() {
+
+  const url = window.location.href.toLowerCase();
+
+  console.log("PAGE CHECK URL:", url);
+
+  return (
+
+    url.includes("/gradebook") ||
+
+    url.includes("/announcements") ||
+
+    url.includes("/external_tools/2375")
+
+  );
+
+}
+
+if (
+  isQuizAttemptPage() ||
+  isBlockedPage()
+) {
 
   console.log(
-    "🚫 Quiz/Exam attempt detected - AI Tutor disabled"
+    "🚫 ECCU AI Tutor disabled on this page"
   );
 
   const existingWidget =
@@ -168,6 +189,20 @@ if (!isAllowedCourse()) {
 
 const CANVAS_CONTEXT = getCanvasContext()
 let conversationHistory = []
+
+const pageKey = window.location.pathname;
+
+if (
+  sessionStorage.getItem("eccu_last_page")
+  !== pageKey
+) {
+  conversationHistory = [];
+  sessionStorage.setItem(
+    "eccu_last_page",
+    pageKey
+  );
+}
+
 let currentRequest = null;
 
 /* ---------- FORMAT LINKS ---------- */
@@ -687,7 +722,7 @@ console.log("📤 Sending Request:", {
   userId: currentUserId,
 
   history:
-    conversationHistory.slice(-12)
+  conversationHistory.slice(-4)
 
 });
 
