@@ -31,6 +31,11 @@ const isTechnicalIssue =
   "../services/analyticsService"
 );
 
+const {
+  isSensitiveQuestion
+} = require("../services/securityFilter");
+
+
 /* ===================================== */
 /* EDUCATIONAL TOPIC DETECTION */
 /* ===================================== */
@@ -460,6 +465,19 @@ should be marked NOT_RELATED.
       relevanceResult
     );
 
+    if (isSensitiveQuestion(message)) {
+
+  return res.json({
+
+    source: "security",
+
+    reply:
+      "This request is outside the scope of the ECCU AI Tutor. I can only assist with course-related learning content."
+
+  });
+
+}
+
     if (!isCourseRelated) {
 
   return res.json({
@@ -536,12 +554,12 @@ const shouldUseRAG =
 if (shouldUseRAG) {
 
   ragResult =
-    await vectorSearch(
-      contextualMessage,
-      allowedCourseIds,
-      intent,
-      currentPage
-    );
+  await vectorSearch(
+    message,
+    allowedCourseIds,
+    intent,
+    currentPage
+  );
 
 }
 
@@ -721,7 +739,7 @@ const structuredContext = {
 
     const aiAnswer =
   await generateAnswer(
-    contextualMessage,
+    message,
     structuredContext,
     intent
   );
