@@ -122,6 +122,10 @@ function getCourseName() {
 
 }
 
+function isMobileOrTablet() {
+  return window.innerWidth <= 1200;
+}
+
 /* -------------------------------------------------- */
 /* COURSE FILTER */
 /* -------------------------------------------------- */
@@ -140,6 +144,8 @@ function isAllowedCourse() {
 /* -------------------------------------------------- */
 
 function initChatbot(){
+
+  
 
   if (isQuizAttemptPage()) {
 
@@ -248,11 +254,65 @@ document.body.appendChild(root)
 
 const avatar = root.querySelector("#eccu-avatar")
 const chat = root.querySelector("#eccu-chat")
+
 const closeBtn = root.querySelector("#eccu-close")
 const sendBtn = root.querySelector("#eccu-send")
 const input = root.querySelector("#eccu-input")
 const chatBody = root.querySelector("#eccu-chat-body")
 const maxBtn = root.querySelector("#eccu-max")
+
+function adjustChatSize() {
+
+  if (window.innerWidth <= 1024) {
+
+    chat.style.height = "100dvh";
+
+  } else {
+
+    chat.style.height = "";
+
+  }
+
+}
+
+adjustChatSize();
+
+if (isMobileOrTablet()) {
+
+  avatar.style.display = "none";
+
+  chat.classList.add("open");
+
+  chat.classList.add("fullscreen");
+
+  maxBtn.innerText = "❐";
+
+}
+
+window.addEventListener("resize", () => {
+
+  adjustChatSize();
+
+  if (isMobileOrTablet()) {
+
+    avatar.style.display = "none";
+
+    chat.classList.add("open");
+    chat.classList.add("fullscreen");
+
+    maxBtn.innerText = "❐";
+
+  } else {
+
+    avatar.style.display = "flex";
+
+    chat.classList.remove("fullscreen");
+
+    maxBtn.innerText = "⛶";
+
+  }
+
+});
 
 /* ---------- MESSAGE ---------- */
 
@@ -353,6 +413,20 @@ avatar.onclick = () => {
 
   chat.classList.add("open");
 
+  if (isMobileOrTablet()) {
+
+  chat.classList.add("fullscreen");
+
+  maxBtn.innerText = "❐";
+
+}
+
+if (window.innerWidth < 400) {
+
+  input.placeholder = "Ask AI Tutor...";
+
+}
+
   setTimeout(() => {
     input.focus();
   }, 120);
@@ -443,8 +517,12 @@ document.addEventListener("keydown", e => {
   ) {
 
     closeBtn.click();
+
   }
+
 });
+
+
 
 /* ---------- SEND ---------- */
 
