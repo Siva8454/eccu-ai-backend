@@ -426,6 +426,22 @@ if (quickAction === "other") {
 
   const q = message.toLowerCase();
 
+  /* ============================= */
+/* COURSE-WIDE LAB QUESTIONS */
+/* ============================= */
+
+const wantsLabs =
+
+  q.includes("lab") ||
+  q.includes("labs") ||
+  q.includes("skillable") ||
+  q.includes("hands-on") ||
+  q.includes("exercise");
+
+  /* ============================= */
+/* SYLLABUS QUESTIONS */
+/* ============================= */
+
   const wantsSyllabus =
   q.includes("syllabus") ||
   q.includes("whole course") ||
@@ -564,7 +580,8 @@ if (shouldUseRAG) {
     message,
     [Number(courseId)],
     intent,
-    currentPage
+    currentPage,
+    wantsLabs
   );
 
 }

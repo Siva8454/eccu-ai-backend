@@ -37,7 +37,8 @@ async function vectorSearch(
   question,
   allowedCourseIds = [],
   intent,
-  currentPage
+  currentPage,
+  wantsLabs = false
 ) {
 
   console.log("🔎 Vector search:", question);
@@ -176,14 +177,14 @@ console.log("Filtered results:", results.length);
   });
 
   const topResults = results
-  .filter(r => r.boostedScore > 0.7)
-  .slice(0, 3);
+  .filter(r => r.boostedScore > 0.6)
+  .slice(0, wantsLabs ? 25 : 3);
 
   /* -------------------------------------------------- */
   /* BUILD CONTEXT */
   /* -------------------------------------------------- */
 
-  const context = topResults.map(r => {
+  let context = topResults.map(r => {
 
     const p = r.payload;
 
@@ -209,6 +210,42 @@ Type: ${p.type}
 `;
 
   }).join("\n\n----------------\n\n");
+
+  if (wantsLabs) {
+
+  const labLinks = [];
+
+  results.forEach(r => {
+
+    (r.payload.links || []).forEach(link => {
+
+      const text =
+        (link.text || "").toLowerCase();
+
+      if (
+        text.includes("lab") ||
+        text.includes("skillable") ||
+        text.includes("exercise")
+      ) {
+        labLinks.push(link.text);
+      }
+
+    });
+
+  });
+
+  if (labLinks.length) {
+
+    context += `
+
+COURSE LABS:
+
+${labLinks.join("\n")}
+`;
+
+  }
+
+}
 
   console.log("Final context size:", context.length);
 
