@@ -417,6 +417,24 @@ if (quickAction === "other") {
 
   const q = message.toLowerCase();
 
+  const wantsSyllabus =
+  q.includes("syllabus") ||
+  q.includes("whole course") ||
+  q.includes("entire course") ||
+  q.includes("full course");
+
+if (wantsSyllabus) {
+
+  return res.json({
+    source: "navigation",
+    reply:
+      `The complete course syllabus is available here:
+
+https://eccouncil.instructure.com/courses/${courseId}/assignments/syllabus`
+  });
+
+}
+
 
 if (
   !isCourseRelated &&
