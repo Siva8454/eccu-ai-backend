@@ -211,6 +211,9 @@ console.log("CURRENT COURSE:", currentCourse);
     const memory =
   getMemory(currentUserId);
 
+  const previousQuestion =
+  memory?.previousQuestion || "";
+
     console.log(
       "🧠 Previous question:",
       memory?.previousQuestion || ""
