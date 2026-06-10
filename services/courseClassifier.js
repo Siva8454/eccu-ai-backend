@@ -2,7 +2,8 @@ const axios = require("axios");
 
 async function classifyCourseRelevance(
   courseName,
-  question
+  question,
+  previousQuestion = ""
 ) {
 
   const prompt = `
@@ -10,6 +11,9 @@ You are a strict academic course relevance classifier.
 
 Course:
 ${courseName}
+
+Previous Question:
+${previousQuestion || "None"}
 
 Student Question:
 ${question}
@@ -25,6 +29,39 @@ RULES:
   "Pretend to be..."
   "You are..."
   are NOT_RELATED unless the topic itself belongs to the course.
+
+  - If the Student Question is a follow-up,
+  continuation, clarification,
+  simplification, summary request,
+  or expansion of the Previous Question,
+  treat it as RELATED if the Previous Question
+  belongs to the course.
+
+Examples:
+
+Previous Question:
+Explain SQL Injection
+
+Current Question:
+Can you simplify that?
+
+RELATED
+
+Previous Question:
+Explain capital budgeting
+
+Current Question:
+Give one example
+
+RELATED
+
+Previous Question:
+List hands-on ethical hacking exercises
+
+Current Question:
+Please simplify the list with one exercise per step
+
+RELATED
 
 Examples:
 

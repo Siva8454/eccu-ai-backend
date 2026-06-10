@@ -394,10 +394,16 @@ if (quickAction === "other") {
     /* COURSE RELEVANCE CHECK */
     /* ===================================== */
 
+   console.log(
+  "Previous Question:",
+  previousQuestion
+);
+   
     const isCourseRelated =
   await classifyCourseRelevance(
     currentCourse.courseName,
-    message
+    message,
+    previousQuestion
   );
 
   console.log(
