@@ -35,6 +35,12 @@ const {
   isSensitiveQuestion
 } = require("../services/securityFilter");
 
+const {
+  classifyCourseRelevance
+} = require(
+  "../services/courseClassifier"
+);
+
 
 /* ===================================== */
 /* EDUCATIONAL TOPIC DETECTION */
@@ -388,102 +394,45 @@ if (quickAction === "other") {
     /* COURSE RELEVANCE CHECK */
     /* ===================================== */
 
-    const relevancePrompt = `
-    You are an academic course relevance classifier.
-
-    Course:
-    ${currentCourse.courseName}
-
-    Student Question:
-    ${message}
-
-    Determine whether this question belongs to the academic subject area of this course.
-
-    Greetings, introductions, thanks, and normal conversation
-    messages such as:
-
-    Hi
-    Hello
-    Hey
-    Good morning
-    Thank you
-
-    should be considered RELATED.
-
-    A question is RELATED only if it belongs to
-the academic subject area of the course.
-
-    Examples:
-
-    Course: Psychology
-    Question: What is social cognition?
-    RELATED
-
-    Course: Psychology
-    Question: What is photosynthesis?
-    NOT_RELATED
-
-    Course: Psychology
-    Question: What is aura farming?
-    NOT_RELATED
-
-    Course: Psychology
-    Question: Explain attribution theory.
-    RELATED
-
-    Course: Psychology
-    Question: What is SQL Injection?
-    NOT_RELATED
-
-    Course: Psychology
-    Question: What is Social Cognition?
-    RELATED
-
-    Course: Financial Management
-    Question: What is SQL Injection?
-    NOT_RELATED
-
-    Course: Ethical Hacking
-    Question: What is SQL Injection?
-    RELATED
-
-    Course: Ethical Hacking
-    Question: What is Financial Management?
-    NOT_RELATED
-
-    Respond ONLY with:
-
-    RELATED
-
-    or
-
-    NOT_RELATED
-    `;
-
-  
-
-
-    const relevanceResult =
-      await generateAnswer(
-        relevancePrompt,
-        {},
-        "classifier"
-      );
-
     const isCourseRelated =
-      relevanceResult
-        ?.trim()
-        ?.toUpperCase()
-        ?.includes("RELATED") &&
-      !relevanceResult
-        ?.trim()
-        ?.toUpperCase()
-        ?.includes("NOT_RELATED");
+  await classifyCourseRelevance(
+    currentCourse.courseName,
+    message
+  );
 
-    console.log(
-      "Course relevance:",
-      relevanceResult
-    );
+  console.log(
+    "Current Course:",
+    currentCourse.courseName
+  );
+
+  console.log(
+    "Student Question:",
+    message
+  );
+
+  console.log(
+    "Course Related:",
+    isCourseRelated
+  );
+
+  const q = message.toLowerCase();
+
+
+if (
+  q.includes("act as") ||
+  q.includes("pretend to be") ||
+  q.includes("roleplay") ||
+  q.includes("you are a")
+) {
+
+  return res.json({
+    source: "course-guardrail",
+    reply:
+      "Please ask a question related to the current course content."
+  });
+
+}
+
 
     if (isSensitiveQuestion(message)) {
 
