@@ -419,11 +419,15 @@ if (quickAction === "other") {
 
 
 if (
-  q.includes("act as") ||
-  q.includes("pretend to be") ||
-  q.includes("roleplay") ||
-  q.includes("you are a")
-) {
+  !isCourseRelated &&
+  (
+    q.includes("act as") ||
+    q.includes("pretend to be") ||
+    q.includes("roleplay") ||
+    q.includes("you are a")
+  )
+)
+{
 
   return res.json({
     source: "course-guardrail",
