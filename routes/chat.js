@@ -450,33 +450,56 @@ const wantsLabs =
   q.includes("explain this activity") ||
   q.includes("explain this assignment");
 
-  /* ========================= */
+ /* ========================= */
 /* MODULE LAB CHECK */
 /* ========================= */
 
 if (
   wantsLabs &&
   !wantsLabExplanation &&
-  currentPage?.text
+  currentPage
 ) {
 
-  const pageText =
-    currentPage.text;
+  let labs = [];
 
-  const labs = [...new Set([
+  /* ---------- FIRST: CHECK PAGE LINKS ---------- */
 
-  ...pageText.matchAll(/iLabs?\s*\d+/gi),
+  if (currentPage.links?.length) {
 
-  ...pageText.matchAll(/Lab Assignment\s*\d*/gi),
+    labs = currentPage.links
+      .map(link => (link.text || "").trim())
+      .filter(text => {
 
-  ...pageText.matchAll(/Skillable\s*Lab\s*\d*/gi),
+        const t = text.toLowerCase();
 
+        return (
+          t.includes("lab") ||
+          t.includes("labs")
+        );
 
-]
-.map(m => m[0])
-.filter(Boolean))];
+      });
 
-console.log("LABS FOUND:", labs);
+  }
+
+  /* ---------- FALLBACK: CHECK PAGE TEXT ---------- */
+
+  if (!labs.length && currentPage.text) {
+
+    labs = [...new Set([
+
+      ...currentPage.text.matchAll(/\b[a-zA-Z0-9()\- ]*lab[s]?[a-zA-Z0-9()\- ]*/gi)
+
+    ]
+      .map(m => m[0].trim())
+      .filter(Boolean))];
+
+  }
+
+  /* ---------- REMOVE DUPLICATES ---------- */
+
+  labs = [...new Set(labs)];
+
+  console.log("LABS FOUND:", labs);
 
   if (labs.length) {
 
@@ -487,7 +510,7 @@ console.log("LABS FOUND:", labs);
 
 ${labs.map(x => `• ${x}`).join("\n")}
 
-These labs can be launched directly from the Learning Materials section of the module.`
+These lab activities can be accessed from the Learning Materials section of the module.`
     });
 
   }
