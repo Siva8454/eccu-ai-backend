@@ -745,6 +745,13 @@ if (currentRequest) {
 currentRequest =
   new AbortController();
 
+  console.log("CURRENT PAGE SENT:", {
+  url: window.location.href,
+  title: document.title,
+  type: pageType,
+  links
+});
+
 const res = await fetch("https://aitutor.eccu.edu/chat", {
 
 method:"POST",

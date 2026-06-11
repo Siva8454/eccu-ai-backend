@@ -476,9 +476,10 @@ if (
       const t = text.toLowerCase();
 
       return (
-        t.includes("lab") ||
-        t.includes("ilab")
-      );
+      /\bilabs?\b/i.test(text) ||
+      /\blab\s*\d*/i.test(text) ||
+      /\blab assignment\b/i.test(text)
+    );
 
     });
 
