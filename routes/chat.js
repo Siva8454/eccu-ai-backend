@@ -430,8 +430,6 @@ if (quickAction === "other") {
 /* COURSE-WIDE LAB QUESTIONS */
 /* ============================= */
 
-const wantsLabs =
-
   const wantsLabs =
 
   /\blabs?\b/i.test(q) ||
