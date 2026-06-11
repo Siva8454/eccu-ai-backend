@@ -473,14 +473,14 @@ if (
       .filter(Boolean)
       .filter(text => {
 
-        const t = text.toLowerCase();
+      const t = text.toLowerCase();
 
-        return (
-      t.includes("ilab") ||
-      /lab\s*assignment/i.test(text)
-    );
+      return (
+        t.includes("lab") ||
+        t.includes("ilab")
+      );
 
-      });
+    });
 
   }
 

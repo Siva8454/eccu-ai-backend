@@ -771,7 +771,8 @@ body: JSON.stringify({
   pageTitle: document.title,
   title: document.title,
   text: pageText,
-  type: pageType
+  type: pageType,
+  links: links
 },
   pageText,
   userId: currentUserId
