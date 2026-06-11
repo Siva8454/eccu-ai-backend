@@ -438,12 +438,25 @@ const wantsLabs =
   q.includes("hands-on") ||
   q.includes("exercise");
 
+  const wantsLabExplanation =
+
+  q.includes("what is this lab") ||
+  q.includes("explain this lab") ||
+  q.includes("summarize this lab") ||
+  q.includes("what do i need to do") ||
+  q.includes("what is this assignment") ||
+  q.includes("tell me about this lab") ||
+  q.includes("describe this lab") ||
+  q.includes("explain this activity") ||
+  q.includes("explain this assignment");
+
   /* ========================= */
 /* MODULE LAB CHECK */
 /* ========================= */
 
 if (
   wantsLabs &&
+  !wantsLabExplanation &&
   currentPage?.text
 ) {
 
