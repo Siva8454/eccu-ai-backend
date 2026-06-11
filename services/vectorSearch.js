@@ -250,26 +250,29 @@ if (
 
   if (labItems.length) {
 
-    context += `
+  context += `
 
-LAB ASSIGNMENTS FOUND:
+  VERIFIED LAB ASSIGNMENTS:
 
-${labItems.join("\n")}
-`;
+  ${labItems.map(l => `- ${l}`).join("\n")}
+
+  IMPORTANT:
+  Only the above lab titles were found in retrieved course content.
+  Do not invent additional labs.
+  Do not infer labs from module names.
+  `;
 
   } else {
 
-      return {
-    context: `
-  The retrieved course content does not contain a complete list of lab assignments.
+    return {
+      context: `
+  No lab assignment pages were identified in the retrieved course content.
 
-  If this course includes labs or Skillable activities, they are typically available within the Modules section of Canvas.
-
-  Direct the student to open Modules and review the available Lab Assignments, Skillable Labs, Hands-on Exercises, and Practical Activities.
+  If this course contains labs, they are typically available within the Modules section of Canvas. Please open Modules and look for Lab Assignments, Skillable Labs, Hands-on Exercises, or Practical Activities.
   `,
-    confidence: 1,
-    rawScore: 1
-  };
+      confidence: 1,
+      rawScore: 1
+    };
 
   }
 
