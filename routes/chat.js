@@ -460,6 +460,8 @@ if (
   currentPage
 ) {
 
+  console.log("PAGE LINKS:", currentPage.links);
+
   let labs = [];
 
   /* ---------- FIRST: CHECK PAGE LINKS ---------- */
