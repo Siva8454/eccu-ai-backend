@@ -450,6 +450,12 @@ const wantsLabs =
   q.includes("explain this activity") ||
   q.includes("explain this assignment");
 
+  console.log({
+  wantsLabs,
+  wantsLabExplanation,
+  question: q
+});
+
  /* ========================= */
 /* MODULE LAB CHECK */
 /* ========================= */
