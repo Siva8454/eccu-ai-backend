@@ -438,6 +438,50 @@ const wantsLabs =
   q.includes("hands-on") ||
   q.includes("exercise");
 
+  /* ========================= */
+/* MODULE LAB CHECK */
+/* ========================= */
+
+if (
+  wantsLabs &&
+  currentPage?.text
+) {
+
+  const pageText =
+    currentPage.text;
+
+  const labs = [...new Set([
+
+  ...pageText.matchAll(/iLabs?\s*\d+/gi),
+
+  ...pageText.matchAll(/Lab Assignment\s*\d*/gi),
+
+  ...pageText.matchAll(/Skillable\s*Lab\s*\d*/gi),
+
+  ...pageText.matchAll(/Hands[- ]On/gi)
+
+]
+.map(m => m[0])
+.filter(Boolean))];
+
+console.log("LABS FOUND:", labs);
+
+  if (labs.length) {
+
+    return res.json({
+      source: "page",
+      reply:
+`The lab activities available on this page are:
+
+${labs.map(x => `• ${x}`).join("\n")}
+
+You can click the lab links in the Learning Materials section to launch them.`
+    });
+
+  }
+
+}
+
   /* ============================= */
 /* SYLLABUS QUESTIONS */
 /* ============================= */

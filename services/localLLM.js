@@ -217,6 +217,15 @@ If the student asks about labs, Skillable activities, hands-on exercises, or pra
 - If no lab titles are available, explain that the available context does not contain a complete lab list.
 - Direct the student to the Modules page to view all lab assignments.
 
+1. If asking about labs in THIS MODULE
+   → check current page first
+
+2. If asking about labs in THIS COURSE
+   → use vector search
+
+3. If no labs found
+   → navigate to Modules page
+
 Student Question:
 ${question}
 
