@@ -180,6 +180,16 @@ console.log("Filtered results:", results.length);
   .filter(r => r.boostedScore > 0.6)
   .slice(0, wantsLabs ? 25 : 3);
 
+  if (!topResults.length) {
+
+  return {
+    context: "",
+    confidence: 0,
+    rawScore: 0
+  };
+
+}
+
   /* -------------------------------------------------- */
   /* BUILD CONTEXT */
   /* -------------------------------------------------- */
@@ -213,35 +223,53 @@ Type: ${p.type}
 
   if (wantsLabs) {
 
-  const labLinks = [];
+  const labItems = [];
 
-  results.forEach(r => {
+  topResults.forEach(r => {
 
-    (r.payload.links || []).forEach(link => {
+    const title =
+  (r.payload.title || "").toLowerCase();
 
-      const text =
-        (link.text || "").toLowerCase();
+const content =
+  (r.payload.content || "").toLowerCase();
 
-      if (
-        text.includes("lab") ||
-        text.includes("skillable") ||
-        text.includes("exercise")
-      ) {
-        labLinks.push(link.text);
-      }
+if (
+  title.includes("lab") ||
+  title.includes("skillable") ||
+  title.includes("exercise") ||
 
-    });
+  content.includes("skillable") ||
+  content.includes("hands-on") ||
+  content.includes("lab assignment") ||
+  content.includes("practical exercise")
+) {
+  labItems.push(r.payload.title);
+}
 
   });
 
-  if (labLinks.length) {
+  if (labItems.length) {
 
     context += `
 
-COURSE LABS:
+LAB ASSIGNMENTS FOUND:
 
-${labLinks.join("\n")}
+${labItems.join("\n")}
 `;
+
+  } else {
+
+      return {
+    context: `
+  The retrieved course content does not contain a complete list of lab assignments.
+
+  If this course includes labs or Skillable activities, they are typically available within the Modules section of Canvas.
+
+  Direct the student to open Modules and review the available Lab Assignments, Skillable Labs, Hands-on Exercises, and Practical Activities.
+  `,
+    confidence: 1,
+    rawScore: 1
+  };
 
   }
 
