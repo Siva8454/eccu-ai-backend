@@ -432,11 +432,10 @@ if (quickAction === "other") {
 
 const wantsLabs =
 
-  q.includes("lab") ||
-  q.includes("labs") ||
-  q.includes("skillable") ||
-  q.includes("hands-on") ||
-  q.includes("exercise");
+  const wantsLabs =
+
+  /\blabs?\b/i.test(q) ||
+  q.includes("lab assignment");
 
   const wantsLabExplanation =
 
