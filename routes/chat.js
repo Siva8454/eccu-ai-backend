@@ -458,7 +458,6 @@ if (
 
   ...pageText.matchAll(/Skillable\s*Lab\s*\d*/gi),
 
-  ...pageText.matchAll(/Hands[- ]On/gi)
 
 ]
 .map(m => m[0])
@@ -471,11 +470,11 @@ console.log("LABS FOUND:", labs);
     return res.json({
       source: "page",
       reply:
-`The lab activities available on this page are:
+`The following lab activities are available in this module:
 
 ${labs.map(x => `• ${x}`).join("\n")}
 
-You can click the lab links in the Learning Materials section to launch them.`
+These labs can be launched directly from the Learning Materials section of the module.`
     });
 
   }
