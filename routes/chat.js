@@ -464,36 +464,23 @@ if (
 
   let labs = [];
 
-  /* ---------- FIRST: CHECK PAGE LINKS ---------- */
+  /* ---------- CHECK PAGE LINKS ---------- */
 
   if (currentPage.links?.length) {
 
     labs = currentPage.links
       .map(link => (link.text || "").trim())
+      .filter(Boolean)
       .filter(text => {
 
         const t = text.toLowerCase();
 
         return (
-          t.includes("lab") ||
-          t.includes("labs")
-        );
+      t.includes("ilab") ||
+      /lab\s*assignment/i.test(text)
+    );
 
       });
-
-  }
-
-  /* ---------- FALLBACK: CHECK PAGE TEXT ---------- */
-
-  if (!labs.length && currentPage.text) {
-
-    labs = [...new Set([
-
-      ...currentPage.text.matchAll(/\b[a-zA-Z0-9()\- ]*lab[s]?[a-zA-Z0-9()\- ]*/gi)
-
-    ]
-      .map(m => m[0].trim())
-      .filter(Boolean))];
 
   }
 

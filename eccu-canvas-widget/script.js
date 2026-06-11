@@ -700,11 +700,19 @@ else if (
   pageType = "module";
 }
 
+const links = [...document.querySelectorAll("a")]
+  .map(a => ({
+    text: a.innerText?.trim(),
+    href: a.href
+  }))
+  .filter(a => a.text);
+
 const currentPage = {
   url: window.location.href,
   title: document.title,
   text: pageText,
-  type: pageType
+  type: pageType,
+  links
 };
 
 console.log("📤 Sending Request:", {
