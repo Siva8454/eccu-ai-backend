@@ -464,8 +464,6 @@ if (
 
   let labs = [];
 
-  /* ---------- CHECK PAGE LINKS ---------- */
-
   if (currentPage.links?.length) {
 
     labs = currentPage.links
@@ -473,23 +471,21 @@ if (
       .filter(Boolean)
       .filter(text => {
 
-      const t = text.toLowerCase();
+        return (
+          /\bilabs?\b/i.test(text) ||
+          /\blab\s*\d*/i.test(text) ||
+          /\blab assignment\b/i.test(text)
+        );
 
-      return (
-      /\bilabs?\b/i.test(text) ||
-      /\blab\s*\d*/i.test(text) ||
-      /\blab assignment\b/i.test(text)
-    );
-
-    });
+      });
 
   }
-
-  /* ---------- REMOVE DUPLICATES ---------- */
 
   labs = [...new Set(labs)];
 
   console.log("LABS FOUND:", labs);
+
+  /* LABS FOUND */
 
   if (labs.length) {
 
@@ -505,7 +501,18 @@ These lab activities can be accessed from the Learning Materials section of the 
 
   }
 
+  /* NO LABS FOUND ON CURRENT PAGE */
+
+  return res.json({
+    source: "page",
+    reply:
+`No lab activities are listed on the current page.
+
+Lab activities are organized within individual course modules. Please open a specific module to view its associated Lab Assignments and hands-on activities.`
+  });
+
 }
+
 
   /* ============================= */
 /* SYLLABUS QUESTIONS */
