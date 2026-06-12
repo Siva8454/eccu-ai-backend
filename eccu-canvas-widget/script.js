@@ -31,7 +31,7 @@ function isBlockedPage() {
 
   return (
 
-    url.includes("/gradebook") ||
+    url.includes("/grades") ||
 
     url.includes("/announcements") ||
 
