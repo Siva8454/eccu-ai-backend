@@ -57,17 +57,23 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
 
   res.setHeader(
-    "Content-Security-Policy",
-    [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
-      "style-src 'self' 'unsafe-inline' https:",
-      "img-src 'self' data: https:",
-      "font-src 'self' data: https:",
-      "connect-src 'self' https:",
-      "frame-ancestors 'self' https://eccouncil.instructure.com"
-    ].join("; ")
-  );
+  "Content-Security-Policy",
+  [
+    "default-src 'self'",
+
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://aitutor.eccu.edu https://eccouncil.instructure.com",
+
+    "style-src 'self' 'unsafe-inline' https://aitutor.eccu.edu https://eccouncil.instructure.com",
+
+    "img-src 'self' data: https://eccouncil.instructure.com https://instructure-uploads.s3.amazonaws.com",
+
+    "font-src 'self' data: https://du11hjcxv0uqb.cloudfront.net",
+
+    "connect-src 'self' https://aitutor.eccu.edu https://eccouncil.instructure.com",
+
+    "frame-ancestors 'self' https://eccouncil.instructure.com"
+  ].join("; ")
+);
 
   next();
 
