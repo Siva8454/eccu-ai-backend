@@ -427,6 +427,42 @@ if (quickAction === "other") {
   const q = message.toLowerCase();
 
   /* ============================= */
+/* COURSE-WIDE Interactivity Questions */
+/* ============================= */
+
+const isInteractivityPage =
+
+  currentPage?.title?.toLowerCase().includes("interactivity") ||
+
+  currentPage?.url?.toLowerCase().includes("interactivity");
+
+const wantsInteractivityExplanation =
+
+  q.includes("what is this interactivity") ||
+  q.includes("explain this interactivity") ||
+  q.includes("tell me about this interactivity") ||
+  q.includes("what does this interactivity do") ||
+  q.includes("describe this interactivity") ||
+  q.includes("what is this activity") ||
+  q.includes("explain this activity") ||
+
+  (
+    isInteractivityPage &&
+    (
+      q.includes("what is this") ||
+      q.includes("explain this") ||
+      q.includes("tell me about this") ||
+      q.includes("what is this page") ||
+      q.includes("tell me about this page") ||
+      q.includes("what do i do here") ||
+      q.includes("what do i need to do") ||
+      q.includes("how do i complete this")
+    )
+  );
+
+  
+
+  /* ============================= */
 /* COURSE-WIDE LAB QUESTIONS */
 /* ============================= */
 
@@ -516,6 +552,27 @@ Lab activities are organized within individual course modules. Please open a spe
 
 }
 
+
+/* ========================= */
+/* INTERACTIVITY CHECK */
+/* ========================= */
+
+if (
+  wantsInteractivityExplanation &&
+  isInteractivityPage
+) {
+
+  return res.json({
+    source: "page",
+    reply:
+`This page contains an interactive learning activity.
+
+To understand the interactivity, please click the Begin button and follow the instructions, scenarios, and options provided within the activity.
+
+If you need assistance after completing the interactivity, feel free to ask questions about the concepts covered in the activity.`
+  });
+
+}
 
   /* ============================= */
 /* SYLLABUS QUESTIONS */
