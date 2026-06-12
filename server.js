@@ -65,9 +65,9 @@ app.use((req, res, next) => {
 
     "style-src 'self' 'unsafe-inline' https://aitutor.eccu.edu https://eccouncil.instructure.com",
 
-    "img-src 'self' data: https://eccouncil.instructure.com https://instructure-uploads.s3.amazonaws.com",
+    "img-src 'self' data: https://eccouncil.instructure.com https://instructure-uploads.s3.amazonaws.com https://*.cloudfront.net https://*.canvas-user-content.com",
 
-    "font-src 'self' data: https://du11hjcxv0uqb.cloudfront.net",
+    "font-src 'self' data: https://*.cloudfront.net",
 
     "connect-src 'self' https://aitutor.eccu.edu https://eccouncil.instructure.com",
 
