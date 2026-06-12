@@ -22,8 +22,56 @@ const feedbackRoutes =
 
 const app = express();
 
-app.use(cors());
+app.disable("x-powered-by");
+
+app.use(cors({
+  origin: [
+    "https://eccouncil.instructure.com"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
+
+app.use((req, res, next) => {
+
+  res.setHeader(
+    "X-XSS-Protection",
+    "1; mode=block"
+  );
+
+  res.setHeader(
+    "X-Content-Type-Options",
+    "nosniff"
+  );
+
+  res.setHeader(
+    "X-Frame-Options",
+    "SAMEORIGIN"
+  );
+
+  next();
+
+});
+
+app.use((req, res, next) => {
+
+  res.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+      "style-src 'self' 'unsafe-inline' https:",
+      "img-src 'self' data: https:",
+      "font-src 'self' data: https:",
+      "connect-src 'self' https:",
+      "frame-ancestors 'self' https://eccouncil.instructure.com"
+    ].join("; ")
+  );
+
+  next();
+
+});
 
 const testRetriever = require("./routes/testRetriever");
 
