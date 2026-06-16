@@ -695,6 +695,19 @@ ${message}
 
 `;
 
+let effectiveMessage = message;
+
+if (isFollowUp && recentHistory) {
+  effectiveMessage = `
+${recentHistory}
+
+Current Question:
+${message}
+`;
+}
+
+console.log("Effective Search Query:", effectiveMessage);
+
 const shouldUseRAG =
   !!currentPage ||
   message.toLowerCase().includes("module") ||
@@ -709,11 +722,12 @@ const shouldUseRAG =
   confidence: 0
 };
 
+
 if (shouldUseRAG) {
 
   ragResult =
     await vectorSearch(
-    message,
+    effectiveMessage,
     [Number(courseId)],
     intent,
     currentPage,
@@ -727,8 +741,25 @@ if (shouldUseRAG) {
     /* ===================================== */
     /* WEB SEARCH */
     /* ===================================== */
+let webSearchQuery = message;
 
-let webResources = [];
+if (isFollowUp) {
+
+  const lastUserQuestion = history
+    ?.filter(h => h.role === "user")
+    ?.slice(-2, -1)?.[0]?.content;
+
+  if (lastUserQuestion) {
+    webSearchQuery = `${lastUserQuestion} ${message}`;
+  }
+
+}
+
+console.log("Web Search Query:", webSearchQuery);
+
+
+
+    let webResources = [];
 
 let skipWebSearch = false;
 
@@ -834,7 +865,7 @@ if (shouldSearch) {
   try {
 
     webResources =
-      await trustedWebSearch(message);
+      await trustedWebSearch(webSearchQuery);
 
     console.log(
       "🌐 WEB RESOURCES:",
