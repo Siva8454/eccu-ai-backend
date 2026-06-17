@@ -38,7 +38,8 @@ async function vectorSearch(
   allowedCourseIds = [],
   intent,
   currentPage,
-  wantsLabs = false
+  wantsLabs = false,
+  wantsLabExplanation = false
 ) {
 
   console.log("🔎 Vector search:", question);
