@@ -710,8 +710,19 @@ if (
     /* LIRN RESOURCES */
     /* ===================================== */
 
-    const lirnResources =
-      getLibraryResources(message);
+    let lirnResources = [];
+
+const wantsLearningResources =
+  /(what is|explain|define|concept|topic|overview|understand)/i
+  .test(message);
+
+if (
+  wantsLearningResources &&
+  !wantsLabExplanation
+) {
+  lirnResources =
+    getLibraryResources(message);
+}
 
     
 
@@ -808,6 +819,14 @@ console.log("Web Search Query:", webSearchQuery);
 
 let skipWebSearch = false;
 
+/* ========================= */
+/* WEB SEARCH TRIGGERS */
+/* ========================= */
+
+const needsWebExamples =
+  /\b(example|examples|real world example|real-world example|case study|case studies)\b/i
+  .test(message);
+
 const needsExternalResources =
 
   message.toLowerCase().includes("resource") ||
@@ -897,7 +916,11 @@ if (needsExternalResources) {
 
 }
 
+console.log("needsWebExamples:", needsWebExamples);
+
 const shouldSearch =
+
+  needsWebExamples &&
 
   !skipWebSearch &&
 
