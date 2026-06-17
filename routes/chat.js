@@ -545,8 +545,31 @@ For lab launch issues, VM access issues, loading problems, or technical difficul
   console.log({
   wantsLabs,
   wantsLabExplanation,
+  wantsLabSolution,
   question: q
 });
+
+/* ===================================== */
+/* LAB SOLUTION PROTECTION */
+/* ===================================== */
+
+if (wantsLabSolution) {
+
+  return res.json({
+    answer: `
+### Lab Assistance
+
+I can help explain the concepts used in this lab and clarify the instructions, but I cannot provide step-by-step solutions, task answers, or complete graded lab activities.
+
+Please review the lab instructions and attempt the activity independently.
+
+If there is a specific concept, command, tool, or instruction that you do not understand, tell me which part is unclear and I can explain it.
+
+If you continue to experience difficulty after reviewing the lab instructions, please contact your instructor.
+`
+  });
+
+}
 
  /* ========================= */
 /* MODULE LAB CHECK */
@@ -555,6 +578,7 @@ For lab launch issues, VM access issues, loading problems, or technical difficul
 if (
   wantsLabs &&
   !wantsLabExplanation &&
+  !wantsLabSolution &&
   currentPage
 ) {
 
@@ -793,27 +817,7 @@ const shouldUseRAG =
 };
 
 
-/* ===================================== */
-/* LAB SOLUTION PROTECTION */
-/* ===================================== */
 
-if (wantsLabSolution) {
-
-  return res.json({
-    answer: `
-### Lab Assistance
-
-I can help explain the concepts used in this lab and clarify the instructions, but I cannot provide step-by-step solutions, task answers, or complete graded lab activities.
-
-Please review the lab instructions and attempt the activity independently.
-
-If there is a specific concept, command, tool, or instruction that you do not understand, tell me which part is unclear and I can explain it.
-
-If you continue to experience difficulty after reviewing the lab instructions, please contact your instructor.
-`
-  });
-
-}
 
 if (shouldUseRAG) {
 
