@@ -473,16 +473,18 @@ const wantsInteractivityExplanation =
 
   const wantsLabExplanation =
 
-  /(explain|summarize|describe|understand|help)/i.test(q) ||
+/(explain|summarize|describe|understand|help).*(lab|assignment|activity|instructions|current page)/i
+.test(q)
 
-  q.includes("what is this lab") ||
-  q.includes("tell me about this lab") ||
-  q.includes("describe this lab") ||
-  q.includes("what do i need to do") ||
-  q.includes("explain this assignment") ||
-  q.includes("explain the lab instructions") ||
-  q.includes("explain the instructions") ||
-  q.includes("explain the current page");
+||
+
+q.includes("what is this lab") ||
+q.includes("tell me about this lab") ||
+q.includes("describe this lab") ||
+q.includes("what do i need to do") ||
+q.includes("explain the lab instructions") ||
+q.includes("explain the instructions") ||
+q.includes("explain the current page");
 
   const wantsLabSolution =
 
@@ -554,7 +556,7 @@ For lab launch issues, VM access issues, loading problems, or technical difficul
   question: q
 });
 
-if (wantsLabs && wantsLabGuidance) {
+if (wantsLabGuidance) {
 
   return res.json({
     source: "lab-guidance",
