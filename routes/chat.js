@@ -511,11 +511,13 @@ if (isLabLaunchPage) {
     source: "lab-launch-page",
 
     reply:
-`This page only contains the lab launcher and does not include the actual lab instructions or activity content.
+`I can see that you are currently on the lab launcher page.
 
-Please open the lab assignment and ask your question from the lab assignment page so I can access the appropriate lab context and assist you accurately.
+This page is used only to launch the lab environment and does not contain the lab instructions or activity details.
 
-For lab launch issues, loading problems, VM access issues, or technical difficulties, please use Help & Support.`
+Please return to the previous page and ask your question there so I can access the lab instructions and provide more accurate assistance.
+
+For lab launch issues, VM access issues, loading problems, or technical difficulties, please use Help & Support.`
 
   });
 
