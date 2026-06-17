@@ -484,9 +484,23 @@ const wantsInteractivityExplanation =
   q.includes("explain the instructions") ||
   q.includes("explain the current page");
 
+  const wantsLabSolution =
+
+/(show me|how do i complete|how to complete|complete|finish|solve|answer|walk me through|step by step)/i
+.test(q)
+
+||
+
+/task\s*\d+/i.test(q)
+
+||
+
+/lab\s*\d+/i.test(q);
+
 // DEBUG
 console.log("wantsLabs:", wantsLabs);
 console.log("wantsLabExplanation:", wantsLabExplanation);
+console.log("wantsLabSolution:", wantsLabSolution);
 console.log("Question:", q);
 
   /* ========================= */
@@ -778,6 +792,28 @@ const shouldUseRAG =
   confidence: 0
 };
 
+
+/* ===================================== */
+/* LAB SOLUTION PROTECTION */
+/* ===================================== */
+
+if (wantsLabSolution) {
+
+  return res.json({
+    answer: `
+### Lab Assistance
+
+I can help explain the concepts used in this lab and clarify the instructions, but I cannot provide step-by-step solutions, task answers, or complete graded lab activities.
+
+Please review the lab instructions and attempt the activity independently.
+
+If there is a specific concept, command, tool, or instruction that you do not understand, tell me which part is unclear and I can explain it.
+
+If you continue to experience difficulty after reviewing the lab instructions, please contact your instructor.
+`
+  });
+
+}
 
 if (shouldUseRAG) {
 
@@ -1103,9 +1139,11 @@ ${r.url}`
     /* LIRN RESOURCES */
     /* ===================================== */
 
-        if (
+       if (
       !isGreeting(message) &&
       !isClarification &&
+      !wantsLabExplanation &&
+      !wantsLabSolution &&
       isCourseRelated &&
       isEducationalTopic(message) &&
       lirnResources &&
