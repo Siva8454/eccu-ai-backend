@@ -537,7 +537,7 @@ if (isLabLaunchPage) {
     reply:
 `I can see that you are currently on the lab launcher page.
 
-This page is used only to launch the lab environment and does not contain the lab instructions or activity details.
+This page is used only to launch the lab environment.
 
 Please return to the previous page and ask your question there so I can access the lab instructions and provide more accurate assistance.
 
