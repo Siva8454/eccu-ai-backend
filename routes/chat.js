@@ -486,8 +486,7 @@ const wantsInteractivityExplanation =
 
   const wantsLabSolution =
 
-/(show me|how do i complete|how to complete|complete|finish|solve|answer|walk me through|step by step)/i
-.test(q)
+/(show me the answer|give me the answer|solve this lab|complete this for me|walk me through every step|step by step solution|task answer|expected output)/i.test(q)
 
 ||
 
@@ -497,10 +496,16 @@ const wantsInteractivityExplanation =
 
 /lab\s*\d+/i.test(q);
 
+const wantsLabGuidance =
+
+/(how to do|how to complete|what do i do|what should i do|how do i start|how do i begin)/i
+.test(q);
+
 // DEBUG
 console.log("wantsLabs:", wantsLabs);
 console.log("wantsLabExplanation:", wantsLabExplanation);
 console.log("wantsLabSolution:", wantsLabSolution);
+console.log("wantsLabGuidance:", wantsLabGuidance);
 console.log("Question:", q);
 
   /* ========================= */
@@ -548,6 +553,29 @@ For lab launch issues, VM access issues, loading problems, or technical difficul
   wantsLabSolution,
   question: q
 });
+
+if (wantsLabs && wantsLabGuidance) {
+
+  return res.json({
+    source: "lab-guidance",
+    reply: `
+### Lab Assignment Guidance
+
+This assignment requires you to perform the lab activity by launching the lab environment and completing the tasks described in the instructions.
+
+Steps:
+
+• Read the instructions on the current page.
+• Click the Launch button to open the lab.
+• Complete the hands-on exercises inside the lab environment.
+• Record your observations and findings.
+• Submit the required deliverables.
+
+I cannot complete the graded lab for you, but I can explain concepts, commands, tools, and troubleshooting steps if you need help.
+`
+  });
+
+}
 
 /* ===================================== */
 /* LAB SOLUTION PROTECTION */
