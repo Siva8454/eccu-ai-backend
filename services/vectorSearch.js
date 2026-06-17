@@ -221,7 +221,7 @@ Type: ${p.type}
 
   }).join("\n\n----------------\n\n");
 
-  if (wantsLabs) {
+  if (wantsLabs && !wantsLabExplanation) {
 
   const labItems = [];
 

@@ -473,16 +473,21 @@ const wantsInteractivityExplanation =
 
   const wantsLabExplanation =
 
+  /(explain|summarize|describe|understand|help)/i.test(q) ||
 
   q.includes("what is this lab") ||
-  q.includes("explain this lab") ||
-  q.includes("summarize this lab") ||
-  q.includes("what do i need to do") ||
-  q.includes("what is this assignment") ||
   q.includes("tell me about this lab") ||
   q.includes("describe this lab") ||
-  q.includes("explain this activity") ||
-  q.includes("explain this assignment");
+  q.includes("what do i need to do") ||
+  q.includes("explain this assignment") ||
+  q.includes("explain the lab instructions") ||
+  q.includes("explain the instructions") ||
+  q.includes("explain the current page");
+
+// DEBUG
+console.log("wantsLabs:", wantsLabs);
+console.log("wantsLabExplanation:", wantsLabExplanation);
+console.log("Question:", q);
 
   /* ========================= */
 /* LAB LAUNCH PAGE CHECK */
