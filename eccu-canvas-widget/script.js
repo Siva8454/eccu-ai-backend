@@ -276,9 +276,13 @@ root.innerHTML = `
   <div id="eccu-chat-body"></div>
 
   <div id="eccu-chat-footer">
-    <input id="eccu-input" placeholder="Ask ECCU AI Tutor..." />
-    <button id="eccu-send">➤</button>
-  </div>
+  <textarea
+    id="eccu-input"
+    placeholder="Ask ECCU AI Tutor..."
+    rows="1"
+  ></textarea>
+  <button id="eccu-send">➤</button>
+</div>
 
 </div>
 `
@@ -293,6 +297,16 @@ const chat = root.querySelector("#eccu-chat")
 const closeBtn = root.querySelector("#eccu-close")
 const sendBtn = root.querySelector("#eccu-send")
 const input = root.querySelector("#eccu-input")
+
+// Auto-grow textarea
+input.addEventListener("input", () => {
+
+  input.style.height = "auto";
+
+  input.style.height =
+    Math.min(input.scrollHeight, 120) + "px";
+
+});
 const chatBody = root.querySelector("#eccu-chat-body")
 const maxBtn = root.querySelector("#eccu-max")
 
@@ -564,8 +578,19 @@ document.addEventListener("keydown", e => {
 sendBtn.onclick = sendMessage
 
 input.addEventListener("keydown", e => {
-if(e.key === "Enter") sendMessage()
-})
+
+  if (
+    e.key === "Enter" &&
+    !e.shiftKey
+  ) {
+
+    e.preventDefault();
+
+    sendMessage();
+
+  }
+
+});
 
 function sendMessage(){
 
@@ -580,6 +605,7 @@ content:msg
 })
 
 input.value = ""
+input.style.height = "auto";
 
 processMessage(msg)
 

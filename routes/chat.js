@@ -473,6 +473,7 @@ const wantsInteractivityExplanation =
 
   const wantsLabExplanation =
 
+
   q.includes("what is this lab") ||
   q.includes("explain this lab") ||
   q.includes("summarize this lab") ||
@@ -482,6 +483,43 @@ const wantsInteractivityExplanation =
   q.includes("describe this lab") ||
   q.includes("explain this activity") ||
   q.includes("explain this assignment");
+
+  /* ========================= */
+/* LAB LAUNCH PAGE CHECK */
+/* ========================= */
+
+const pageContent = `
+${currentPage?.text || ""}
+${pageText || ""}
+`;
+
+const isLabLaunchPage =
+
+  currentPage?.text?.includes(
+    "This tool needs to be loaded in a new browser window"
+  ) ||
+
+  currentPage?.text?.includes(
+    "The session for this tool has expired"
+  );
+
+
+if (isLabLaunchPage) {
+
+  return res.json({
+
+    source: "lab-launch-page",
+
+    reply:
+`This page only contains the lab launcher and does not include the actual lab instructions or activity content.
+
+Please open the lab assignment and ask your question from the lab assignment page so I can access the appropriate lab context and assist you accurately.
+
+For lab launch issues, loading problems, VM access issues, or technical difficulties, please use Help & Support.`
+
+  });
+
+}
 
   console.log({
   wantsLabs,

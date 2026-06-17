@@ -364,13 +364,13 @@ pointer-events: none;
 
     display: flex;
 
-    align-items: center;
+    align-items: flex-end;
 
     margin: 12px;
 
     min-height: 82px;
 
-    border-radius: 999px;
+    border-radius: 24px;
 
     gap: 12px;
 
@@ -413,30 +413,48 @@ pointer-events: none;
     background: rgba(0,0,0,.08);
 }
 
-#eccu-chat-footer input {
+#eccu-chat-footer textarea {
 
     flex: 1;
 
-    font-size: 18px;
-
     border: none !important;
 
+    outline: none !important;
+
     background: transparent;
+
+    box-shadow: none !important;
+
+    resize: none;
+
+    overflow-y: auto;
+
+    min-height: 28px;
+
+    max-height: 180px;
+
+    padding: 8px 12px;
+
+    font-size: 18px;
+
+    line-height: 1.5;
+
+    display: block;
+
+    width: 100%;
+
+    font-family: inherit;
+
+    box-sizing: border-box;
+}
+
+#eccu-chat-footer textarea:focus {
+
+    border: none !important;
 
     outline: none !important;
 
     box-shadow: none !important;
-
-    padding: 0 12px;
-}
-
-#eccu-chat-footer input:focus {
-
-  border: none !important;
-
-  outline: none !important;
-
-  box-shadow: none !important;
 }
 
 #eccu-chat-footer button {
@@ -926,7 +944,7 @@ backdrop-filter:
 }
 
 /* OPTIONAL: nicer input width */
-#eccu-chat.fullscreen #eccu-chat-footer input {
+#eccu-chat.fullscreen #eccu-chat-footer textarea {
 
   width: 100%;
 
