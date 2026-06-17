@@ -498,7 +498,7 @@ const wantsInteractivityExplanation =
 
 const wantsLabGuidance =
 
-/(how to do|how to complete|what do i do|what should i do|how do i start|how do i begin)/i
+/(how to do|how to complete|what do i do|what should i do|how do i start|how do i begin|how to switch|cannot switch|can't switch|unable to switch|i do not know how to|i don't know how to|where do i find|how do i access|how do i launch|how do i open)/i
 .test(q);
 
 // DEBUG

@@ -625,7 +625,6 @@ if (
   text.includes("ai key") ||
   text.includes("activation key") ||
   text.includes("transfer key") ||
-  text.includes("parrot") ||
   text.includes("ai activation")
 ) {
 
