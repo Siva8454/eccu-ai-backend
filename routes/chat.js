@@ -391,13 +391,7 @@ if (quickAction === "other") {
   });
 
 }
-/* ========================= */
-/* COURSEWIDE CHECK */
-/* ========================= */
-const wantsCourseWideSearch =
 
-/course|entire course|throughout the course|all modules|research project|research projects|instructor|professor|faculty|syllabus|grading|final exam|course summary|module summary|summary of module/i
-.test(q);
 
 
     /* ===================================== */
@@ -432,6 +426,14 @@ const wantsCourseWideSearch =
   );
 
   const q = message.toLowerCase();
+
+  /* ========================= */
+/* COURSEWIDE CHECK */
+/* ========================= */
+const wantsCourseWideSearch =
+
+/course|entire course|throughout the course|all modules|research project|research projects|project|projects|instructor|professor|faculty|syllabus|grading|grade policy|late policy|final exam|course summary|module summary|summary of module|how many/i
+.test(q);
 
   /* ============================= */
 /* COURSE-WIDE Interactivity Questions */
