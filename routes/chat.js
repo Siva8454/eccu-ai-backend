@@ -495,6 +495,42 @@ q.includes("explain the lab instructions") ||
 q.includes("explain the instructions") ||
 q.includes("explain the current page");
 
+const wantsCourseStatistics =
+
+/how many/i.test(q)
+
+&&
+
+(
+ q.includes("research project") ||
+ q.includes("research projects") ||
+ q.includes("lab assignment") ||
+ q.includes("labs") ||
+ q.includes("discussions") ||
+ q.includes("assignments")
+);
+
+if (wantsCourseStatistics) {
+
+   const result = await vectorSearch(
+      "research project",
+      [Number(courseId)],
+      intent,
+      null,
+      false,
+      true
+   );
+
+   // count unique matches
+
+   const count =
+      (result.context.match(/research project/gi) || []).length;
+
+   return res.json({
+      reply: `I found approximately ${count} research projects in this course.`
+   });
+}
+
   const wantsLabSolution =
 
 /(show me the answer|give me the answer|solve this lab|complete this for me|walk me through every step|step by step solution|task answer|expected output)/i.test(q)
@@ -620,6 +656,7 @@ If you continue to experience difficulty after reviewing the lab instructions, p
 
 if (
   wantsLabs &&
+  !wantsCourseWideSearch &&
   !wantsLabExplanation &&
   !wantsLabSolution &&
   currentPage
@@ -836,9 +873,10 @@ ${message}
 
 let effectiveMessage = message;
 
-if (isFollowUp && recentHistory) {
+if (isFollowUp) {
   effectiveMessage = `
-${recentHistory}
+Previous Question:
+${previousQuestion || ""}
 
 Current Question:
 ${message}

@@ -43,6 +43,10 @@ async function vectorSearch(
   wantsCourseWideSearch = false
 ) {
 
+  if (wantsCourseWideSearch) {
+   currentPage = null;
+}
+
   console.log("🔎 Vector search:", question);
   console.log("📄 Current Page:", currentPage);
 
@@ -73,6 +77,16 @@ console.log(question.slice(0, 3000));
   }
 
   console.log("Raw results:", results.length);
+
+  console.log("TOP RESULTS:");
+
+results.slice(0, 10).forEach(r => {
+  console.log(
+    "TITLE:", r.payload?.title,
+    "| MODULE:", r.payload?.moduleName,
+    "| SCORE:", r.score
+  );
+});
 
   // ✅ Manual course filtering (since Qdrant index not available)
 if (allowedCourseIds.length) {
