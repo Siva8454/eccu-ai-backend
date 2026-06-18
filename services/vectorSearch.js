@@ -39,7 +39,8 @@ async function vectorSearch(
   intent,
   currentPage,
   wantsLabs = false,
-  wantsLabExplanation = false
+  wantsLabExplanation = false,
+  wantsCourseWideSearch = false
 ) {
 
   console.log("🔎 Vector search:", question);
@@ -58,10 +59,13 @@ console.log(question.slice(0, 3000));
   /* VECTOR SEARCH (DEEP SEARCH) */
   /* -------------------------------------------------- */
 
-  let results = await client.search(COLLECTION, {
+  let results = await client.search(
+  COLLECTION,
+  {
     vector: embedding,
-    limit: 20, // ⭐ deeper search
-  });
+    limit: wantsCourseWideSearch ? 50 : 20,
+  }
+);
 
   if (!results.length) {
     console.log("❌ No results found in vector DB");
@@ -109,12 +113,13 @@ console.log("Filtered results:", results.length);
     /* ⭐ PRIORITY 1 — CURRENT PAGE MATCH */
 
         if (
-    currentPage?.url &&
-    p.pageUrl &&
-    currentPage.url === p.pageUrl
-  ){
-      score += 0.4;
-    }
+  !wantsCourseWideSearch &&
+  currentPage?.url &&
+  p.pageUrl &&
+  currentPage.url === p.pageUrl
+){
+  score += 0.4;
+}
 
     /* ⭐ PRIORITY 2 — MODULE MATCH */
 
@@ -137,14 +142,15 @@ console.log("Filtered results:", results.length);
     /* ⭐ PRIORITY 4 — CURRENT PAGE TITLE */
 
       if (
-        currentPage?.title &&
-        p.title &&
-        currentPage.title
-          .toLowerCase()
-          .includes(p.title.toLowerCase())
-      ) {
-        score += 0.35;
-      }
+      !wantsCourseWideSearch &&
+      currentPage?.title &&
+      p.title &&
+      currentPage.title
+        .toLowerCase()
+        .includes(p.title.toLowerCase())
+    ){
+      score += 0.35;
+    }
 
     return {
       ...r,
@@ -179,7 +185,14 @@ console.log("Filtered results:", results.length);
 
   const topResults = results
   .filter(r => r.boostedScore > 0.6)
-  .slice(0, wantsLabs ? 25 : 3);
+  .slice(
+  0,
+  wantsCourseWideSearch
+    ? 10
+    : wantsLabs
+      ? 25
+      : 3
+);
 
   if (!topResults.length) {
 
@@ -280,6 +293,18 @@ if (
 }
 
   console.log("Final context size:", context.length);
+
+  console.log(
+  "COURSE WIDE SEARCH:",
+  wantsCourseWideSearch
+);
+
+topResults.forEach(r => {
+  console.log(
+    "SELECTED:",
+    r.payload.title
+  );
+});
 
   return {
   context,

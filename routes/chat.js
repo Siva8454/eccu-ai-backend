@@ -391,6 +391,13 @@ if (quickAction === "other") {
   });
 
 }
+/* ========================= */
+/* COURSEWIDE CHECK */
+/* ========================= */
+const wantsCourseWideSearch =
+
+/course|entire course|throughout the course|all modules|research project|research projects|instructor|professor|faculty|syllabus|grading|final exam|course summary|module summary|summary of module/i
+.test(q);
 
 
     /* ===================================== */
@@ -509,6 +516,10 @@ console.log("wantsLabExplanation:", wantsLabExplanation);
 console.log("wantsLabSolution:", wantsLabSolution);
 console.log("wantsLabGuidance:", wantsLabGuidance);
 console.log("Question:", q);
+console.log(
+  "wantsCourseWideSearch:",
+  wantsCourseWideSearch
+);
 
   /* ========================= */
 /* LAB LAUNCH PAGE CHECK */
@@ -664,6 +675,8 @@ Lab activities are organized within individual course modules. Please open a spe
   });
 
 }
+
+
 
 
 /* ========================= */
@@ -857,7 +870,8 @@ if (shouldUseRAG) {
     [Number(courseId)],
     intent,
     currentPage,
-    wantsLabs
+    wantsLabs,
+    wantsCourseWideSearch
   );
 
 }
