@@ -502,33 +502,123 @@ const wantsCourseStatistics =
 &&
 
 (
- q.includes("research project") ||
- q.includes("research projects") ||
- q.includes("lab assignment") ||
- q.includes("labs") ||
- q.includes("discussions") ||
- q.includes("assignments")
+  q.includes("research project") ||
+  q.includes("research projects") ||
+
+  q.includes("lab assignment") ||
+  q.includes("lab assignments") ||
+  q.includes("labs") ||
+
+  q.includes("discussion") ||
+  q.includes("discussions") ||
+
+  q.includes("written assignment") ||
+  q.includes("written assignments") ||
+
+  q.includes("case study") ||
+  q.includes("case studies") ||
+
+  q.includes("quiz") ||
+  q.includes("quizzes") ||
+
+  q.includes("exam") ||
+  q.includes("exams") ||
+
+  q.includes("interactivity") ||
+  q.includes("interactive") ||
+  q.includes("interactivities")
 );
 
 if (wantsCourseStatistics) {
 
-   const result = await vectorSearch(
-      "research project",
-      [Number(courseId)],
-      intent,
-      null,
-      false,
-      true
-   );
+  let searchTerm = "";
+  let label = "";
 
-   // count unique matches
+  if (
+    q.includes("research project") ||
+    q.includes("research projects")
+  ) {
+    searchTerm = "research project";
+    label = "research projects";
+  }
 
-   const count =
-      (result.context.match(/research project/gi) || []).length;
+  else if (
+    q.includes("lab assignment") ||
+    q.includes("lab assignments") ||
+    q.includes("labs")
+  ) {
+    searchTerm = "lab assignment";
+    label = "lab assignments";
+  }
 
-   return res.json({
-      reply: `I found approximately ${count} research projects in this course.`
-   });
+  else if (
+    q.includes("discussion") ||
+    q.includes("discussions")
+  ) {
+    searchTerm = "discussion";
+    label = "discussions";
+  }
+
+  else if (
+    q.includes("written assignment") ||
+    q.includes("written assignments")
+  ) {
+    searchTerm = "written assignment";
+    label = "written assignments";
+  }
+
+  else if (
+    q.includes("case study") ||
+    q.includes("case studies")
+  ) {
+    searchTerm = "case study";
+    label = "case studies";
+  }
+
+  else if (
+    q.includes("quiz") ||
+    q.includes("quizzes")
+  ) {
+    searchTerm = "quiz";
+    label = "quizzes";
+  }
+
+  else if (
+    q.includes("exam") ||
+    q.includes("exams") ||
+    q.includes("final exam") ||
+    q.includes("mock exam")
+  ) {
+    searchTerm = "exam";
+    label = "exams";
+  }
+
+  else if (
+    q.includes("interactivity") ||
+    q.includes("interactive") ||
+    q.includes("interactivities")
+  ) {
+    searchTerm = "interactivity";
+    label = "interactive activities";
+  }
+
+  const result = await vectorSearch(
+    searchTerm,
+    [Number(courseId)],
+    intent,
+    null,
+    false,
+    true
+  );
+
+  const count =
+    (result.context.match(
+      new RegExp(searchTerm, "gi")
+    ) || []).length;
+
+  return res.json({
+    reply: `I found approximately ${count} ${label} in this course.`
+  });
 }
 
   const wantsLabSolution =
