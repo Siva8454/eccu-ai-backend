@@ -1,8 +1,12 @@
+require("dotenv").config();
 const axios = require("axios");
 console.log("🟢 UPDATED CANVAS FETCHER LOADED");
 
 const BASE = process.env.CANVAS_BASE_URL;
 const TOKEN = process.env.CANVAS_TOKEN;
+
+console.log("BASE URL:", BASE);
+console.log("TOKEN EXISTS:", !!TOKEN);
 
 const MASTER_BLUEPRINT_TERM_ID = 297; // ✅ ECCU Master Blueprint
 
@@ -150,6 +154,10 @@ async function fetchFiles(courseId) {
   return paginate(`/api/v1/courses/${courseId}/files?per_page=100`);
 }
 
+async function fetchQuizzes(courseId) {
+  return paginate(`/api/v1/courses/${courseId}/quizzes?per_page=100`);
+}
+
 /* -------------------------------------------------- */
 /* MASTER ECCU FETCH */
 /* -------------------------------------------------- */
@@ -194,5 +202,17 @@ async function fetchAllCanvas() {
 
 module.exports = {
   fetchAllCanvas,
-  fetchUserEnrollments
+  fetchUserEnrollments,
+
+  fetchCourses,
+  fetchModules,
+  fetchModuleItems,
+
+  fetchAssignments,
+  fetchDiscussions,
+  fetchQuizzes,
+  fetchFiles,
+
+  fetchPages,
+  fetchPageBody
 };

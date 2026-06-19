@@ -1,15 +1,40 @@
+require("dotenv").config();
+
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config({
+  path: path.join(__dirname, "../.env")
+});
+
+console.log("ENV FILE:", path.join(__dirname, "../.env"));
+console.log("BASE:", process.env.CANVAS_BASE_URL);
+console.log("TOKEN:", !!process.env.CANVAS_TOKEN);
+
 const {
   fetchCourses,
   fetchModules,
+  fetchModuleItems,
   fetchAssignments,
+  fetchDiscussions,
+  fetchQuizzes,
+  fetchPages,
+  fetchPageBody,
+  fetchFiles
 } = require("./canvasFetcher");
 
 const CACHE_DIR = path.join(__dirname, "../data/cache");
 
 if (!fs.existsSync(CACHE_DIR)) {
   fs.mkdirSync(CACHE_DIR, { recursive: true });
+}
+
+function stripHtml(html = "") {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 async function buildCanvasCache() {
@@ -33,42 +58,40 @@ console.log(courses);
     const files = await fetchFiles(courseId);
     const quizzes = await fetchQuizzes(courseId);
 
-    const courseData = {
+/* FETCH PAGE BODIES */
+for (const p of pages) {
+  try {
+    const fullPage = await fetchPageBody(courseId, p.url);
+    p.body = stripHtml(fullPage.body);
+  } catch (err) {
+    console.log("Failed page:", p.title);
+  }
+}
+
+const courseData = {
   id: courseId,
   name: courseName,
   code: course.course_code,
 
-  modules: modules.map(m => ({
-    id: m.id,
-    name: m.name
-  })),
+  modules: await Promise.all(
+    modules.map(async (m) => ({
+      id: m.id,
+      name: m.name,
+      items: await fetchModuleItems(courseId, m.id)
+    }))
+  ),
 
-  assignments: assignments.map(a => ({
-    id: a.id,
-    name: a.name,
-    due_at: a.due_at,
-    points: a.points_possible
-  })),
-
-  discussions: discussions.map(d => ({
-    id: d.id,
-    title: d.title
-  })),
-
-  quizzes: quizzes.map(q => ({
-    id: q.id,
-    title: q.title
-  })),
+  assignments,
+  discussions,
+  quizzes,
 
   pages: pages.map(p => ({
     title: p.title,
-    url: p.url
+    url: p.url,
+    body: p.body || ""
   })),
 
-  files: files.map(f => ({
-    id: f.id,
-    name: f.display_name
-  }))
+  files
 };
 
     const filePath = path.join(CACHE_DIR, `course_${courseId}.json`);
@@ -81,3 +104,12 @@ console.log(courses);
 }
 
 module.exports = { buildCanvasCache };
+
+buildCanvasCache()
+  .then(() => {
+    console.log("✅ CACHE BUILD COMPLETE");
+  })
+  .catch(err => {
+    console.error("❌ CACHE BUILD FAILED");
+    console.error(err);
+  });
