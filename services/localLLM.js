@@ -6,6 +6,13 @@ const client = new OpenAI({
     timeout: 60000
 });
 
+
+// TEMPORARY DEBUG
+console.log("Fireworks Key:", process.env.FIREWORKS_API_KEY ? "FOUND" : "MISSING");
+console.log("Base URL:", process.env.FIREWORKS_BASE_URL);
+console.log("Model:", process.env.FIREWORKS_MODEL);
+
+
 const { isSensitiveQuestion } = require("./securityFilter");
 
 
