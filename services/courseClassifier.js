@@ -110,6 +110,10 @@ or
 NOT_RELATED
 `;
 
+console.log("=== Sending request to Fireworks ===");
+console.log("URL:", "https://api.fireworks.ai/inference/v1/chat/completions");
+console.log("Model:", process.env.FIREWORKS_MODEL);
+
   try {
 
     const response = await axios.post(
@@ -151,6 +155,9 @@ NOT_RELATED
 
     );
 
+console.log("=== Classifier Response ===");
+console.log(JSON.stringify(response.data, null, 2));
+
     const result =
       response.data.choices[0]
       .message.content
@@ -163,14 +170,14 @@ NOT_RELATED
 
   catch (err) {
 
-    console.error(
-      "Course classifier error:",
-      err.message
-    );
+  console.error("===== CLASSIFIER ERROR =====");
+  console.error("Status:", err.response?.status);
+  console.error("Data:", JSON.stringify(err.response?.data, null, 2));
+  console.error("Message:", err.message);
 
-    return false;
+  return false;
 
-  }
+}
 
 }
 

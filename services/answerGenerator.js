@@ -268,6 +268,10 @@ ${question}
 
   }
 
+  console.log("=== Sending request to Fireworks ===");
+console.log("URL:", "https://api.fireworks.ai/inference/v1/chat/completions");
+console.log("Model:", process.env.FIREWORKS_MODEL);
+
   try {
 
     const response = await axios.post(
@@ -276,7 +280,7 @@ ${question}
 
       {
 
-        model: "llama-3.1-8b-instant",
+        model: process.env.FIREWORKS_MODEL,
 
         messages: [
 
@@ -386,6 +390,10 @@ ${context?.extraContext || "None"}
 
     );
 
+    // ADD THESE LINES
+console.log("=== Fireworks Response ===");
+console.log(JSON.stringify(response.data, null, 2));
+
     return response.data
       .choices[0]
       .message
@@ -395,14 +403,14 @@ ${context?.extraContext || "None"}
 
   catch (err) {
 
-    console.error(
-      "Groq error:",
-      err.response?.data || err.message
-    );
+  console.error("===== FIREWORKS ERROR =====");
+  console.error("Status:", err.response?.status);
+  console.error("Data:", JSON.stringify(err.response?.data, null, 2));
+  console.error("Message:", err.message);
 
-    throw err;
+  throw err;
 
-  }
+}
 
 }
 
