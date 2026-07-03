@@ -114,11 +114,11 @@ NOT_RELATED
 
     const response = await axios.post(
 
-      "https://api.groq.com/openai/v1/chat/completions",
+      "https://api.fireworks.ai/inference/v1/chat/completions",
 
       {
 
-        model: "llama-3.1-8b-instant",
+        model: process.env.FIREWORKS_MODEL,
 
         temperature: 0,
 
@@ -140,7 +140,7 @@ NOT_RELATED
         headers: {
 
           Authorization:
-            `Bearer ${process.env.GROQ_API_KEY}`,
+            `Bearer ${process.env.FIREWORKS_API_KEY}`,
 
           "Content-Type":
             "application/json"

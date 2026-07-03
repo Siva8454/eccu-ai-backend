@@ -30,9 +30,13 @@ if (!fs.existsSync(CACHE_DIR)) {
 
 function stripHtml(html = "") {
   return html
+    .replace(/<div id="navbar"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, "")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, "")
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -58,6 +62,21 @@ console.log(courses);
     const files = await fetchFiles(courseId);
     const quizzes = await fetchQuizzes(courseId);
 
+    const cleanedAssignments = assignments.map(a => ({
+      ...a,
+      description: stripHtml(a.description || "")
+    }));
+
+    const cleanedDiscussions = discussions.map(d => ({
+      ...d,
+      discussion_topic: {
+        ...(d.discussion_topic || {}),
+        message: stripHtml(
+          d.discussion_topic?.message || ""
+        )
+      }
+    }));
+
 /* FETCH PAGE BODIES */
 for (const p of pages) {
   try {
@@ -81,8 +100,8 @@ const courseData = {
     }))
   ),
 
-  assignments,
-  discussions,
+  assignments: cleanedAssignments,
+  discussions: cleanedDiscussions,
   quizzes,
 
   pages: pages.map(p => ({

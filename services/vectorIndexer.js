@@ -1,6 +1,10 @@
+require("dotenv").config();
 const { QdrantClient } = require("@qdrant/js-client-rest");
 const { getLocalEmbedding } = require("./localEmbedding");
 const fs = require("fs");
+
+console.log("QDRANT_URL:", process.env.QDRANT_URL);
+console.log("QDRANT_API_KEY:", process.env.QDRANT_API_KEY ? "FOUND" : "MISSING");
 
 const qdrant = new QdrantClient({
   url: process.env.QDRANT_URL,
@@ -13,6 +17,15 @@ const COLLECTION = "eccu_knowledge_v7";
 function shouldSkipContent(text = "") {
 
   const lower = text.toLowerCase();
+
+  if (
+  text.includes("EC-Council University (ECCU)") &&
+  text.includes("Module 01") &&
+  text.includes("Module 10")
+) {
+  console.log("Skipping navigation page");
+ return true;
+}
 
   // IMAGE / ICON FILES
   if (
@@ -100,6 +113,15 @@ async function indexKnowledgeStore() {
     fs.readFileSync("./data/knowledge-store.json", "utf-8")
   );
 
+  console.log(
+  store.courses.filter(
+    c =>
+      c.id === 2213 ||
+      c.id === 2360
+  )
+);
+
+process.exit();
   // Create collection if not exists
   try {
   await qdrant.getCollection(COLLECTION);
@@ -134,39 +156,15 @@ try {
 
   store.courses.forEach(course => {
     (course.modules || []).forEach(module => {
+      console.log(module);
       const items = module.items || module.moduleItems || [];
+      console.log(module);
 
       items.forEach(item => {
         if (!item.title && !item.name) return;
 
         const title = item.title || item.name;
 
-<<<<<<< HEAD
-            const text = `
-      Course: ${course.courseName}
-
-      Module: ${module.moduleName}
-
-      Title: ${title}
-
-      Content:
-      ${content}
-      `;
-
-      points.push({
-        id: id++,
-              payload: {
-        courseId: course.courseId,
-        courseName: course.courseName,
-        moduleName: module.moduleName,
-        title,
-        content,
-        pageUrl: item.url || "",
-        type: item.type || "content",
-        links: item.links || []
-      },
-        text
-=======
         const rawContent =
           item.content ||
           item.body ||
@@ -353,7 +351,6 @@ try {
 
           text
         });
->>>>>>> 8acbfc2 (Agentic RAG upgrade)
       });
     });
   });
@@ -378,18 +375,20 @@ try {
     });
   }
 
-<<<<<<< HEAD
- await qdrant.upsert(COLLECTION, {
-=======
   console.log("⬆ Uploading vectors to Qdrant...");
 
   await qdrant.upsert(COLLECTION, {
->>>>>>> 8acbfc2 (Agentic RAG upgrade)
     wait: true,
     points: vectors
   });
 
   console.log("🚀 Vector indexing complete");
+}
+
+if (require.main === module) {
+  indexKnowledgeStore()
+    .then(() => console.log("Done"))
+    .catch(console.error);
 }
 
 module.exports = { indexKnowledgeStore };

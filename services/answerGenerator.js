@@ -272,7 +272,7 @@ ${question}
 
     const response = await axios.post(
 
-      "https://api.groq.com/openai/v1/chat/completions",
+      "https://api.fireworks.ai/inference/v1/chat/completions",
 
       {
 
@@ -375,7 +375,7 @@ ${context?.extraContext || "None"}
 
         headers: {
 
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          Authorization: `Bearer ${process.env.FIREWORKS_API_KEY}`,
 
           "Content-Type":
             "application/json"

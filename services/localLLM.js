@@ -1,7 +1,9 @@
-const Groq = require("groq-sdk");
+const OpenAI = require("openai");
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+const client = new OpenAI({
+    apiKey: process.env.FIREWORKS_API_KEY,
+    baseURL: "https://api.fireworks.ai/inference/v1",
+    timeout: 60000
 });
 
 const { isSensitiveQuestion } = require("./securityFilter");
@@ -399,8 +401,8 @@ console.log(prompt);
 console.log("================================");
 console.log("Prompt Length:", prompt.length);
 
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+    const response = await client.chat.completions.create({
+      model: process.env.FIREWORKS_MODEL,
       temperature: 0.3,
       max_tokens: 2000,
       messages: [
@@ -427,7 +429,7 @@ console.log("Prompt Length:", prompt.length);
 
   } catch (err) {
 
-    console.error("❌ Groq error:", err);
+    console.error("❌ Fireworks error:", err);
 
     return "AI service is temporarily unavailable. Please try again.";
 
