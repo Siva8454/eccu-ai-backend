@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 async function classifyCourseRelevance(
   courseName,
   question,
@@ -6,3 +8,7 @@ async function classifyCourseRelevance(
   console.log("Skipping LLM course classifier.");
   return true;
 }
+
+module.exports = {
+  classifyCourseRelevance
+};
