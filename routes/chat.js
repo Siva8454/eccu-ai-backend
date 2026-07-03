@@ -176,7 +176,7 @@ const helpUrl =
   `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
 
 const currentCourse =
-  detectCourse(courseCode);
+    detectCourse(courseCode, courseId);
 
   if (!currentCourse) {
   return res.json({

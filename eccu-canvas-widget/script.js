@@ -154,7 +154,7 @@ function isAllowedCourse() {
 
   const courseId = getCourseId()
 
-  const allowedCourses = [2213, 2460, 2360]
+  const allowedCourses = [2213, 2460, 2360, 2738, 2754]
 
   return allowedCourses.includes(courseId)
 }
