@@ -33,6 +33,8 @@ function isBlockedPage() {
 
     url.includes("/grades") ||
 
+    url.includes("/gradebook") ||
+
     url.includes("/announcements") ||
 
     url.includes("/external_tools/2375")
