@@ -817,6 +817,10 @@ Lab activities are organized within individual course modules. Please open a spe
 /* INTERACTIVITY CHECK */
 /* ========================= */
 
+console.log("isInteractivityPage:", isInteractivityPage);
+console.log("wantsInteractivityExplanation:", wantsInteractivityExplanation);
+console.log("Question:", q);
+
 if (
   wantsInteractivityExplanation &&
   isInteractivityPage
