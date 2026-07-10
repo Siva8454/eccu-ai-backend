@@ -447,27 +447,11 @@ const isInteractivityPage =
 
 const wantsInteractivityExplanation =
 
-  q.includes("what is this interactivity") ||
-  q.includes("explain this interactivity") ||
-  q.includes("tell me about this interactivity") ||
-  q.includes("what does this interactivity do") ||
-  q.includes("describe this interactivity") ||
-  q.includes("what is this activity") ||
-  q.includes("explain this activity") ||
-
-  (
     isInteractivityPage &&
-    (
-      q.includes("what is this") ||
-      q.includes("explain this") ||
-      q.includes("tell me about this") ||
-      q.includes("what is this page") ||
-      q.includes("tell me about this page") ||
-      q.includes("what do i do here") ||
-      q.includes("what do i need to do") ||
-      q.includes("how do i complete this")
-    )
-  );
+
+    /(interactiv|activity|scenario|simulation|exercise|block)/i.test(q) &&
+
+    /(how|what|help|start|begin|complete|tackle|explain|describe|tell|do)/i.test(q);
 
   
 
