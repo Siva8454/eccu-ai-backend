@@ -2,31 +2,36 @@ function isTechnicalIssue(question = "") {
 
   const q = question.toLowerCase();
 
-  const keywords = [
-    "lab not working",
-    "lab wont work",
-    "lab won't work",
-    "lab not loading",
-    "lab wont load",
-    "lab won't load",
+  const labTerms = [
+    "lab",
     "skillable",
-    "cannot access",
-    "can't access",
-    "cant access",
-    "unable to access",
+    "vm",
+    "virtual machine",
+    "launcher"
+  ];
+
+  const issueTerms = [
+    "open",
+    "opening",
+    "working",
+    "loading",
+    "launch",
+    "access",
+    "stuck",
+    "timeout",
+    "expired",
     "error",
     "issue",
     "problem",
-    "not launching",
-    "launch failed",
-    "video not playing",
-    "page not loading",
-    "login problem"
+    "failed",
+    "crash"
   ];
 
-  return keywords.some(keyword =>
-    q.includes(keyword)
+  return (
+    labTerms.some(term => q.includes(term)) &&
+    issueTerms.some(term => q.includes(term))
   );
+
 }
 
 module.exports = isTechnicalIssue;
