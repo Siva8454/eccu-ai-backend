@@ -1437,6 +1437,10 @@ logAnalytics({
 
 });
 
+console.log("🚀 About to log question");
+console.log("Final Answer Exists:", !!finalAnswer);
+console.log("Current Course:", currentCourse);
+
 logQuestion({
 
   courseId,
