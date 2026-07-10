@@ -453,6 +453,31 @@ const wantsInteractivityExplanation =
 
     /(how|what|help|start|begin|complete|tackle|explain|describe|tell|do)/i.test(q);
 
+
+/* ============================= */
+/* COURSE-WIDE Learning Resources */
+/* ============================= */
+
+const wantsLearningResources =
+    q.includes("where can i read") ||
+    q.includes("where do i read") ||
+    q.includes("where can i learn") ||
+    q.includes("learn more") ||
+    q.includes("read more") ||
+    q.includes("more about") ||
+    q.includes("reading") ||
+    q.includes("reading material") ||
+    q.includes("study material") ||
+    q.includes("reference") ||
+    q.includes("references") ||
+    q.includes("resource") ||
+    q.includes("resources") ||
+    q.includes("textbook") ||
+    q.includes("chapter") ||
+    q.includes("documentation") ||
+    q.includes("article") ||
+    q.includes("articles") ||
+    q.includes("official documentation");
   
 
   /* ============================= */
@@ -985,17 +1010,20 @@ const shouldUseRAG =
 
 
 
-if (shouldUseRAG) {
+const searchWholeCourse =
+    wantsCourseWideSearch ||
+    wantsLearningResources;
 
-  ragResult =
-    await vectorSearch(
+console.log("searchWholeCourse:", searchWholeCourse);
+
+ragResult = await vectorSearch(
     effectiveMessage,
     [Number(courseId)],
     intent,
     currentPage,
     wantsLabs,
-    wantsCourseWideSearch
-  );
+    searchWholeCourse
+);
 
 }
 
