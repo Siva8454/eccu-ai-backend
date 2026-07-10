@@ -668,8 +668,9 @@ const isLabLaunchPage =
 
 // Only block educational questions on the launcher page.
 // Let technical issues continue to the AI.
-console.log("LAB PAGE:", isLabLaunchPage);
-console.log("TECH ISSUE:", isTechnicalIssue(message));
+console.log("isLabLaunchPage:", isLabLaunchPage);
+console.log("isTechnicalIssue:", isTechnicalIssue(message));
+console.log("Message:", message);
 
 if (isLabLaunchPage && !isTechnicalIssue(message)) {
 
