@@ -41,6 +41,8 @@ const {
   "../services/courseClassifier"
 );
 
+const { logQuestion } = require("../utils/questionLogger");
+
 
 /* ===================================== */
 /* EDUCATIONAL TOPIC DETECTION */
@@ -1432,6 +1434,35 @@ logAnalytics({
 
   confidence:
     ragResult?.confidence || 0
+
+});
+
+logQuestion({
+
+  courseId,
+  courseCode,
+  courseName: courseConfig?.courseName || "",
+
+  userId: currentUserId,
+
+  module: currentPage?.moduleName || "",
+
+  pageTitle: currentPage?.title || "",
+  pageType: currentPage?.type || "",
+
+  question: message,
+
+  answer: finalAnswer,
+
+  intent,
+
+  source: "rag+liveweb",
+
+  confidence: ragResult?.confidence || 0,
+
+  responseTime: Date.now() - startTime,
+
+  feedback: null
 
 });
 
