@@ -940,12 +940,12 @@ if (
 
     let lirnResources = [];
 
-const wantsLearningResources =
+const wantsLirnResources =
   /(what is|explain|define|concept|topic|overview|understand)/i
   .test(message);
 
 if (
-  wantsLearningResources &&
+  wantsLirnResources &&
   !wantsLabExplanation
 ) {
   lirnResources =
