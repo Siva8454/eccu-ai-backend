@@ -1441,7 +1441,7 @@ logQuestion({
 
   courseId,
   courseCode,
-  courseName: courseConfig?.courseName || "",
+  courseName: currentCourse?.courseName || "",
 
   userId: currentUserId,
 
