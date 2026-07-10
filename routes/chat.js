@@ -649,7 +649,7 @@ console.log(
   wantsCourseWideSearch
 );
 
-  /* ========================= */
+ /* ========================= */
 /* LAB LAUNCH PAGE CHECK */
 /* ========================= */
 
@@ -659,30 +659,26 @@ ${pageText || ""}
 `;
 
 const isLabLaunchPage =
-
   currentPage?.text?.includes(
     "This tool needs to be loaded in a new browser window"
   ) ||
-
   currentPage?.text?.includes(
     "The session for this tool has expired"
   );
 
-
-if (isLabLaunchPage) {
+// Only block educational questions on the launcher page.
+// Let technical issues continue to the AI.
+if (isLabLaunchPage && !isTechnicalIssue(message)) {
 
   return res.json({
 
     source: "lab-launch-page",
 
-    reply:
-`I can see that you are currently on the lab launcher page.
+    reply: `I can see that you are currently on the lab launcher page.
 
 This page is used only to launch the lab environment.
 
-Please return to the previous page and ask your question there so I can access the lab instructions and provide more accurate assistance.
-
-For lab launch issues, VM access issues, loading problems, or technical difficulties, please use Help & Support.`
+Please return to the previous page and ask your question there so I can access the lab instructions and provide more accurate assistance.`
 
   });
 
