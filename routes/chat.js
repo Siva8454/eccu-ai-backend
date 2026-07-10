@@ -669,7 +669,9 @@ const isLabLaunchPage =
 // Only block educational questions on the launcher page.
 // Let technical issues continue to the AI.
 console.log("isLabLaunchPage:", isLabLaunchPage);
-console.log("isTechnicalIssue:", isTechnicalIssue(message));
+const technicalIssue = isTechnicalIssue(message);
+
+console.log("isTechnicalIssue:", technicalIssue);
 console.log("Message:", message);
 
 if (isLabLaunchPage && !isTechnicalIssue(message)) {
@@ -748,6 +750,7 @@ If you continue to experience difficulty after reviewing the lab instructions, p
 
 if (
   wantsLabs &&
+  !technicalIssue &&
   !wantsCourseWideSearch &&
   !wantsLabExplanation &&
   !wantsLabSolution &&
