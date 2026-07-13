@@ -1441,6 +1441,7 @@ console.log("🚀 About to log question");
 console.log("Final Answer Exists:", !!finalAnswer);
 console.log("Current Course:", currentCourse);
 
+console.log("===== LOGGING QUESTION =====");
 logQuestion({
 
   courseId,
@@ -1469,6 +1470,7 @@ logQuestion({
   feedback: null
 
 });
+console.log("===== QUESTION LOGGED =====");
 
     return res.json({
 

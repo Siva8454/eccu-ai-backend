@@ -6,6 +6,8 @@ const QUESTIONS_FILE = path.join(
   "../data/questions.json"
 );
 
+console.log("Question Logger Called");
+
 function logQuestion(data) {
   try {
 
@@ -18,9 +20,15 @@ function logQuestion(data) {
     }
 
     // Read existing questions
-    const questions = JSON.parse(
-      fs.readFileSync(QUESTIONS_FILE, "utf8")
+    let questions = [];
+
+try {
+    questions = JSON.parse(
+        fs.readFileSync(QUESTIONS_FILE, "utf8")
     );
+} catch {
+    questions = [];
+}
 
     // Create new record
     const record = {
@@ -56,10 +64,14 @@ function logQuestion(data) {
 
     questions.push(record);
 
+    console.log("Questions length:", questions.length);
+
     fs.writeFileSync(
       QUESTIONS_FILE,
       JSON.stringify(questions, null, 2)
     );
+
+    console.log("Saved Successfully");
 
   } catch (err) {
 
