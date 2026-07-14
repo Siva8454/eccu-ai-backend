@@ -450,10 +450,23 @@ console.log("Prompt Length:", prompt.length);
       ]
     });
 
+    console.log("================================");
+console.log("TOKEN USAGE");
+console.log("================================");
+
+console.log(response.usage);
+
+console.log("Prompt Tokens:", response.usage.prompt_tokens);
+console.log("Completion Tokens:", response.usage.completion_tokens);
+console.log("Total Tokens:", response.usage.total_tokens);
+
+console.log("================================");
+
     console.log(
   "Finish Reason:",
   response?.choices?.[0]?.finish_reason
 );
+
 
     const answer = response?.choices?.[0]?.message?.content;
 
@@ -461,6 +474,8 @@ console.log("Prompt Length:", prompt.length);
   "Answer Length:",
   answer?.length
 );
+
+
 
     return answer || "AI could not generate a response.";
 

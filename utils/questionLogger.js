@@ -5,6 +5,7 @@ const QUESTIONS_FILE = path.join(
   __dirname,
   "../data/questions.json"
 );
+console.log("Questions file path:", QUESTIONS_FILE);
 
 console.log("Question Logger Called");
 
