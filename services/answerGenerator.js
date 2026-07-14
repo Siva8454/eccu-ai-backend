@@ -272,6 +272,22 @@ ${question}
 console.log("URL:", "https://api.fireworks.ai/inference/v1/chat/completions");
 console.log("Model:", process.env.FIREWORKS_MODEL);
 
+// ===== PROMPT SIZE ANALYSIS =====
+console.log("\n========== PROMPT ANALYSIS ==========");
+console.log("Main Prompt Length       :", prompt.length);
+console.log("Current Page Length     :", (context?.currentPage || "").length);
+console.log("Vector Context Length   :", (context?.extraContext || "").length);
+console.log("Page Title Length       :", (context?.pageTitle || "").length);
+console.log("Question Length         :", question.length);
+console.log("=====================================\n");
+
+// Optional: Preview first 500 characters
+console.log("===== CURRENT PAGE PREVIEW =====");
+console.log((context?.currentPage || "").substring(0,500));
+
+console.log("===== VECTOR CONTEXT PREVIEW =====");
+console.log((context?.extraContext || "").substring(0,500));
+
   try {
 
     const response = await axios.post(
