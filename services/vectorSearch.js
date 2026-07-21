@@ -89,6 +89,8 @@ results.slice(0, 10).forEach(r => {
 });
 
   // ✅ Manual course filtering (since Qdrant index not available)
+  console.log("ALLOWED COURSE IDS:", allowedCourseIds);
+  
 if (allowedCourseIds.length) {
 
   console.log("BEFORE FILTER:", results.length);
@@ -114,6 +116,13 @@ if (allowedCourseIds.length) {
 }
 
 console.log("Filtered results:", results.length);
+
+results.slice(0,5).forEach(r => {
+  console.log({
+    title: r.payload.title,
+    moduleName: r.payload.moduleName
+  });
+});
 
   /* -------------------------------------------------- */
   /* BOOSTING LOGIC (VERY IMPORTANT) */
