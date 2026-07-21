@@ -1012,18 +1012,72 @@ const shouldUseRAG =
 
 
 
+const mentionsAnotherModule =
+    /\bmodule\s+\d+\b/i.test(message);
+
+const mentionsAnotherWeek =
+    /\bweek\s+\d+\b/i.test(message);
+
+const mentionsAssignment =
+    /\bassignment\b/i.test(message);
+
+const mentionsDiscussion =
+    /\bdiscussion\b/i.test(message);
+
+const mentionsLab =
+    /\blab\b/i.test(message);
+
+const mentionsQuiz =
+    /\bquiz\b/i.test(message);
+
+const mentionsResearchProject =
+    /\bresearch project\b/i.test(message);
+
+const mentionsCaseStudy =
+    /\bcase study\b/i.test(message);
+
 const searchWholeCourse =
     wantsCourseWideSearch ||
-    wantsLearningResources;
+    wantsLearningResources ||
+    mentionsAnotherModule ||
+    mentionsAnotherWeek ||
+    mentionsAssignment ||
+    mentionsDiscussion ||
+    mentionsLab ||
+    mentionsQuiz ||
+    mentionsResearchProject ||
+    mentionsCaseStudy;
 
 console.log("searchWholeCourse:", searchWholeCourse);
 
+let searchQuery = effectiveMessage;
+
+if (mentionsAnotherModule) {
+    const match = message.match(/module\s+\d+/i);
+
+    if (match) {
+        searchQuery = match[0];
+    }
+}
+else if (mentionsAssignment) {
+    searchQuery = message;
+}
+else if (mentionsDiscussion) {
+    searchQuery = message;
+}
+else if (mentionsLab) {
+    searchQuery = message;
+}
+
+console.log("Search Query:", searchQuery);
+
 ragResult = await vectorSearch(
-    effectiveMessage,
+    searchQuery,
     [Number(courseId)],
     intent,
     currentPage,
     wantsLabs,
+    wantsLabExplanation,
     searchWholeCourse
 );
 
@@ -1231,6 +1285,13 @@ const structuredContext = {
       currentPage.text;
 
   }
+  console.log("Search Query:", searchQuery);
+console.log("Course Wide Search:", searchWholeCourse);
+console.log("RAG Confidence:", confidence);
+
+  console.log("\n========== FINAL RAG CONTEXT ==========");
+console.log(structuredContext.extraContext?.substring(0, 3000));
+console.log("=======================================\n");
 
     const aiAnswer =
   await generateAnswer(

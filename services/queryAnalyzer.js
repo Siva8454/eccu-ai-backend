@@ -96,11 +96,24 @@ saveMemory(userId, {
   type
 });
 
-  return {
+  const wantsModuleSummary =
+    /(summar(y|ize)|overview|teach|explain)/i.test(q) &&
+    /module\s*\d+/i.test(q);
+
+const wantsPageSearch =
+    q.includes("module") ||
+    q.includes("assignment") ||
+    q.includes("discussion") ||
+    q.includes("lab") ||
+    q.includes("resource") ||
+    q.includes("week");
+
+return {
     type,
-    moduleName
-  };
-}
+    moduleName,
+    wantsModuleSummary,
+    wantsPageSearch
+};
 
 module.exports = {
   analyzeQuery
