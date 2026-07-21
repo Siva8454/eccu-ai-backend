@@ -615,7 +615,7 @@ if (wantsCourseStatistics) {
 
   const result = await vectorSearch(
     searchTerm,
-    [Number(courseId)],
+    [currentCourse.blueprintCourseId],
     intent,
     null,
     false,
@@ -1073,7 +1073,7 @@ console.log("Search Query:", searchQuery);
 
 ragResult = await vectorSearch(
     searchQuery,
-    [Number(courseId)],
+    [currentCourse.blueprintCourseId],
     intent,
     currentPage,
     wantsLabs,
