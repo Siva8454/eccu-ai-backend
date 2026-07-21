@@ -1287,7 +1287,6 @@ const structuredContext = {
   }
   console.log("Search Query:", searchQuery);
 console.log("Course Wide Search:", searchWholeCourse);
-console.log("RAG Confidence:", confidence);
 
   console.log("\n========== FINAL RAG CONTEXT ==========");
 console.log(structuredContext.extraContext?.substring(0, 3000));
