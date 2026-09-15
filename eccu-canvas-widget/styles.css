@@ -1125,3 +1125,51 @@ backdrop-filter:
 
 }
 
+/* ================================
+   AI MARKDOWN FORMATTING
+================================ */
+
+.bot-msg strong {
+  font-weight: 700;
+}
+
+.bot-msg em {
+  font-style: italic;
+}
+
+.bot-msg h2,
+.bot-msg h3,
+.bot-msg h4 {
+  margin: 14px 0 8px;
+  line-height: 1.3;
+}
+
+.bot-msg h2 {
+  font-size: 20px;
+}
+
+.bot-msg h3 {
+  font-size: 18px;
+}
+
+.bot-msg h4 {
+  font-size: 16px;
+}
+
+.bot-msg ul,
+.bot-msg ol {
+  margin: 8px 0 12px 20px;
+  padding-left: 18px;
+}
+
+.bot-msg li {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.bot-msg code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}

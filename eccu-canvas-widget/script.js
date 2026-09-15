@@ -211,20 +211,141 @@ let currentRequest = null;
 
 function formatLinks(text) {
 
-  // remove angle brackets around URLs
+  if (!text) return "";
+
+  // -----------------------------------------
+  // 1. Escape HTML for safety
+  // -----------------------------------------
+  text = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // -----------------------------------------
+  // 2. Convert Markdown headings
+  // -----------------------------------------
   text = text.replace(
-    /<(https?:\/\/[^>]+)>/g,
-    '$1'
+    /^### (.+)$/gm,
+    "<h4>$1</h4>"
   );
 
-  // convert URLs into clickable links
   text = text.replace(
-    /(https?:\/\/[^\s<]+)/g,
-    '<a href="$1" target="_blank">$1</a>'
+    /^## (.+)$/gm,
+    "<h3>$1</h3>"
   );
 
-  // preserve line breaks
+  text = text.replace(
+    /^# (.+)$/gm,
+    "<h2>$1</h2>"
+  );
+
+  // -----------------------------------------
+  // 3. Bold
+  // **text**
+  // -----------------------------------------
+  text = text.replace(
+    /\*\*(.+?)\*\*/g,
+    "<strong>$1</strong>"
+  );
+
+  // -----------------------------------------
+  // 4. Italic
+  // *text*
+  // -----------------------------------------
+  text = text.replace(
+    /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+    "<em>$1</em>"
+  );
+
+  // -----------------------------------------
+  // 5. Inline code
+  // `code`
+  // -----------------------------------------
+  text = text.replace(
+    /`([^`\n]+)`/g,
+    "<code>$1</code>"
+  );
+
+  // -----------------------------------------
+  // 6. Convert Markdown links
+  // [text](https://example.com)
+  // -----------------------------------------
+  text = text.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
+
+  // -----------------------------------------
+  // 7. Convert raw URLs
+  // -----------------------------------------
+  text = text.replace(
+    /(^|[\s>])(https?:\/\/[^\s<]+)/g,
+    '$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>'
+  );
+
+  // -----------------------------------------
+  // 8. Convert bullet lists
+  // - item
+  // * item
+  // -----------------------------------------
+  text = text.replace(
+    /(?:^|\n)((?:[-*] .+(?:\n|$))+)/g,
+    function(match, list) {
+
+      const items = list
+        .trim()
+        .split(/\n/)
+        .map(item => {
+          return item.replace(/^[-*]\s+/, "").trim();
+        })
+        .filter(Boolean);
+
+      return "\n<ul>" +
+        items.map(item => `<li>${item}</li>`).join("") +
+        "</ul>\n";
+    }
+  );
+
+  // -----------------------------------------
+  // 9. Numbered lists
+  // 1. item
+  // 2. item
+  // -----------------------------------------
+  text = text.replace(
+    /(?:^|\n)((?:\d+\.\s.+(?:\n|$))+)/g,
+    function(match, list) {
+
+      const items = list
+        .trim()
+        .split(/\n/)
+        .map(item => {
+          return item.replace(/^\d+\.\s+/, "").trim();
+        })
+        .filter(Boolean);
+
+      return "\n<ol>" +
+        items.map(item => `<li>${item}</li>`).join("") +
+        "</ol>\n";
+    }
+  );
+
+  // -----------------------------------------
+  // 10. Convert remaining line breaks
+  // -----------------------------------------
   text = text.replace(/\n/g, "<br>");
+
+  // Remove unnecessary <br> around lists/headings
+  text = text
+    .replace(/<br>\s*<ul>/g, "<ul>")
+    .replace(/<\/ul>\s*<br>/g, "</ul>")
+    .replace(/<br>\s*<ol>/g, "<ol>")
+    .replace(/<\/ol>\s*<br>/g, "</ol>")
+    .replace(/<br>\s*<h[234]>/g, match =>
+      match.replace("<br>", "")
+    )
+    .replace(/<\/h[234]><br>/g, match =>
+      match.replace("<br>", "")
+    );
 
   return text;
 }

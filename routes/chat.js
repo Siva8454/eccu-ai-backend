@@ -1,14 +1,31 @@
 const express = require("express");
 const router = express.Router();
 
-const { searchKnowledge } = require("../services/eccuResponder");
-const { vectorSearch } = require("../services/vectorSearch");
-const { generateAnswer } = require("../services/localLLM");
-const { fetchUserEnrollments } = require("../services/canvasFetcher");
-const { saveQA, searchLearned } = require("../services/learningService");
-const { getLibraryResources } = require("../services/lirnResources");
+const { searchKnowledge } =
+  require("../services/knowledgeSearch");
+
+const { vectorSearch } =
+  require("../services/vectorSearch");
+
+const { generateAnswer } =
+  require("../services/localLLM");
+
+const { fetchUserEnrollments } =
+  require("../services/canvasFetcher");
+
+const {
+  saveQA,
+  searchLearned
+} = require("../services/learningService");
+
+const { getLibraryResources } =
+  require("../services/lirnResources");
+
 const detectCourse =
   require("../utils/detectCourse");
+
+const courseMappings =
+  require("../config/courseMappings");
 
 const {
   trustedWebSearch
@@ -18,14 +35,10 @@ const {
   detectIntent
 } = require("../services/intentDetector");
 
-const {
-  getMemory
-} = require("../services/memoryStore");
-
 const isTechnicalIssue =
   require("../utils/isTechnicalIssue");
 
-  const {
+const {
   logAnalytics
 } = require(
   "../services/analyticsService"
@@ -41,7 +54,8 @@ const {
   "../services/courseClassifier"
 );
 
-const { logQuestion } = require("../utils/questionLogger");
+const { logQuestion } =
+  require("../utils/questionLogger");
 
 
 /* ===================================== */
@@ -50,7 +64,8 @@ const { logQuestion } = require("../utils/questionLogger");
 
 function isEducationalTopic(query = "") {
 
-  const text = query.toLowerCase();
+  const text =
+    query.toLowerCase();
 
   return (
 
@@ -98,9 +113,15 @@ function isEducationalTopic(query = "") {
 
 }
 
+
+/* ===================================== */
+/* GREETING */
+/* ===================================== */
+
 function isGreeting(message = "") {
 
-  const text = message.trim().toLowerCase();
+  const text =
+    message.trim().toLowerCase();
 
   return [
 
@@ -118,13 +139,15 @@ function isGreeting(message = "") {
 
 }
 
+
 /* ===================================== */
 /* VALID RESOURCE CHECK */
 /* ===================================== */
 
 function hasUsefulResources(resources = []) {
 
-  if (!resources.length) return false;
+  if (!resources.length)
+    return false;
 
   return resources.some(r => {
 
@@ -157,100 +180,114 @@ function hasUsefulResources(resources = []) {
 
 }
 
+
 router.post("/", async (req, res) => {
 
   try {
 
-    const startTime = Date.now();
+    const startTime =
+      Date.now();
 
     const {
-  message,
-  currentPage,
-  pageText,
-  history,
-  userId,
-  courseId,
-  courseCode,
-  courseName
-} = req.body;
+      message,
+      currentPage,
+      pageText,
+      history,
+      userId,
+      courseId,
+      courseCode,
+      courseName
+    } = req.body;
 
-const helpUrl =
-  `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
 
-const currentCourse =
-    detectCourse(courseCode, courseId);
+    const helpUrl =
+      `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
 
-  if (!currentCourse) {
-  return res.json({
-    source: "course-detection",
-    reply:
-      `Course configuration not found for ${courseCode}.`
-  });
-}
 
-console.log("Course Code:", courseCode);
-console.log("Course Name:", courseName);
-console.log("Detected Course:", currentCourse?.courseName);
-console.log("CURRENT COURSE:", currentCourse);
+    const currentCourse =
+      detectCourse(
+        courseCode,
+        courseId
+      );
+
+
+    if (!currentCourse) {
+
+      return res.json({
+
+        source:
+          "course-detection",
+
+        reply:
+          `Course configuration not found for ${courseCode}.`
+
+      });
+
+    }
+
+
+    console.log(
+      "Course Code:",
+      courseCode
+    );
+
+    console.log(
+      "Course Name:",
+      courseName
+    );
+
+    console.log(
+      "Detected Course:",
+      currentCourse?.courseName
+    );
+
+    console.log(
+      "CURRENT COURSE:",
+      currentCourse
+    );
+
 
     if (!message) {
 
       return res.status(400).json({
-        error: "Message is required"
+
+        error:
+          "Message is required"
+
       });
 
     }
 
-    console.log("💬 Student question:", message);
+
+    console.log(
+      "💬 Student question:",
+      message
+    );
+
 
     /* ===================================== */
-    /* MEMORY */
+    /* CONVERSATION CONTEXT */
     /* ===================================== */
 
     const currentUserId =
-  userId || "default-user";
+      userId || "default-user";
 
-    const memory =
-  getMemory(currentUserId);
 
-  const previousQuestion =
-  memory?.previousQuestion || "";
+    const previousQuestion =
+      (history || [])
+        .filter(
+          h =>
+            h.role === "user"
+        )
+        .slice(-1)[0]
+        ?.content || "";
+
 
     console.log(
       "🧠 Previous question:",
-      memory?.previousQuestion || ""
+      previousQuestion
     );
 
-    /* ===================================== */
-    /* LEARNED KNOWLEDGE */
-    /* ===================================== */
-
-    const learned =
-      searchLearned(message);
-
-    if (learned) {
-
-      return res.json({
-        reply: learned
-      });
-
-    }
-
-    /* ===================================== */
-    /* STATIC KNOWLEDGE */
-    /* ===================================== */
-
-    const knowledgeAnswer =
-      searchKnowledge(message);
-
-    if (knowledgeAnswer) {
-
-      return res.json({
-        source: "knowledge-store",
-        reply: knowledgeAnswer
-      });
-
-    }
 
     /* ===================================== */
     /* ENROLLMENTS */
@@ -259,22 +296,227 @@ console.log("CURRENT COURSE:", currentCourse);
     const enrollments =
       await fetchUserEnrollments();
 
+
     if (!enrollments?.length) {
 
       return res.json({
-        source: "enrollment-check",
+
+        source:
+          "enrollment-check",
+
         reply:
           "No active enrollments found."
+
       });
 
     }
 
-    const allowedCourseIds =
+
+    /* ===================================== */
+    /* COURSE CONFIG / VECTOR ISOLATION */
+    /* ===================================== */
+
+    const enrolledCourseIds =
       enrollments
-        .filter(e =>
-          e.enrollment_state === "active"
+
+        .filter(
+          e =>
+            e.enrollment_state ===
+            "active"
         )
-        .map(e => e.course_id);
+
+        .map(
+          e =>
+            Number(e.course_id)
+        );
+
+
+    const currentConfigKey =
+      courseMappings[
+        Number(courseId)
+      ] ||
+      courseMappings[
+        Number(
+          currentCourse.blueprintCourseId
+        )
+      ];
+
+
+    /*
+      FAIL CLOSED
+
+      If the current course does not have
+      a mapping, do NOT perform vector search.
+    */
+
+    if (!currentConfigKey) {
+
+      console.error(
+        "❌ No course mapping found for:",
+        courseId,
+        currentCourse?.blueprintCourseId
+      );
+
+
+      return res.status(403).json({
+
+        source:
+          "course-isolation",
+
+        reply:
+          "Course configuration is not available for this course."
+
+      });
+
+    }
+
+
+    /*
+      Find all Canvas course IDs belonging
+      to the SAME configuration.
+
+      Example:
+
+      ECCU 501
+
+      2213 → ECCU501_CONFIG
+      2738 → ECCU501_CONFIG
+      2876 → ECCU501_CONFIG
+
+      These can safely share the same
+      ECCU 501 Qdrant collection.
+    */
+
+    const courseConfigCourseIds =
+      Object.entries(
+        courseMappings
+      )
+
+        .filter(
+          ([, configKey]) =>
+            configKey ===
+            currentConfigKey
+        )
+
+        .map(
+          ([mappedCourseId]) =>
+            Number(mappedCourseId)
+        );
+
+
+    /*
+      Only allow:
+
+      1. Courses the student is actively enrolled in
+
+      OR
+
+      2. The Master Blueprint course belonging
+         to the current course configuration.
+    */
+
+    const allowedCourseIds =
+      courseConfigCourseIds.filter(
+        id =>
+          enrolledCourseIds.includes(id) ||
+          id ===
+            Number(
+              currentCourse.blueprintCourseId
+            )
+      );
+
+
+    console.log(
+      "🎯 CURRENT CANVAS COURSE ID:",
+      Number(courseId)
+    );
+
+    console.log(
+      "🎯 CURRENT BLUEPRINT COURSE ID:",
+      Number(
+        currentCourse.blueprintCourseId
+      )
+    );
+
+    console.log(
+      "🎯 CURRENT CONFIG KEY:",
+      currentConfigKey
+    );
+
+    console.log(
+      "🎯 ENROLLED COURSE IDS:",
+      enrolledCourseIds
+    );
+
+    console.log(
+      "🎯 ALLOWED COURSE IDS:",
+      allowedCourseIds
+    );
+
+
+    /* ===================================== */
+    /* LEARNED KNOWLEDGE */
+    /* ===================================== */
+
+    const learned =
+      searchLearned(
+        message,
+        allowedCourseIds
+      );
+
+
+    if (learned) {
+
+      console.log(
+        "🧠 Learned course-specific answer found"
+      );
+
+
+      return res.json({
+
+        source:
+          "learned-knowledge",
+
+        reply:
+          learned.answer ||
+          learned
+
+      });
+
+    }
+
+
+    /* ===================================== */
+    /* STATIC KNOWLEDGE */
+    /* ===================================== */
+
+    const knowledgeAnswer =
+      searchKnowledge(
+        message,
+        allowedCourseIds
+      );
+
+
+    if (knowledgeAnswer) {
+
+      console.log(
+        "📚 Course-specific knowledge-store answer found"
+      );
+
+
+      return res.json({
+
+        source:
+          "knowledge-store",
+
+        reply:
+          knowledgeAnswer.answer ||
+          knowledgeAnswer
+
+      });
+
+    }
+
 
     /* ===================================== */
     /* INTENT */
@@ -283,44 +525,62 @@ console.log("CURRENT COURSE:", currentCourse);
     const intent =
       detectIntent(message);
 
+
     console.log(
       "Detected intent:",
       intent
     );
 
-if (isGreeting(message)) {
 
-  return res.json({
+    /* ===================================== */
+    /* GREETING */
+    /* ===================================== */
 
-    source: "greeting",
+    if (isGreeting(message)) {
 
-    reply: `Hello! I'm your ECCU AI Tutor.
+      return res.json({
+
+        source:
+          "greeting",
+
+        reply:
+`Hello! I'm your ECCU AI Tutor.
 
 I can help you with course concepts, assignments, labs, discussions, module content, and learning materials related to ${currentCourse.courseName}.`
 
-  });
+      });
 
-}
+    }
 
-/* ===================================== */
-/* QUICK ACTIONS */
-/* ===================================== */
 
-const quickAction =
-  message.trim().toLowerCase();
+    /* ===================================== */
+    /* QUICK ACTIONS */
+    /* ===================================== */
 
-  console.log("Quick Action:", quickAction);
+    const quickAction =
+      message.trim().toLowerCase();
 
-if (
-  quickAction === "course / topic" ||
-  quickAction === "course/topic"
-) {
 
-  return res.json({
+    console.log(
+      "Quick Action:",
+      quickAction
+    );
 
-    source: "quick-action",
 
-    reply: `You are currently enrolled in ${currentCourse.courseName}.
+    if (
+      quickAction ===
+        "course / topic" ||
+      quickAction ===
+        "course/topic"
+    ) {
+
+      return res.json({
+
+        source:
+          "quick-action",
+
+        reply:
+`You are currently enrolled in ${currentCourse.courseName}.
 
 I can help explain:
 
@@ -333,388 +593,555 @@ I can help explain:
 
 Ask any course-related question and I'll help you understand the material.`
 
-  });
+      });
 
-}
+    }
 
-if (quickAction === "labs") {
 
-  return res.json({
+    if (
+      quickAction === "labs"
+    ) {
 
-    source: "quick-action",
+      return res.json({
 
-    reply:
-      "Tell me which lab you need help with, or ask me to explain the lab instructions on the current page."
+        source:
+          "quick-action",
 
-  });
+        reply:
+          "Tell me which lab you need help with, or ask me to explain the lab instructions on the current page."
 
-}
+      });
 
-if (
-  quickAction === "assignments / research project / case study"
-) {
+    }
 
-  return res.json({
 
-    source: "quick-action",
+    if (
+      quickAction ===
+        "assignments / research project / case study"
+    ) {
 
-    reply:
-      "Tell me which assignment or research project you need help with, or ask me to explain the current assignment page."
+      return res.json({
 
-  });
+        source:
+          "quick-action",
 
-}
+        reply:
+          "Tell me which assignment or research project you need help with, or ask me to explain the current assignment page."
 
-if (
-  quickAction === "help & support" ||
-  quickAction === "help/support"
-) {
+      });
 
-  return res.json({
+    }
 
-    source: "quick-action",
 
-    reply:
-      "I can help explain course content, assignments, labs, discussions, navigation, and general course-related questions."
+    if (
+      quickAction ===
+        "help & support" ||
+      quickAction ===
+        "help/support"
+    ) {
 
-  });
+      return res.json({
 
-}
+        source:
+          "quick-action",
 
-if (quickAction === "other") {
+        reply:
+          "I can help explain course content, assignments, labs, discussions, navigation, and general course-related questions."
 
-  return res.json({
+      });
 
-    source: "quick-action",
+    }
 
-    reply:
-      "Ask any course-related question and I'll do my best to help."
 
-  });
+    if (
+      quickAction === "other"
+    ) {
 
-}
+      return res.json({
 
+        source:
+          "quick-action",
+
+        reply:
+          "Ask any course-related question and I'll do my best to help."
+
+      });
+
+    }
 
 
     /* ===================================== */
     /* COURSE RELEVANCE CHECK */
     /* ===================================== */
 
-   console.log(
-  "Previous Question:",
-  previousQuestion
-);
-   
+    console.log(
+      "Previous Question:",
+      previousQuestion
+    );
+
+
     const isCourseRelated =
-  await classifyCourseRelevance(
-    currentCourse.courseName,
-    message,
-    previousQuestion
-  );
+      await classifyCourseRelevance(
 
-  console.log(
-    "Current Course:",
-    currentCourse.courseName
-  );
+        currentCourse.courseName,
 
-  console.log(
-    "Student Question:",
-    message
-  );
+        message,
 
-  console.log(
-    "Course Related:",
-    isCourseRelated
-  );
+        previousQuestion
 
-  const q = message.toLowerCase();
-
-  /* ========================= */
-/* COURSEWIDE CHECK */
-/* ========================= */
-const wantsCourseWideSearch =
-
-/course|entire course|throughout the course|all modules|research project|research projects|project|projects|instructor|professor|faculty|syllabus|grading|grade policy|late policy|final exam|course summary|module summary|summary of module|how many/i
-.test(q);
-
-  /* ============================= */
-/* COURSE-WIDE Interactivity Questions */
-/* ============================= */
-
-const isInteractivityPage =
-
-  currentPage?.title?.toLowerCase().includes("interactivity") ||
-
-  currentPage?.url?.toLowerCase().includes("interactivity");
-
-const wantsInteractivityExplanation =
-
-    isInteractivityPage &&
-
-    /(interactiv|activity|scenario|simulation|exercise|block)/i.test(q) &&
-
-    /(how|what|help|start|begin|complete|tackle|explain|describe|tell|do)/i.test(q);
+      );
 
 
-/* ============================= */
-/* COURSE-WIDE Learning Resources */
-/* ============================= */
+    console.log(
+      "Current Course:",
+      currentCourse.courseName
+    );
 
-const wantsLearningResources =
-    q.includes("where can i read") ||
-    q.includes("where do i read") ||
-    q.includes("where can i learn") ||
-    q.includes("learn more") ||
-    q.includes("read more") ||
-    q.includes("more about") ||
-    q.includes("reading") ||
-    q.includes("reading material") ||
-    q.includes("study material") ||
-    q.includes("reference") ||
-    q.includes("references") ||
-    q.includes("resource") ||
-    q.includes("resources") ||
-    q.includes("textbook") ||
-    q.includes("chapter") ||
-    q.includes("documentation") ||
-    q.includes("article") ||
-    q.includes("articles") ||
-    q.includes("official documentation");
-  
+    console.log(
+      "Student Question:",
+      message
+    );
 
-  /* ============================= */
-/* COURSE-WIDE LAB QUESTIONS */
-/* ============================= */
+    console.log(
+      "Course Related:",
+      isCourseRelated
+    );
 
-  const wantsLabs =
 
-  /\blabs?\b/i.test(q) ||
-  q.includes("lab assignment");
+    const q =
+      message.toLowerCase();
 
-  const wantsLabExplanation =
 
-/(explain|summarize|describe|understand|help).*(lab|assignment|activity|instructions|current page)/i
-.test(q)
+    /* ========================= */
+    /* COURSEWIDE CHECK */
+    /* ========================= */
 
-||
+    const wantsCourseWideSearch =
 
-q.includes("what is this lab") ||
-q.includes("tell me about this lab") ||
-q.includes("describe this lab") ||
-q.includes("what do i need to do") ||
-q.includes("explain the lab instructions") ||
-q.includes("explain the instructions") ||
-q.includes("explain the current page");
+      /course|entire course|throughout the course|all modules|research project|research projects|project|projects|instructor|professor|faculty|syllabus|grading|grade policy|late policy|final exam|course summary|module summary|summary of module|how many/i
+        .test(q);
 
-const wantsCourseStatistics =
 
-/how many/i.test(q)
+    /* ============================= */
+    /* COURSE-WIDE INTERACTIVITY */
+    /* ============================= */
 
-&&
+    const isInteractivityPage =
 
-(
-  q.includes("research project") ||
-  q.includes("research projects") ||
+      currentPage?.title
+        ?.toLowerCase()
+        .includes("interactivity") ||
 
-  q.includes("lab assignment") ||
-  q.includes("lab assignments") ||
-  q.includes("labs") ||
+      currentPage?.url
+        ?.toLowerCase()
+        .includes("interactivity");
 
-  q.includes("discussion") ||
-  q.includes("discussions") ||
 
-  q.includes("written assignment") ||
-  q.includes("written assignments") ||
+    const wantsInteractivityExplanation =
 
-  q.includes("case study") ||
-  q.includes("case studies") ||
+      isInteractivityPage &&
 
-  q.includes("quiz") ||
-  q.includes("quizzes") ||
+      /(interactiv|activity|scenario|simulation|exercise|block)/i
+        .test(q) &&
 
-  q.includes("exam") ||
-  q.includes("exams") ||
+      /(how|what|help|start|begin|complete|tackle|explain|describe|tell|do)/i
+        .test(q);
 
-  q.includes("interactivity") ||
-  q.includes("interactive") ||
-  q.includes("interactivities")
-);
 
-if (wantsCourseStatistics) {
+    /* ============================= */
+    /* COURSE-WIDE LEARNING RESOURCES */
+    /* ============================= */
 
-  let searchTerm = "";
-  let label = "";
+    const wantsLearningResources =
 
-  if (
-    q.includes("research project") ||
-    q.includes("research projects")
-  ) {
-    searchTerm = "research project";
-    label = "research projects";
-  }
+      q.includes("where can i read") ||
+      q.includes("where do i read") ||
+      q.includes("where can i learn") ||
+      q.includes("learn more") ||
+      q.includes("read more") ||
+      q.includes("more about") ||
+      q.includes("reading") ||
+      q.includes("reading material") ||
+      q.includes("study material") ||
+      q.includes("reference") ||
+      q.includes("references") ||
+      q.includes("resource") ||
+      q.includes("resources") ||
+      q.includes("textbook") ||
+      q.includes("chapter") ||
+      q.includes("documentation") ||
+      q.includes("article") ||
+      q.includes("articles") ||
+      q.includes("official documentation");
 
-  else if (
-    q.includes("lab assignment") ||
-    q.includes("lab assignments") ||
-    q.includes("labs")
-  ) {
-    searchTerm = "lab assignment";
-    label = "lab assignments";
-  }
 
-  else if (
-    q.includes("discussion") ||
-    q.includes("discussions")
-  ) {
-    searchTerm = "discussion";
-    label = "discussions";
-  }
+    /* ============================= */
+    /* COURSE-WIDE LAB QUESTIONS */
+    /* ============================= */
 
-  else if (
-    q.includes("written assignment") ||
-    q.includes("written assignments")
-  ) {
-    searchTerm = "written assignment";
-    label = "written assignments";
-  }
+    const wantsLabs =
 
-  else if (
-    q.includes("case study") ||
-    q.includes("case studies")
-  ) {
-    searchTerm = "case study";
-    label = "case studies";
-  }
+      /\blabs?\b/i.test(q) ||
+      q.includes("lab assignment");
 
-  else if (
-    q.includes("quiz") ||
-    q.includes("quizzes")
-  ) {
-    searchTerm = "quiz";
-    label = "quizzes";
-  }
 
-  else if (
-    q.includes("exam") ||
-    q.includes("exams") ||
-    q.includes("final exam") ||
-    q.includes("mock exam")
-  ) {
-    searchTerm = "exam";
-    label = "exams";
-  }
+    const wantsLabExplanation =
 
-  else if (
-    q.includes("interactivity") ||
-    q.includes("interactive") ||
-    q.includes("interactivities")
-  ) {
-    searchTerm = "interactivity";
-    label = "interactive activities";
-  }
+      /(explain|summarize|describe|understand|help).*(lab|assignment|activity|instructions|current page)/i
+        .test(q)
 
-  const result = await vectorSearch(
-    searchTerm,
-    [currentCourse.blueprintCourseId],
-    intent,
-    null,
-    false,
-    true
-  );
+      ||
 
-  const count =
-    (result.context.match(
-      new RegExp(searchTerm, "gi")
-    ) || []).length;
+      q.includes("what is this lab") ||
+      q.includes("tell me about this lab") ||
+      q.includes("describe this lab") ||
+      q.includes("what do i need to do") ||
+      q.includes("explain the lab instructions") ||
+      q.includes("explain the instructions") ||
+      q.includes("explain the current page");
 
-  return res.json({
-    reply: `I found approximately ${count} ${label} in this course.`
-  });
-}
 
-  const wantsLabSolution =
+    const wantsCourseStatistics =
 
-/(show me the answer|give me the answer|solve this lab|complete this for me|walk me through every step|step by step solution|task answer|expected output)/i.test(q)
+      /how many/i.test(q)
 
-||
+      &&
 
-/task\s*\d+/i.test(q)
+      (
 
-||
+        q.includes("research project") ||
+        q.includes("research projects") ||
 
-/lab\s*\d+/i.test(q);
+        q.includes("lab assignment") ||
+        q.includes("lab assignments") ||
+        q.includes("labs") ||
 
-const wantsLabGuidance =
+        q.includes("discussion") ||
+        q.includes("discussions") ||
 
-/(how to do|how to complete|what do i do|what should i do|how do i start|how do i begin|how to switch|cannot switch|can't switch|unable to switch|i do not know how to|i don't know how to|where do i find|how do i access|how do i launch|how do i open)/i
-.test(q);
+        q.includes("written assignment") ||
+        q.includes("written assignments") ||
 
-// DEBUG
-console.log("wantsLabs:", wantsLabs);
-console.log("wantsLabExplanation:", wantsLabExplanation);
-console.log("wantsLabSolution:", wantsLabSolution);
-console.log("wantsLabGuidance:", wantsLabGuidance);
-console.log("Question:", q);
-console.log(
-  "wantsCourseWideSearch:",
-  wantsCourseWideSearch
-);
+        q.includes("case study") ||
+        q.includes("case studies") ||
 
- /* ========================= */
-/* LAB LAUNCH PAGE CHECK */
-/* ========================= */
+        q.includes("quiz") ||
+        q.includes("quizzes") ||
 
-const pageContent = `
+        q.includes("exam") ||
+        q.includes("exams") ||
+
+        q.includes("interactivity") ||
+        q.includes("interactive") ||
+        q.includes("interactivities")
+
+      );
+
+
+    /* ===================================== */
+    /* COURSE STATISTICS */
+    /* ===================================== */
+
+    if (wantsCourseStatistics) {
+
+      let searchTerm = "";
+      let label = "";
+
+
+      if (
+        q.includes("research project") ||
+        q.includes("research projects")
+      ) {
+
+        searchTerm =
+          "research project";
+
+        label =
+          "research projects";
+
+      }
+
+      else if (
+        q.includes("lab assignment") ||
+        q.includes("lab assignments") ||
+        q.includes("labs")
+      ) {
+
+        searchTerm =
+          "lab assignment";
+
+        label =
+          "lab assignments";
+
+      }
+
+      else if (
+        q.includes("discussion") ||
+        q.includes("discussions")
+      ) {
+
+        searchTerm =
+          "discussion";
+
+        label =
+          "discussions";
+
+      }
+
+      else if (
+        q.includes("written assignment") ||
+        q.includes("written assignments")
+      ) {
+
+        searchTerm =
+          "written assignment";
+
+        label =
+          "written assignments";
+
+      }
+
+      else if (
+        q.includes("case study") ||
+        q.includes("case studies")
+      ) {
+
+        searchTerm =
+          "case study";
+
+        label =
+          "case studies";
+
+      }
+
+      else if (
+        q.includes("quiz") ||
+        q.includes("quizzes")
+      ) {
+
+        searchTerm =
+          "quiz";
+
+        label =
+          "quizzes";
+
+      }
+
+      else if (
+        q.includes("exam") ||
+        q.includes("exams") ||
+        q.includes("final exam") ||
+        q.includes("mock exam")
+      ) {
+
+        searchTerm =
+          "exam";
+
+        label =
+          "exams";
+
+      }
+
+      else if (
+        q.includes("interactivity") ||
+        q.includes("interactive") ||
+        q.includes("interactivities")
+      ) {
+
+        searchTerm =
+          "interactivity";
+
+        label =
+          "interactive activities";
+
+      }
+
+
+      const result =
+        await vectorSearch(
+
+          searchTerm,
+
+          allowedCourseIds,
+
+          intent,
+
+          null,
+
+          false,
+
+          true,
+
+          true
+
+        );
+
+
+      const count =
+        (result?.context || "")
+          .match(
+            new RegExp(
+              searchTerm,
+              "gi"
+            )
+          ) || [];
+
+
+      return res.json({
+
+        reply:
+          `I found approximately ${count.length} ${label} in this course.`
+
+      });
+
+    }
+
+
+    /* ============================= */
+    /* LAB SOLUTION DETECTION */
+    /* ============================= */
+
+    const wantsLabSolution =
+
+      /show me the answer|give me the answer|solve this lab|complete this for me|walk me through every step|step by step solution|task answer|expected output/i
+        .test(q)
+
+      ||
+
+      /task\s*\d+/i.test(q)
+
+      ||
+
+      /lab\s*\d+/i.test(q);
+
+
+    const wantsLabGuidance =
+
+      /(how to do|how to complete|what do i do|what should i do|how do i start|how do i begin|how to switch|cannot switch|can't switch|unable to switch|i do not know how to|i don't know how to|where do i find|how do i access|how do i launch|how do i open)/i
+        .test(q);
+
+
+    console.log(
+      "wantsLabs:",
+      wantsLabs
+    );
+
+    console.log(
+      "wantsLabExplanation:",
+      wantsLabExplanation
+    );
+
+    console.log(
+      "wantsLabSolution:",
+      wantsLabSolution
+    );
+
+    console.log(
+      "wantsLabGuidance:",
+      wantsLabGuidance
+    );
+
+    console.log(
+      "Question:",
+      q
+    );
+
+    console.log(
+      "wantsCourseWideSearch:",
+      wantsCourseWideSearch
+    );
+
+
+    /* ========================= */
+    /* LAB LAUNCH PAGE CHECK */
+    /* ========================= */
+
+    const pageContent = `
 ${currentPage?.text || ""}
 ${pageText || ""}
 `;
 
-const isLabLaunchPage =
-  currentPage?.text?.includes(
-    "This tool needs to be loaded in a new browser window"
-  ) ||
-  currentPage?.text?.includes(
-    "The session for this tool has expired"
-  );
 
-// Only block educational questions on the launcher page.
-// Let technical issues continue to the AI.
-console.log("isLabLaunchPage:", isLabLaunchPage);
-const technicalIssue = isTechnicalIssue(message);
+    const isLabLaunchPage =
 
-console.log("isTechnicalIssue:", technicalIssue);
-console.log("Message:", message);
+      currentPage?.text?.includes(
+        "This tool needs to be loaded in a new browser window"
+      ) ||
 
-if (isLabLaunchPage && !isTechnicalIssue(message)) {
+      currentPage?.text?.includes(
+        "The session for this tool has expired"
+      );
 
-    console.log("RETURNING LAB PAGE RESPONSE");
 
-    return res.json({
+    console.log(
+      "isLabLaunchPage:",
+      isLabLaunchPage
+    );
 
-    source: "lab-launch-page",
 
-    reply: `I can see that you are currently on the lab launcher page.
+    const technicalIssue =
+      isTechnicalIssue(message);
+
+
+    console.log(
+      "isTechnicalIssue:",
+      technicalIssue
+    );
+
+
+    console.log(
+      "Message:",
+      message
+    );
+
+
+    if (
+      isLabLaunchPage &&
+      !isTechnicalIssue(message)
+    ) {
+
+      console.log(
+        "RETURNING LAB PAGE RESPONSE"
+      );
+
+
+      return res.json({
+
+        source:
+          "lab-launch-page",
+
+        reply:
+`I can see that you are currently on the lab launcher page.
 
 This page is used only to launch the lab environment.
 
 Please return to the previous page and ask your question there so I can access the lab instructions and provide more accurate assistance.`
 
-  });
+      });
 
-}
+    }
 
-  console.log({
-  wantsLabs,
-  wantsLabExplanation,
-  wantsLabSolution,
-  question: q
-});
 
-if (wantsLabGuidance) {
+    /* ========================= */
+    /* LAB PAGE CONTENT */
+    /* ========================= */
 
-  return res.json({
-    source: "lab-guidance",
-    reply: `
+    console.log({
+      wantsLabs,
+      wantsLabExplanation,
+      wantsLabSolution,
+      question: q
+    });
+
+
+    if (wantsLabGuidance) {
+
+      return res.json({
+
+        source:
+          "lab-guidance",
+
+        reply: `
 ### Lab Assignment Guidance
 
 This assignment requires you to perform the lab activity by launching the lab environment and completing the tasks described in the instructions.
@@ -729,18 +1156,21 @@ Steps:
 
 I cannot complete the graded lab for you, but I can explain concepts, commands, tools, and troubleshooting steps if you need help.
 `
-  });
 
-}
+      });
 
-/* ===================================== */
-/* LAB SOLUTION PROTECTION */
-/* ===================================== */
+    }
 
-if (wantsLabSolution) {
 
-  return res.json({
-    answer: `
+    /* ===================================== */
+    /* LAB SOLUTION PROTECTION */
+    /* ===================================== */
+
+    if (wantsLabSolution) {
+
+      return res.json({
+
+        answer: `
 ### Lab Assistance
 
 I can help explain the concepts used in this lab and clarify the instructions, but I cannot provide step-by-step solutions, task answers, or complete graded lab activities.
@@ -751,174 +1181,243 @@ If there is a specific concept, command, tool, or instruction that you do not un
 
 If you continue to experience difficulty after reviewing the lab instructions, please contact your instructor.
 `
-  });
-
-}
-
- /* ========================= */
-/* MODULE LAB CHECK */
-/* ========================= */
-
-if (
-  wantsLabs &&
-  !technicalIssue &&
-  !wantsCourseWideSearch &&
-  !wantsLabExplanation &&
-  !wantsLabSolution &&
-  currentPage
-) {
-
-  console.log("PAGE LINKS:", currentPage.links);
-
-  let labs = [];
-
-  if (currentPage.links?.length) {
-
-    labs = currentPage.links
-      .map(link => (link.text || "").trim())
-      .filter(Boolean)
-      .filter(text => {
-
-        return (
-          /\bilabs?\b/i.test(text) ||
-          /\blab\s*\d*/i.test(text) ||
-          /\blab assignment\b/i.test(text)
-        );
 
       });
 
-  }
+    }
 
-  labs = [...new Set(labs)];
 
-  console.log("LABS FOUND:", labs);
+    /* ========================= */
+    /* MODULE LAB CHECK */
+    /* ========================= */
 
-  /* LABS FOUND */
+    if (
 
-  if (labs.length) {
+      wantsLabs &&
+      !technicalIssue &&
+      !wantsCourseWideSearch &&
+      !wantsLabExplanation &&
+      !wantsLabSolution &&
+      currentPage
 
-    return res.json({
-      source: "page",
-      reply:
+    ) {
+
+      console.log(
+        "PAGE LINKS:",
+        currentPage.links
+      );
+
+
+      let labs = [];
+
+
+      if (currentPage.links?.length) {
+
+        labs =
+          currentPage.links
+
+            .map(
+              link =>
+                (link.text || "")
+                  .trim()
+            )
+
+            .filter(Boolean)
+
+            .filter(text => {
+
+              return (
+
+                /\bilabs?\b/i.test(text) ||
+
+                /\blab\s*\d*/i.test(text) ||
+
+                /\blab assignment\b/i.test(text)
+
+              );
+
+            });
+
+      }
+
+
+      labs =
+        [...new Set(labs)];
+
+
+      console.log(
+        "LABS FOUND:",
+        labs
+      );
+
+
+      if (labs.length) {
+
+        return res.json({
+
+          source:
+            "page",
+
+          reply:
 `The following lab activities are available in this module:
 
 ${labs.map(x => `• ${x}`).join("\n")}
 
 These lab activities can be accessed from the Learning Materials section of the module.`
-    });
 
-  }
+        });
 
-  /* NO LABS FOUND ON CURRENT PAGE */
+      }
 
-  return res.json({
-    source: "page",
-    reply:
+
+      return res.json({
+
+        source:
+          "page",
+
+        reply:
 `No lab activities are listed on the current page.
 
 Lab activities are organized within individual course modules. Please open a specific module to view its associated Lab Assignments and hands-on activities.`
-  });
 
-}
+      });
+
+    }
 
 
+    /* ========================= */
+    /* INTERACTIVITY CHECK */
+    /* ========================= */
+
+    console.log(
+      "isInteractivityPage:",
+      isInteractivityPage
+    );
+
+    console.log(
+      "wantsInteractivityExplanation:",
+      wantsInteractivityExplanation
+    );
+
+    console.log(
+      "Question:",
+      q
+    );
 
 
-/* ========================= */
-/* INTERACTIVITY CHECK */
-/* ========================= */
+    if (
+      wantsInteractivityExplanation &&
+      isInteractivityPage
+    ) {
 
-console.log("isInteractivityPage:", isInteractivityPage);
-console.log("wantsInteractivityExplanation:", wantsInteractivityExplanation);
-console.log("Question:", q);
+      return res.json({
 
-if (
-  wantsInteractivityExplanation &&
-  isInteractivityPage
-) {
+        source:
+          "page",
 
-  return res.json({
-    source: "page",
-    reply:
+        reply:
 `This page contains an interactive learning activity.
 
 To understand the interactivity, please click the Begin button and follow the instructions, scenarios, and options provided within the activity.
 
 If you need assistance after completing the interactivity, feel free to ask questions about the concepts covered in the activity.`
-  });
 
-}
+      });
 
-  /* ============================= */
-/* SYLLABUS QUESTIONS */
-/* ============================= */
+    }
 
-  const wantsSyllabus =
-  q.includes("syllabus") ||
-  q.includes("whole course") ||
-  q.includes("entire course") ||
-  q.includes("full course");
 
-if (wantsSyllabus) {
+    /* ============================= */
+    /* SYLLABUS QUESTIONS */
+    /* ============================= */
 
-  return res.json({
-    source: "navigation",
-    reply:
-      `The complete course syllabus is available here:
+    const wantsSyllabus =
+
+      q.includes("syllabus") ||
+      q.includes("whole course") ||
+      q.includes("entire course") ||
+      q.includes("full course");
+
+
+    if (wantsSyllabus) {
+
+      return res.json({
+
+        source:
+          "navigation",
+
+        reply:
+`The complete course syllabus is available here:
 
 https://eccouncil.instructure.com/courses/${courseId}/assignments/syllabus`
-  });
 
-}
+      });
 
-
-if (
-  !isCourseRelated &&
-  (
-    q.includes("act as") ||
-    q.includes("pretend to be") ||
-    q.includes("roleplay") ||
-    q.includes("you are a")
-  )
-)
-{
-
-  return res.json({
-    source: "course-guardrail",
-    reply:
-      "Please ask a question related to the current course content."
-  });
-
-}
+    }
 
 
-    if (isSensitiveQuestion(message)) {
+    if (
 
-  return res.json({
+      !isCourseRelated &&
 
-    source: "security",
+      (
 
-    reply:
-      "This request is outside the scope of the ECCU AI Tutor. I can only assist with course-related learning content."
+        q.includes("act as") ||
+        q.includes("pretend to be") ||
+        q.includes("roleplay") ||
+        q.includes("you are a")
 
-  });
+      )
 
-}
+    ) {
+
+      return res.json({
+
+        source:
+          "course-guardrail",
+
+        reply:
+          "Please ask a question related to the current course content."
+
+      });
+
+    }
+
+
+    if (
+      isSensitiveQuestion(message)
+    ) {
+
+      return res.json({
+
+        source:
+          "security",
+
+        reply:
+          "This request is outside the scope of the ECCU AI Tutor. I can only assist with course-related learning content."
+
+      });
+
+    }
+
 
     if (!isCourseRelated) {
 
-  return res.json({
+      return res.json({
 
-    source: "course-guardrail",
+        source:
+          "course-guardrail",
 
-    reply:
-      `This question does not appear to be related to ${currentCourse.courseName}.
+        reply:
+`This question does not appear to be related to ${currentCourse.courseName}.
 
-      I can assist with course concepts, assignments, labs, discussions, module content, and learning materials related to this course.`
+I can assist with course concepts, assignments, labs, discussions, module content, and learning materials related to this course.`
 
-        });
+      });
 
-      }
+    }
+
+
     /* ===================================== */
     /* EXAM / CHEATING GUARDRAIL */
     /* ===================================== */
@@ -927,7 +1426,8 @@ if (
 
       return res.json({
 
-        source: "guardrail",
+        source:
+          "guardrail",
 
         reply:
           "Providing answers for exams or assessments is prohibited. Please refer to your course materials or contact your instructor."
@@ -936,43 +1436,57 @@ if (
 
     }
 
+
     /* ===================================== */
     /* LIRN RESOURCES */
     /* ===================================== */
 
     let lirnResources = [];
 
-const wantsLirnResources =
-  /(what is|explain|define|concept|topic|overview|understand)/i
-  .test(message);
 
-if (
-  wantsLirnResources &&
-  !wantsLabExplanation
-) {
-  lirnResources =
-    getLibraryResources(message);
-}
+    const wantsLirnResources =
 
-    
+      /(what is|explain|define|concept|topic|overview|understand)/i
+        .test(message);
+
+
+    if (
+      wantsLirnResources &&
+      !wantsLabExplanation
+    ) {
+
+      lirnResources =
+        getLibraryResources(message);
+
+    }
+
 
     /* ===================================== */
     /* VECTOR SEARCH */
     /* ===================================== */
 
     const isFollowUp =
-/explain( this)?|simplify|tell me more|i don't understand|i didnt understand|give examples?|example|elaborate|continue/i
-.test(message);
 
-    const recentHistory = isFollowUp
-  ? (history || [])
-      .slice(-2)
-      .map(h => `${h.role}: ${h.content}`)
-      .join("\n")
-  : "";
+      /explain( this)?|simplify|tell me more|i don't understand|i didnt understand|give examples?|example|elaborate|continue/i
+        .test(message);
 
-const contextualMessage = `
 
+    const recentHistory =
+
+      isFollowUp
+
+        ? (history || [])
+            .slice(-2)
+            .map(
+              h =>
+                `${h.role}: ${h.content}`
+            )
+            .join("\n")
+
+        : "";
+
+
+    const contextualMessage = `
 CONVERSATION HISTORY:
 ${recentHistory}
 
@@ -981,266 +1495,447 @@ ${message}
 
 `;
 
-let effectiveMessage = message;
 
-if (isFollowUp) {
-  effectiveMessage = `
+    let effectiveMessage =
+      message;
+
+
+    if (isFollowUp) {
+
+      effectiveMessage = `
 Previous Question:
 ${previousQuestion || ""}
 
 Current Question:
 ${message}
 `;
-}
 
-console.log("Effective Search Query:", effectiveMessage);
+    }
 
-const shouldUseRAG =
-  !!currentPage ||
-  message.toLowerCase().includes("module") ||
-  message.toLowerCase().includes("assignment") ||
-  message.toLowerCase().includes("discussion") ||
-  message.toLowerCase().includes("quiz") ||
-  message.toLowerCase().includes("lab") ||
-  message.length > 20;
+
+    console.log(
+      "Effective Search Query:",
+      effectiveMessage
+    );
+
+
+    const shouldUseRAG =
+
+      !!currentPage ||
+
+      message
+        .toLowerCase()
+        .includes("module") ||
+
+      message
+        .toLowerCase()
+        .includes("assignment") ||
+
+      message
+        .toLowerCase()
+        .includes("discussion") ||
+
+      message
+        .toLowerCase()
+        .includes("quiz") ||
+
+      message
+        .toLowerCase()
+        .includes("lab") ||
+
+      message.length > 20;
+
 
     let ragResult = {
-  context: "",
-  confidence: 0
-};
+
+      context: "",
+
+      confidence: 0
+
+    };
 
 
+    const mentionsAnotherModule =
+
+      /\bmodule\s+\d+\b/i
+        .test(message);
 
 
-const mentionsAnotherModule =
-    /\bmodule\s+\d+\b/i.test(message);
+    const mentionsAnotherWeek =
 
-const mentionsAnotherWeek =
-    /\bweek\s+\d+\b/i.test(message);
+      /\bweek\s+\d+\b/i
+        .test(message);
 
-const mentionsAssignment =
-    /\bassignment\b/i.test(message);
 
-const mentionsDiscussion =
-    /\bdiscussion\b/i.test(message);
+    const mentionsAssignment =
 
-const mentionsLab =
-    /\blab\b/i.test(message);
+      /\bassignment\b/i
+        .test(message);
 
-const mentionsQuiz =
-    /\bquiz\b/i.test(message);
 
-const mentionsResearchProject =
-    /\bresearch project\b/i.test(message);
+    const mentionsDiscussion =
 
-const mentionsCaseStudy =
-    /\bcase study\b/i.test(message);
+      /\bdiscussion\b/i
+        .test(message);
 
-const searchWholeCourse =
-    wantsCourseWideSearch ||
-    wantsLearningResources ||
-    mentionsAnotherModule ||
-    mentionsAnotherWeek ||
-    mentionsAssignment ||
-    mentionsDiscussion ||
-    mentionsLab ||
-    mentionsQuiz ||
-    mentionsResearchProject ||
-    mentionsCaseStudy;
 
-console.log("searchWholeCourse:", searchWholeCourse);
+    const mentionsLab =
 
-let searchQuery = effectiveMessage;
+      /\blab\b/i
+        .test(message);
 
-if (mentionsAnotherModule) {
-    const match = message.match(/module\s+\d+/i);
 
-    if (match) {
-        searchQuery = match[0];
+    const mentionsQuiz =
+
+      /\bquiz\b/i
+        .test(message);
+
+
+    const mentionsResearchProject =
+
+      /\bresearch project\b/i
+        .test(message);
+
+
+    const mentionsCaseStudy =
+
+      /\bcase study\b/i
+        .test(message);
+
+
+    const searchWholeCourse =
+
+      wantsCourseWideSearch ||
+      wantsLearningResources ||
+      mentionsAnotherModule ||
+      mentionsAnotherWeek ||
+      mentionsAssignment ||
+      mentionsDiscussion ||
+      mentionsLab ||
+      mentionsQuiz ||
+      mentionsResearchProject ||
+      mentionsCaseStudy;
+
+
+    console.log(
+      "searchWholeCourse:",
+      searchWholeCourse
+    );
+
+
+    let searchQuery =
+      effectiveMessage;
+
+
+    if (mentionsAnotherModule) {
+
+      const match =
+        message.match(
+          /module\s+\d+/i
+        );
+
+
+      if (match) {
+
+        searchQuery =
+          match[0];
+
+      }
+
     }
-}
-else if (mentionsAssignment) {
-    searchQuery = message;
-}
-else if (mentionsDiscussion) {
-    searchQuery = message;
-}
-else if (mentionsLab) {
-    searchQuery = message;
-}
 
-console.log("Search Query:", searchQuery);
+    else if (mentionsAssignment) {
 
-ragResult = await vectorSearch(
-    searchQuery,
-    [currentCourse.blueprintCourseId],
-    intent,
-    currentPage,
-    wantsLabs,
-    wantsLabExplanation,
-    searchWholeCourse
-);
+      searchQuery =
+        message;
 
+    }
+
+    else if (mentionsDiscussion) {
+
+      searchQuery =
+        message;
+
+    }
+
+    else if (mentionsLab) {
+
+      searchQuery =
+        message;
+
+    }
 
 
-    
+    console.log(
+      "Search Query:",
+      searchQuery
+    );
+
+
+    /* ===================================== */
+    /* COURSE-SPECIFIC VECTOR SEARCH */
+    /* ===================================== */
+
+    ragResult =
+      await vectorSearch(
+
+        searchQuery,
+
+        allowedCourseIds,
+
+        intent,
+
+        currentPage,
+
+        wantsLabs,
+
+        wantsLabExplanation,
+
+        searchWholeCourse
+
+      );
+
 
     /* ===================================== */
     /* WEB SEARCH */
     /* ===================================== */
-let webSearchQuery = message;
 
-if (isFollowUp) {
+    let webSearchQuery =
+      message;
 
-  const lastUserQuestion = history
-    ?.filter(h => h.role === "user")
-    ?.slice(-2, -1)?.[0]?.content;
 
-  if (lastUserQuestion) {
-    webSearchQuery = `${lastUserQuestion} ${message}`;
-  }
+    if (isFollowUp) {
 
-}
+      const lastUserQuestion =
+        history
+          ?.filter(
+            h =>
+              h.role === "user"
+          )
+          ?.slice(-2, -1)?.[0]
+          ?.content;
 
-console.log("Web Search Query:", webSearchQuery);
 
+      if (lastUserQuestion) {
+
+        webSearchQuery =
+          `${lastUserQuestion} ${message}`;
+
+      }
+
+    }
+
+
+    console.log(
+      "Web Search Query:",
+      webSearchQuery
+    );
 
 
     let webResources = [];
 
-let skipWebSearch = false;
-
-/* ========================= */
-/* WEB SEARCH TRIGGERS */
-/* ========================= */
-
-const needsWebExamples =
-  /\b(example|examples|real world example|real-world example|case study|case studies)\b/i
-  .test(message);
-
-const needsExternalResources =
-
-  message.toLowerCase().includes("resource") ||
-
-  message.toLowerCase().includes("resources") ||
-
-  message.toLowerCase().includes("reference") ||
-
-  message.toLowerCase().includes("references") ||
-
-  message.toLowerCase().includes("real world") ||
-
-  message.toLowerCase().includes("example") ||
-
-  message.toLowerCase().includes("examples") ||
-
-  message.toLowerCase().includes("case study") ||
-
-  message.toLowerCase().includes("case studies") ||
-
-  message.toLowerCase().includes("latest") ||
-
-  message.toLowerCase().includes("current") ||
-
-  message.toLowerCase().includes("trend") ||
-
-  message.toLowerCase().includes("research");
-
-/*
-HIGH CONFIDENCE COURSE CONTENT
-=
-Do NOT search the web if
-the module/page already contains
-enough information.
-*/
-
-if (
-
-  ragResult?.confidence >= 0.75 &&
-
-  (
-    currentPage?.text?.length > 500 ||
-    ragResult?.context?.length > 1000
-  ) &&
-
-  !needsExternalResources
-
-) {
-
-  skipWebSearch = true;
-
-  console.log(
-    "✅ Skipping web search - strong ECCU content found"
-  );
-
-}
-
-const pageSpecificQuestion =
-
-  !!currentPage?.text ||
-
-  message.toLowerCase().includes("this module") ||
-  message.toLowerCase().includes("this page") ||
-  message.toLowerCase().includes("this assignment") ||
-  message.toLowerCase().includes("this discussion") ||
-  message.toLowerCase().includes("this lab") ||
-  message.toLowerCase().includes("from this module") ||
-  message.toLowerCase().includes("from this page");
-
-if (
-  pageSpecificQuestion &&
-  !needsExternalResources
-) {
-
-  skipWebSearch = true;
-
-}
+    let skipWebSearch = false;
 
 
-if (needsExternalResources) {
+    /* ========================= */
+    /* WEB SEARCH TRIGGERS */
+    /* ========================= */
 
-  skipWebSearch = false;
+    const needsWebExamples =
 
-  console.log(
-    "🌐 Forcing web search for enrichment request"
-  );
+      /\b(example|examples|real world example|real-world example|case study|case studies)\b/i
+        .test(message);
 
-}
 
-console.log("needsWebExamples:", needsWebExamples);
+    const needsExternalResources =
 
-const shouldSearch =
+      message
+        .toLowerCase()
+        .includes("resource") ||
 
-  needsWebExamples &&
+      message
+        .toLowerCase()
+        .includes("resources") ||
 
-  !skipWebSearch &&
+      message
+        .toLowerCase()
+        .includes("reference") ||
 
-  !isGreeting(message) &&
+      message
+        .toLowerCase()
+        .includes("references") ||
 
-  isCourseRelated;
+      message
+        .toLowerCase()
+        .includes("real world") ||
 
-if (shouldSearch) {
+      message
+        .toLowerCase()
+        .includes("example") ||
 
-  try {
+      message
+        .toLowerCase()
+        .includes("examples") ||
 
-    webResources =
-      await trustedWebSearch(webSearchQuery);
+      message
+        .toLowerCase()
+        .includes("case study") ||
+
+      message
+        .toLowerCase()
+        .includes("case studies") ||
+
+      message
+        .toLowerCase()
+        .includes("latest") ||
+
+      message
+        .toLowerCase()
+        .includes("current") ||
+
+      message
+        .toLowerCase()
+        .includes("trend") ||
+
+      message
+        .toLowerCase()
+        .includes("research");
+
+
+    /*
+      HIGH CONFIDENCE COURSE CONTENT
+      =
+      Do NOT search the web if
+      the module/page already contains
+      enough information.
+    */
+
+    if (
+
+      ragResult?.confidence >= 0.75 &&
+
+      (
+
+        currentPage?.text?.length > 500 ||
+
+        ragResult?.context?.length > 1000
+
+      ) &&
+
+      !needsExternalResources
+
+    ) {
+
+      skipWebSearch = true;
+
+
+      console.log(
+        "✅ Skipping web search - strong ECCU content found"
+      );
+
+    }
+
+
+    const pageSpecificQuestion =
+
+      !!currentPage?.text ||
+
+      message
+        .toLowerCase()
+        .includes("this module") ||
+
+      message
+        .toLowerCase()
+        .includes("this page") ||
+
+      message
+        .toLowerCase()
+        .includes("this assignment") ||
+
+      message
+        .toLowerCase()
+        .includes("this discussion") ||
+
+      message
+        .toLowerCase()
+        .includes("this lab") ||
+
+      message
+        .toLowerCase()
+        .includes("from this module") ||
+
+      message
+        .toLowerCase()
+        .includes("from this page");
+
+
+    if (
+      pageSpecificQuestion &&
+      !needsExternalResources
+    ) {
+
+      skipWebSearch = true;
+
+    }
+
+
+    if (needsExternalResources) {
+
+      skipWebSearch = false;
+
+
+      console.log(
+        "🌐 Forcing web search for enrichment request"
+      );
+
+    }
+
 
     console.log(
-      "🌐 WEB RESOURCES:",
-      webResources
+      "needsWebExamples:",
+      needsWebExamples
     );
 
-  } catch (err) {
 
-    console.log(
-      "❌ WEB SEARCH ERROR:",
-      err.message
-    );
+    const shouldSearch =
 
-  }
+      needsWebExamples &&
 
-}
+      !skipWebSearch &&
+
+      !isGreeting(message) &&
+
+      isCourseRelated;
+
+
+    if (shouldSearch) {
+
+      try {
+
+        webResources =
+          await trustedWebSearch(
+            webSearchQuery
+          );
+
+
+        console.log(
+          "🌐 WEB RESOURCES:",
+          webResources
+        );
+
+      }
+
+      catch (err) {
+
+        console.log(
+          "❌ WEB SEARCH ERROR:",
+          err.message
+        );
+
+      }
+
+    }
+
 
     /* ===================================== */
     /* FINAL CONTEXT */
@@ -1260,44 +1955,127 @@ ${r.url}`
 
 `;
 
+
     /* ===================================== */
     /* GENERATE ANSWER */
     /* ===================================== */
-const structuredContext = {
 
-  pageTitle:
-    currentPage?.pageTitle || "",
+    const structuredContext = {
 
-  currentPage:
-  currentPage?.text?.slice(0, 5000) || "",
+      pageTitle:
+        searchWholeCourse
+          ? ""
+          : (
+              currentPage?.pageTitle ||
+              currentPage?.title ||
+              ""
+            ),
 
-  extraContext:
-  finalContext?.slice(0, 5000) || ""
+      currentPage:
+        searchWholeCourse
+          ? ""
+          : (
+              currentPage?.text?.slice(
+                0,
+                5000
+              ) || ""
+            ),
 
-};
-  const isClarification =
-    /explain it|explain this|simplify|i don't understand|i didnt understand|i didn't understand/i
-      .test(message);
+      extraContext:
+        finalContext?.slice(
+          0,
+          5000
+        ) || ""
 
-  if (isClarification && currentPage?.text) {
+    };
 
-    structuredContext.currentPage =
-      currentPage.text;
 
-  }
-  console.log("Search Query:", searchQuery);
-console.log("Course Wide Search:", searchWholeCourse);
+    const isClarification =
 
-  console.log("\n========== FINAL RAG CONTEXT ==========");
-console.log(structuredContext.extraContext?.substring(0, 3000));
-console.log("=======================================\n");
+      /explain it|explain this|simplify|i don't understand|i didnt understand|i didn't understand/i
+        .test(message);
+
+
+    if (
+      isClarification &&
+      currentPage?.text &&
+      !searchWholeCourse
+    ) {
+
+      structuredContext.currentPage =
+        currentPage.text;
+
+    }
+
+
+    console.log(
+      "Search Query:",
+      searchQuery
+    );
+
+
+    console.log(
+      "📚 SEARCH MODE:",
+      searchWholeCourse
+        ? "COURSE-WIDE"
+        : "CURRENT PAGE"
+    );
+
+
+    console.log(
+      "📄 CURRENT PAGE SENT TO LLM:",
+      structuredContext.currentPage
+        ? "YES"
+        : "NO"
+    );
+
+
+    console.log(
+      "Course Wide Search:",
+      searchWholeCourse
+    );
+
+
+    console.log(
+      "🎯 CONFIG KEY:",
+      currentConfigKey
+    );
+
+
+    console.log(
+      "🎯 ALLOWED COURSE IDS:",
+      allowedCourseIds
+    );
+
+
+    console.log(
+      "\n========== FINAL RAG CONTEXT =========="
+    );
+
+
+    console.log(
+      structuredContext
+        .extraContext
+        ?.substring(0, 3000)
+    );
+
+
+    console.log(
+      "=======================================\n"
+    );
+
 
     const aiAnswer =
-  await generateAnswer(
-    message,
-    structuredContext,
-    intent
-  );
+      await generateAnswer(
+
+        message,
+
+        structuredContext,
+
+        intent
+
+      );
+
 
     /* ===================================== */
     /* CLEAN RESPONSE */
@@ -1306,19 +2084,31 @@ console.log("=======================================\n");
     let completeResponse =
       aiAnswer || "";
 
-    completeResponse =
-  completeResponse.replace(
-
-/(\*\*)?(sources|references|additional resources|course reference|online resources|further reading|resources|citations|additional tips)(\*\*)?\s*:?\s*[\s\S]*$/i,
-
-""
-
-);
 
     completeResponse =
+      completeResponse.replace(
+
+        /(\*\*)?(sources|references|additional resources|course reference|online resources|further reading|resources|citations|additional tips)(\*\*)?\s*:?\s*[\s\S]*$/i,
+
+        ""
+
+      );
+
+
+    completeResponse =
+
       completeResponse
-        .replace(/\]\((https?:\/\/.*?)\)/g, "")
-        .replace(/\[(.*?)\]\((.*?)\)/g, "$1\n$2");
+
+        .replace(
+          /\]\((https?:\/\/.*?)\)/g,
+          ""
+        )
+
+        .replace(
+          /\[(.*?)\]\((.*?)\)/g,
+          "$1\n$2"
+        );
+
 
     /* ===================================== */
     /* WEB LEARNING RESOURCES */
@@ -1334,13 +2124,17 @@ console.log("=======================================\n");
 
       webResources.length > 0 &&
 
-      hasUsefulResources(webResources);
+      hasUsefulResources(
+        webResources
+      );
+
 
     if (shouldShowResources) {
 
       console.log(
         "✅ APPENDING WEB RESOURCES"
       );
+
 
       const cleanedResources =
 
@@ -1349,7 +2143,9 @@ console.log("=======================================\n");
           .filter(r => {
 
             const text =
-              `${r.title} ${r.url}`.toLowerCase();
+              `${r.title} ${r.url}`
+                .toLowerCase();
+
 
             return (
 
@@ -1377,7 +2173,10 @@ console.log("=======================================\n");
 
           .slice(0, 3);
 
-      if (cleanedResources.length > 0) {
+
+      if (
+        cleanedResources.length > 0
+      ) {
 
         completeResponse += `
 
@@ -1396,11 +2195,13 @@ ${r.url}`
 
     }
 
+
     /* ===================================== */
     /* LIRN RESOURCES */
     /* ===================================== */
 
-       if (
+    if (
+
       !isGreeting(message) &&
       !isClarification &&
       !wantsLabExplanation &&
@@ -1409,12 +2210,13 @@ ${r.url}`
       isEducationalTopic(message) &&
       lirnResources &&
       lirnResources.length > 0
-    )
-{
+
+    ) {
 
       console.log(
         "📚 APPENDING LIRN RESOURCES"
       );
+
 
       completeResponse += `
 
@@ -1429,38 +2231,57 @@ ${r.url}`
 
     }
 
+
     /* ===================================== */
     /* AUTO LEARNING */
     /* ===================================== */
 
     if (
+
       aiAnswer &&
+
       aiAnswer.length > 50 &&
+
       ragResult.confidence > 0.5
+
     ) {
 
-      saveQA(message, aiAnswer);
+      const saved =
+        saveQA(
+          message,
+          aiAnswer,
+          Number(courseId)
+        );
 
-      console.log(
-        "🧠 Learned new Q&A"
-      );
+
+      if (saved) {
+
+        console.log(
+          "🧠 Learned new course-specific Q&A"
+        );
+
+      }
 
     }
+
 
     /* ===================================== */
     /* RESPONSE */
     /* ===================================== */
 
-   
+    let finalAnswer =
+      completeResponse;
 
-    let finalAnswer = completeResponse;
 
-if (isTechnicalIssue(message)) {
+    if (
+      isTechnicalIssue(message)
+    ) {
 
-  const helpUrl =
-    `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
+      const helpUrl =
+        `https://eccouncil.instructure.com/courses/${courseId}/pages/help`;
 
-  finalAnswer += `
+
+      finalAnswer += `
 
 ---
 
@@ -1474,73 +2295,131 @@ The Help page contains:
 • Support Contact Information
 
 `;
-}
 
-logAnalytics({
+    }
 
-  courseId,
-  courseCode,
 
-  userId: currentUserId,
+    /* ===================================== */
+    /* ANALYTICS */
+    /* ===================================== */
 
-  question: message,
+    logAnalytics({
 
-  intent,
+      courseId,
 
-  source: "rag+liveweb",
+      courseCode,
 
-  responseTime:
-    Date.now() - startTime,
+      userId:
+        currentUserId,
 
-  confidence:
-    ragResult?.confidence || 0
+      question:
+        message,
 
-});
+      intent,
 
-console.log("🚀 About to log question");
-console.log("Final Answer Exists:", !!finalAnswer);
-console.log("Current Course:", currentCourse);
+      source:
+        "rag+liveweb",
 
-console.log("===== LOGGING QUESTION =====");
-logQuestion({
+      responseTime:
+        Date.now() -
+        startTime,
 
-  courseId,
-  courseCode,
-  courseName: currentCourse?.courseName || "",
-
-  userId: currentUserId,
-
-  module: currentPage?.moduleName || "",
-
-  pageTitle: currentPage?.title || "",
-  pageType: currentPage?.type || "",
-
-  question: message,
-
-  answer: finalAnswer,
-
-  intent,
-
-  source: "rag+liveweb",
-
-  confidence: ragResult?.confidence || 0,
-
-  responseTime: Date.now() - startTime,
-
-  feedback: null
-
-});
-console.log("===== QUESTION LOGGED =====");
-
-    return res.json({
-
-      source: "rag+liveweb",
-
-      reply: finalAnswer
+      confidence:
+        ragResult?.confidence || 0
 
     });
 
+
+    console.log(
+      "🚀 About to log question"
+    );
+
+
+    console.log(
+      "Final Answer Exists:",
+      !!finalAnswer
+    );
+
+
+    console.log(
+      "Current Course:",
+      currentCourse
+    );
+
+
+    console.log(
+      "===== LOGGING QUESTION ====="
+    );
+
+
+    logQuestion({
+
+      courseId,
+
+      courseCode,
+
+      courseName:
+        currentCourse?.courseName ||
+        "",
+
+      userId:
+        currentUserId,
+
+      module:
+        currentPage?.moduleName ||
+        "",
+
+      pageTitle:
+        currentPage?.title ||
+        "",
+
+      pageType:
+        currentPage?.type ||
+        "",
+
+      question:
+        message,
+
+      answer:
+        finalAnswer,
+
+      intent,
+
+      source:
+        "rag+liveweb",
+
+      confidence:
+        ragResult?.confidence ||
+        0,
+
+      responseTime:
+        Date.now() -
+        startTime,
+
+      feedback:
+        null
+
+    });
+
+
+    console.log(
+      "===== QUESTION LOGGED ====="
+    );
+
+
+    return res.json({
+
+      source:
+        "rag+liveweb",
+
+      reply:
+        finalAnswer
+
+    });
+
+
   }
+
 
   catch (err) {
 
@@ -1549,14 +2428,17 @@ console.log("===== QUESTION LOGGED =====");
       err
     );
 
+
     return res.status(500).json({
 
-      error: err.toString()
+      error:
+        err.toString()
 
     });
 
   }
 
 });
+
 
 module.exports = router;

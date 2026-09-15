@@ -1,120 +1,293 @@
-function analyzeQuery(question, userId) {
+const {
+  getMemory,
+  saveMemory
+} = require("./memoryStore");
 
-    const memory =
-  getMemory(userId);
 
-  const q = question.toLowerCase();
+/* =========================================================
+   ANALYZE QUERY
+   ========================================================= */
 
-  let type = null;
-  let moduleName = null;
-
-    const {
-    getMemory,
-    saveMemory
-    } = require("./memoryStore");
-
-  /* ----------------------------- */
-  /* TYPE DETECTION */
-  /* ----------------------------- */
+function analyzeQuery(
+  question,
+  userId
+) {
 
   if (
+    !question ||
+    typeof question !== "string"
+  ) {
+
+    return {
+
+      type: null,
+
+      moduleName: null,
+
+      wantsModuleSummary: false,
+
+      wantsPageSearch: false
+
+    };
+
+  }
+
+
+  const memory =
+    userId
+      ? getMemory(userId)
+      : {};
+
+
+  const q =
+    question
+      .toLowerCase()
+      .trim();
+
+
+  let type =
+    null;
+
+
+  let moduleName =
+    null;
+
+
+  /* =======================================================
+     TYPE DETECTION
+     ======================================================= */
+
+  if (
+
     q.includes("assignment") ||
+
     q.includes("submit") ||
-    q.includes("due")
+
+    q.includes("submission") ||
+
+    q.includes("due") ||
+
+    q.includes("deadline")
+
   ) {
-    type = "assignment";
+
+    type =
+      "assignment";
+
   }
 
+
   else if (
+
     q.includes("discussion") ||
+
     q.includes("discussion thread") ||
-    q.includes("peer reply")
+
+    q.includes("peer reply") ||
+
+    q.includes("reply to peers")
+
   ) {
-    type = "discussion";
+
+    type =
+      "discussion";
+
   }
 
+
   else if (
+
     q.includes("file") ||
+
     q.includes("pdf") ||
+
     q.includes("template") ||
-    q.includes("document")
+
+    q.includes("document") ||
+
+    q.includes("download")
+
   ) {
-    type = "file";
+
+    type =
+      "file";
+
   }
+
 
   else if (
+
     q.includes("syllabus") ||
+
     q.includes("grading") ||
+
+    q.includes("grade") ||
+
     q.includes("attendance")
+
   ) {
-    type = "syllabus";
+
+    type =
+      "syllabus";
+
   }
 
-  /* ----------------------------- */
-  /* MODULE DETECTION */
-  /* ----------------------------- */
+
+  /* =======================================================
+     MODULE DETECTION
+     ======================================================= */
 
   const moduleMatch =
-    q.match(/module\s*(\d+)/i);
+    q.match(
+      /\bmodule\s*(\d+)\b/i
+    );
 
-  if (moduleMatch) {
+
+  if (
+    moduleMatch
+  ) {
 
     const num =
       moduleMatch[1]
         .padStart(2, "0");
 
+
     moduleName =
       `Module ${num}`;
+
   }
 
-  /* -------------------------------- */
-/* MEMORY FALLBACK */
-/* -------------------------------- */
 
-if (
-  !moduleName &&
-  memory.moduleName
-) {
-  moduleName =
-    memory.moduleName;
-}
+  /* =======================================================
+     MEMORY FALLBACK
+     ======================================================= */
 
-if (
-  !type &&
-  memory.type
-) {
-  type =
-    memory.type;
-}
+  if (
+    !moduleName &&
+    memory?.moduleName
+  ) {
 
-/* -------------------------------- */
-/* SAVE MEMORY */
-/* -------------------------------- */
+    moduleName =
+      memory.moduleName;
 
-saveMemory(userId, {
-  moduleName,
-  type
-});
+  }
+
+
+  if (
+    !type &&
+    memory?.type
+  ) {
+
+    type =
+      memory.type;
+
+  }
+
+
+  /* =======================================================
+     SAVE RELEVANT MEMORY
+     ======================================================= */
+
+  if (
+    userId
+  ) {
+
+    saveMemory(
+
+      userId,
+
+      {
+
+        moduleName:
+          moduleName || null,
+
+        type:
+          type || null
+
+      }
+
+    );
+
+  }
+
+
+  /* =======================================================
+     MODULE SUMMARY DETECTION
+     ======================================================= */
 
   const wantsModuleSummary =
-    /(summar(y|ize)|overview|teach|explain)/i.test(q) &&
-    /module\s*\d+/i.test(q);
 
-const wantsPageSearch =
-    q.includes("module") ||
-    q.includes("assignment") ||
-    q.includes("discussion") ||
-    q.includes("lab") ||
-    q.includes("resource") ||
-    q.includes("week");
+    /(summar(y|ize)|overview|teach|explain|walk\s*me\s*through)/i
+      .test(q)
 
-return {
+    &&
+
+    /\bmodule\s*\d+\b/i
+      .test(q);
+
+
+  /* =======================================================
+     PAGE / COURSE CONTENT SEARCH
+     ======================================================= */
+
+  const wantsPageSearch =
+
+    /\bmodule\b/i.test(q)
+
+    ||
+
+    /\bassignment\b/i.test(q)
+
+    ||
+
+    /\bdiscussion\b/i.test(q)
+
+    ||
+
+    /\blab\b/i.test(q)
+
+    ||
+
+    /\bresource\b/i.test(q)
+
+    ||
+
+    /\bweek\b/i.test(q)
+
+    ||
+
+    /\bpage\b/i.test(q)
+
+    ||
+
+    /\blesson\b/i.test(q);
+
+
+  /* =======================================================
+     RETURN ANALYSIS
+     ======================================================= */
+
+  return {
+
     type,
+
     moduleName,
+
     wantsModuleSummary,
+
     wantsPageSearch
-};
+
+  };
+
+}
+
+
+/* =========================================================
+   EXPORT
+   ========================================================= */
 
 module.exports = {
+
   analyzeQuery
+
 };

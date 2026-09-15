@@ -1,56 +1,531 @@
-const fs = require("fs")
-const path = require("path")
+const fs = require("fs");
+const path = require("path");
 
-const LEARN_FILE = path.join(__dirname,"../data/learned-knowledge.json")
+const courseMappings =
+  require("../config/courseMappings");
 
-function saveQA(question, answer){
 
-let store = { qa: [] }
+const LEARN_FILE =
+  path.join(
+    __dirname,
+    "../data/learned-knowledge.json"
+  );
 
-if(fs.existsSync(LEARN_FILE)){
-store = JSON.parse(fs.readFileSync(LEARN_FILE))
+
+/* =========================================================
+   LOAD STORE
+   ========================================================= */
+
+function loadStore() {
+
+  try {
+
+    if (
+      !fs.existsSync(
+        LEARN_FILE
+      )
+    ) {
+
+      return {
+        qa: []
+      };
+
+    }
+
+
+    const data =
+      fs.readFileSync(
+        LEARN_FILE,
+        "utf8"
+      );
+
+
+    if (!data.trim()) {
+
+      return {
+        qa: []
+      };
+
+    }
+
+
+    const store =
+      JSON.parse(data);
+
+
+    if (
+      !Array.isArray(
+        store.qa
+      )
+    ) {
+
+      store.qa = [];
+
+    }
+
+
+    return store;
+
+  } catch (err) {
+
+    console.error(
+      "❌ Failed to load learned knowledge:",
+      err.message
+    );
+
+
+    return {
+      qa: []
+    };
+
+  }
+
 }
 
-store.qa.push({
-question: question.toLowerCase(),
-answer,
-createdAt: new Date()
-})
 
-/* ---------- PREVENT DUPLICATE QUESTIONS ---------- */
+/* =========================================================
+   SAVE STORE
+   ========================================================= */
 
-if(store.qa.find(q => q.question === question.toLowerCase())){
-  return;
+function saveStore(
+  store
+) {
+
+  try {
+
+    fs.writeFileSync(
+
+      LEARN_FILE,
+
+      JSON.stringify(
+        store,
+        null,
+        2
+      )
+
+    );
+
+    return true;
+
+  } catch (err) {
+
+    console.error(
+      "❌ Failed to save learned knowledge:",
+      err.message
+    );
+
+    return false;
+
+  }
+
 }
 
-store.qa.push({
-question: question.toLowerCase(),
-answer,
-createdAt: new Date()
-})
 
-fs.writeFileSync(LEARN_FILE, JSON.stringify(store,null,2))
+/* =========================================================
+   NORMALIZE QUESTION
+   ========================================================= */
+
+function normalizeQuestion(
+  question
+) {
+
+  return String(
+    question || ""
+  )
+
+    .toLowerCase()
+
+    .replace(
+      /\s+/g,
+      " "
+    )
+
+    .trim();
+
+}
+
+
+/* =========================================================
+   RESOLVE COURSE CONFIG
+   ========================================================= */
+
+function resolveCourseConfig(
+  courseId
+) {
+
+  if (
+    courseId === undefined ||
+    courseId === null
+  ) {
+
+    return null;
+
+  }
+
+
+  const numericCourseId =
+    Number(
+      courseId
+    );
+
+
+  if (
+    !Number.isFinite(
+      numericCourseId
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  return (
+    courseMappings[
+      numericCourseId
+    ] ||
+    null
+  );
 
 }
 
 
-function searchLearned(question){
+/* =========================================================
+   SAVE Q&A
+   ========================================================= */
 
-if(!fs.existsSync(LEARN_FILE)) return null
+/**
+ * Save a learned question/answer pair.
+ *
+ * IMPORTANT:
+ * Every learned answer is associated with a course.
+ *
+ * @param {string} question
+ * @param {string} answer
+ * @param {number} courseId
+ */
 
-const store = JSON.parse(fs.readFileSync(LEARN_FILE))
+function saveQA(
+  question,
+  answer,
+  courseId
+) {
 
-const q = question.toLowerCase()
+  if (
+    !question ||
+    !answer
+  ) {
 
-for(const item of store.qa){
+    return false;
 
-if(q.includes(item.question) || item.question.includes(q)){
-return item.answer
+  }
+
+
+  const normalizedQuestion =
+    normalizeQuestion(
+      question
+    );
+
+
+  if (
+    !normalizedQuestion
+  ) {
+
+    return false;
+
+  }
+
+
+  const configKey =
+    resolveCourseConfig(
+      courseId
+    );
+
+
+  /*
+   * Do not store course content without a valid
+   * course mapping.
+   */
+
+  if (
+    !configKey
+  ) {
+
+    console.log(
+      "⚠️ Learned knowledge NOT saved: unmapped course",
+      courseId
+    );
+
+    return false;
+
+  }
+
+
+  const store =
+    loadStore();
+
+
+  /* =======================================================
+     DUPLICATE CHECK
+     ======================================================= */
+
+  const duplicate =
+    store.qa.find(
+      item =>
+
+        normalizeQuestion(
+          item.question
+        ) ===
+        normalizedQuestion
+
+        &&
+
+        Number(
+          item.courseId
+        ) ===
+        Number(
+          courseId
+        )
+
+    );
+
+
+  if (
+    duplicate
+  ) {
+
+    console.log(
+      "ℹ️ Learned Q&A already exists:",
+      question
+    );
+
+    return false;
+
+  }
+
+
+  /* =======================================================
+     SAVE
+     ======================================================= */
+
+  store.qa.push({
+
+    question:
+      normalizedQuestion,
+
+    answer,
+
+    courseId:
+      Number(
+        courseId
+      ),
+
+    configKey,
+
+    createdAt:
+      new Date().toISOString()
+
+  });
+
+
+  return saveStore(
+    store
+  );
+
 }
 
+
+/* =========================================================
+   SEARCH LEARNED KNOWLEDGE
+   ========================================================= */
+
+/**
+ * Search learned answers for the current course only.
+ *
+ * @param {string} question
+ * @param {number|number[]} allowedCourseIds
+ */
+
+function searchLearned(
+  question,
+  allowedCourseIds = []
+) {
+
+  if (
+    !question ||
+    typeof question !== "string"
+  ) {
+
+    return null;
+
+  }
+
+
+  const store =
+    loadStore();
+
+
+  if (
+    !store.qa.length
+  ) {
+
+    return null;
+
+  }
+
+
+  /* =======================================================
+     NORMALIZE ALLOWED COURSE IDS
+     ======================================================= */
+
+  const courseIds =
+    Array.isArray(
+      allowedCourseIds
+    )
+
+      ? allowedCourseIds
+          .map(Number)
+          .filter(
+            id =>
+              Number.isFinite(id)
+          )
+
+      : [
+
+          Number(
+            allowedCourseIds
+          )
+
+        ].filter(
+          id =>
+            Number.isFinite(id)
+        );
+
+
+  /*
+   * Fail closed.
+   *
+   * Never perform a global learned-knowledge search.
+   */
+
+  if (
+    courseIds.length === 0
+  ) {
+
+    console.log(
+      "⚠️ searchLearned blocked: no allowed course IDs"
+    );
+
+    return null;
+
+  }
+
+
+  const normalizedQuestion =
+    normalizeQuestion(
+      question
+    );
+
+
+  /* =======================================================
+     SEARCH COURSE-SPECIFIC KNOWLEDGE
+     ======================================================= */
+
+  for (
+    const item
+    of store.qa
+  ) {
+
+    const itemCourseId =
+      Number(
+        item.courseId
+      );
+
+
+    /*
+     * Older learned records may not have courseId.
+     *
+     * Do NOT allow those records to bypass isolation.
+     */
+
+    if (
+      !Number.isFinite(
+        itemCourseId
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    if (
+      !courseIds.includes(
+        itemCourseId
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    const learnedQuestion =
+      normalizeQuestion(
+        item.question
+      );
+
+
+    if (
+      normalizedQuestion.includes(
+        learnedQuestion
+      )
+
+      ||
+
+      learnedQuestion.includes(
+        normalizedQuestion
+      )
+
+    ) {
+
+      return {
+
+        answer:
+          item.answer,
+
+        courseId:
+          itemCourseId,
+
+        configKey:
+          item.configKey ||
+          resolveCourseConfig(
+            itemCourseId
+          ),
+
+        confidence:
+          0.92
+
+      };
+
+    }
+
+  }
+
+
+  return null;
+
 }
 
-return null
-}
 
-module.exports = { saveQA, searchLearned }
+/* =========================================================
+   EXPORT
+   ========================================================= */
+
+module.exports = {
+
+  saveQA,
+
+  searchLearned
+
+};

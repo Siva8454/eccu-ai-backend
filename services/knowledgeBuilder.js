@@ -7,6 +7,13 @@ const {
   getLocalEmbedding
 } = require("./localEmbedding");
 
+const courseMappings =
+  require("../config/courseMappings");
+
+const courseConfigs =
+  require("../config/courseConfig");
+
+
 /* -------------------------------------------------- */
 /* QDRANT CLIENT */
 /* -------------------------------------------------- */
@@ -17,9 +24,10 @@ const client = new QdrantClient({
   checkCompatibility: false
 });
 
-const COLLECTION = "eccu_knowledge_v7";
+const DEFAULT_VECTOR_SIZE = 384;
 
 console.log("Knowledge builder started...");
+
 
 /* -------------------------------------------------- */
 /* CLEAN CANVAS CONTENT */
@@ -91,59 +99,61 @@ function cleanCanvasContent(text = "") {
 
 }
 
-    /* -------------------------------------------------- */
-    /* LOW VALUE CONTENT FILTER */
-    /* -------------------------------------------------- */
 
-    function isLowValueContent(text = "") {
+/* -------------------------------------------------- */
+/* LOW VALUE CONTENT FILTER */
+/* -------------------------------------------------- */
 
-      const lower = text.toLowerCase();
+function isLowValueContent(text = "") {
 
-      const badPatterns = [
+  const lower = text.toLowerCase();
 
-        "copyright",
-        "all rights reserved",
-        "submit your discussion",
-        "discussion comments",
-        "post a full and complete initial response",
-        "minimum word count",
-        "reply to at least",
-        "reproduction is strictly prohibited",
-        "click the end button",
-        "home instructor syllabus",
-        "canvas student android guide",
-        "helpful video",
-        "apa paper template",
-        "apa sample paper",
-        "in-text citation",
-        "grammarly",
-        "turnitin",
-        "syllabus",
-        "course overview",
-        "student guide",
-        "academic integrity",
-        "late submission",
-        "netiquette",
-        "attendance policy",
-        "grading policy",
-        "weekly objectives",
-        "play_video",
-        "objective_m",
-        ".svg",
-        ".png",
-        ".jpg",
-        ".jpeg",
-        "course issues",
-        "help faq",
-        "write to us",
-        "support center"
+  const badPatterns = [
 
-      ];
+    "copyright",
+    "all rights reserved",
+    "submit your discussion",
+    "discussion comments",
+    "post a full and complete initial response",
+    "minimum word count",
+    "reply to at least",
+    "reproduction is strictly prohibited",
+    "click the end button",
+    "home instructor syllabus",
+    "canvas student android guide",
+    "helpful video",
+    "apa paper template",
+    "apa sample paper",
+    "in-text citation",
+    "grammarly",
+    "turnitin",
+    "syllabus",
+    "course overview",
+    "student guide",
+    "academic integrity",
+    "late submission",
+    "netiquette",
+    "attendance policy",
+    "grading policy",
+    "weekly objectives",
+    "play_video",
+    "objective_m",
+    ".svg",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    "course issues",
+    "help faq",
+    "write to us",
+    "support center"
 
-      return badPatterns.some(pattern =>
-        lower.includes(pattern)
-      );
-    }
+  ];
+
+  return badPatterns.some(pattern =>
+    lower.includes(pattern)
+  );
+
+}
 
 
 /* -------------------------------------------------- */
@@ -164,11 +174,13 @@ function extractLinks(html) {
   while ((match = regex.exec(html))) {
 
     links.push({
+
       url: match[1],
 
       text: match[2]
         .replace(/<[^>]+>/g, "")
         .trim()
+
     });
 
   }
@@ -177,47 +189,58 @@ function extractLinks(html) {
 
 }
 
+
 /* -------------------------------------------------- */
-/* ENSURE COLLECTION */
+/* ENSURE COURSE COLLECTION */
 /* -------------------------------------------------- */
 
-async function ensureCollection() {
+async function ensureCollection(
+  collectionName
+) {
 
   try {
 
-    await client.getCollection(COLLECTION);
+    await client.getCollection(
+      collectionName
+    );
 
     console.log(
-      "📦 Collection already exists"
+      `📦 Collection already exists: ${collectionName}`
     );
 
   } catch {
 
     console.log(
-      "🆕 Creating Qdrant collection..."
+      `🆕 Creating Qdrant collection: ${collectionName}`
     );
 
     await client.createCollection(
-      COLLECTION,
+      collectionName,
       {
         vectors: {
-          size: 384,
+          size: DEFAULT_VECTOR_SIZE,
           distance: "Cosine"
         }
       }
     );
 
-    console.log("✅ Collection created");
+    console.log(
+      `✅ Collection created: ${collectionName}`
+    );
 
   }
 
 }
 
+
 /* -------------------------------------------------- */
 /* TEXT CHUNKER */
 /* -------------------------------------------------- */
 
-function chunkText(text, size = 1200) {
+function chunkText(
+  text,
+  size = 1200
+) {
 
   if (!text) return [];
 
@@ -228,7 +251,10 @@ function chunkText(text, size = 1200) {
   while (i < text.length) {
 
     chunks.push(
-      text.slice(i, i + size)
+      text.slice(
+        i,
+        i + size
+      )
     );
 
     i += size;
@@ -239,6 +265,7 @@ function chunkText(text, size = 1200) {
 
 }
 
+
 /* -------------------------------------------------- */
 /* GENERATE UNIQUE ID */
 /* -------------------------------------------------- */
@@ -247,10 +274,13 @@ function generateId() {
 
   return (
     Date.now() +
-    Math.floor(Math.random() * 100000)
+    Math.floor(
+      Math.random() * 100000
+    )
   );
 
 }
+
 
 /* -------------------------------------------------- */
 /* MODULE NUMBER */
@@ -261,41 +291,59 @@ function detectModuleNumber(name) {
   if (!name) return null;
 
   const match =
-    name.match(/module\s*0*(\d+)/i);
+    name.match(
+      /module\s*0*(\d+)/i
+    );
 
   if (match) {
-    return Number(match[1]);
+
+    return Number(
+      match[1]
+    );
+
   }
 
   return null;
 
 }
 
+
 /* -------------------------------------------------- */
 /* UPSERT VECTOR */
 /* -------------------------------------------------- */
 
 async function upsertPoint(
+  collectionName,
   id,
   embedding,
   payload
 ) {
 
-  await client.upsert(COLLECTION, {
+  await client.upsert(
+    collectionName,
+    {
 
-    wait: true,
+      wait: true,
 
-    points: [
-      {
-        id,
-        vector: embedding,
-        payload
-      }
-    ]
+      points: [
 
-  });
+        {
+
+          id,
+
+          vector: embedding,
+
+          payload
+
+        }
+
+      ]
+
+    }
+  );
 
 }
+
 
 /* -------------------------------------------------- */
 /* MAIN BUILDER */
@@ -305,56 +353,182 @@ async function buildKnowledgeStore(
   canvasData
 ) {
 
-  await ensureCollection();
-
   console.log(
     "🚀 Building ECCU vector knowledge..."
   );
 
   let totalIndexed = 0;
 
-  for (const course of (canvasData || [])) {
+  let totalCoursesIndexed = 0;
+
+
+  /* ==================================================
+     PROCESS EACH CANVAS COURSE
+     ================================================== */
+
+  for (
+    const course of
+    (canvasData || [])
+  ) {
 
     const courseId =
       Number(course.id);
+
+
+    console.log(
+      "\n========================================"
+    );
 
     console.log(
       `📘 Course: ${course.name}`
     );
 
-    /* ================= MODULE ITEMS ================= */
+    console.log(
+      `🆔 Canvas Course ID: ${courseId}`
+    );
 
-    for (const module of (
-      course.modules || []
-    )) {
+    console.log(
+      "========================================"
+    );
+
+
+    /* ==================================================
+       COURSE ID → CONFIG MAPPING
+       ================================================== */
+
+    const configKey =
+      courseMappings[courseId];
+
+
+    if (!configKey) {
+
+      console.warn(
+        `⚠️ No course mapping found for Canvas Course ID ${courseId}.`
+      );
+
+      console.warn(
+        `⚠️ Course "${course.name}" will be skipped.`
+      );
+
+      continue;
+
+    }
+
+
+    /* ==================================================
+       CONFIG LOOKUP
+       ================================================== */
+
+    const config =
+      courseConfigs[configKey];
+
+
+    if (!config) {
+
+      console.error(
+        `❌ Config "${configKey}" not found in courseConfig.js`
+      );
+
+      console.error(
+        `❌ Course "${course.name}" will be skipped.`
+      );
+
+      continue;
+
+    }
+
+
+    /* ==================================================
+       COLLECTION LOOKUP
+       ================================================== */
+
+    const collection =
+      config.collection;
+
+
+    if (!collection) {
+
+      console.error(
+        `❌ No Qdrant collection configured for ${configKey}`
+      );
+
+      console.error(
+        `❌ Course "${course.name}" will be skipped.`
+      );
+
+      continue;
+
+    }
+
+
+    /* ==================================================
+       LOG COURSE ROUTING
+       ================================================== */
+
+    console.log(
+      `🔗 Config: ${configKey}`
+    );
+
+    console.log(
+      `🗄️ Qdrant Collection: ${collection}`
+    );
+
+
+    /* ==================================================
+       MAKE SURE COLLECTION EXISTS
+       ================================================== */
+
+    await ensureCollection(
+      collection
+    );
+
+
+    totalCoursesIndexed++;
+
+
+    /* ==================================================
+       MODULE ITEMS
+       ================================================== */
+
+    for (
+      const module of
+      (course.modules || [])
+    ) {
 
       const moduleNumber =
         detectModuleNumber(
           module.name
         );
 
-      for (const item of (
-        module.items || []
-      )) {
+
+      for (
+        const item of
+        (module.items || [])
+      ) {
 
         const rawContent =
-        item.content ||
-        item.body ||
-        item.description ||
-        "";
+          item.content ||
+          item.body ||
+          item.description ||
+          "";
+
 
         const cleanedContent =
           cleanCanvasContent(
             rawContent
           );
 
-          if (
+
+        if (
           isLowValueContent(
             cleanedContent
           )
         ) {
+
           continue;
+
         }
+
 
         const text = [
 
@@ -363,35 +537,49 @@ async function buildKnowledgeStore(
           cleanedContent
 
         ]
+
         .filter(Boolean)
+
         .join("\n\n");
+
 
         // skip garbage chunks
         if (
           !text ||
           text.length < 180
         ) {
+
           continue;
+
         }
+
 
         const chunks =
           chunkText(text);
 
-        for (const chunk of chunks) {
+
+        for (
+          const chunk of chunks
+        ) {
 
           const embedding =
             await getLocalEmbedding(
               chunk
             );
 
+
           await upsertPoint(
+
+            collection,
 
             generateId(),
 
             embedding,
 
             {
-              type: "module_item",
+
+              type:
+                "module_item",
 
               courseId,
 
@@ -408,9 +596,11 @@ async function buildKnowledgeStore(
 
               content:
                 chunk
+
             }
 
           );
+
 
           totalIndexed++;
 
@@ -420,19 +610,27 @@ async function buildKnowledgeStore(
 
     }
 
-    /* ================= PAGES ================= */
 
-    for (const page of (
-      course.pages || []
-    )) {
+    /* ==================================================
+       PAGES
+       ================================================== */
+
+    for (
+      const page of
+      (course.pages || [])
+    ) {
 
       const links =
-        extractLinks(page.body);
+        extractLinks(
+          page.body
+        );
+
 
       const cleanedPage =
         cleanCanvasContent(
           page.body || ""
         );
+
 
       const text = [
 
@@ -441,34 +639,48 @@ async function buildKnowledgeStore(
         cleanedPage
 
       ]
+
       .filter(Boolean)
+
       .join("\n\n");
+
 
       if (
         !text ||
         text.length < 180
       ) {
+
         continue;
+
       }
+
 
       const chunks =
         chunkText(text);
 
-      for (const chunk of chunks) {
+
+      for (
+        const chunk of chunks
+      ) {
 
         const embedding =
           await getLocalEmbedding(
             chunk
           );
 
+
         await upsertPoint(
+
+          collection,
 
           generateId(),
 
           embedding,
 
           {
-            type: "page",
+
+            type:
+              "page",
 
             courseId,
 
@@ -485,9 +697,11 @@ async function buildKnowledgeStore(
 
             pageUrl:
               page.url
+
           }
 
         );
+
 
         totalIndexed++;
 
@@ -495,16 +709,21 @@ async function buildKnowledgeStore(
 
     }
 
-    /* ================= ASSIGNMENTS ================= */
 
-    for (const a of (
-      course.assignments || []
-    )) {
+    /* ==================================================
+       ASSIGNMENTS
+       ================================================== */
+
+    for (
+      const a of
+      (course.assignments || [])
+    ) {
 
       const cleanedAssignment =
         cleanCanvasContent(
           a.description || ""
         );
+
 
       const text = [
 
@@ -513,34 +732,48 @@ async function buildKnowledgeStore(
         cleanedAssignment
 
       ]
+
       .filter(Boolean)
+
       .join("\n\n");
+
 
       if (
         !text ||
         text.length < 180
       ) {
+
         continue;
+
       }
+
 
       const chunks =
         chunkText(text);
 
-      for (const chunk of chunks) {
+
+      for (
+        const chunk of chunks
+      ) {
 
         const embedding =
           await getLocalEmbedding(
             chunk
           );
 
+
         await upsertPoint(
+
+          collection,
 
           generateId(),
 
           embedding,
 
           {
-            type: "assignment",
+
+            type:
+              "assignment",
 
             courseId,
 
@@ -552,9 +785,11 @@ async function buildKnowledgeStore(
 
             content:
               chunk
+
           }
 
         );
+
 
         totalIndexed++;
 
@@ -562,16 +797,21 @@ async function buildKnowledgeStore(
 
     }
 
-    /* ================= DISCUSSIONS ================= */
 
-    for (const d of (
-      course.discussions || []
-    )) {
+    /* ==================================================
+       DISCUSSIONS
+       ================================================== */
+
+    for (
+      const d of
+      (course.discussions || [])
+    ) {
 
       const cleanedDiscussion =
         cleanCanvasContent(
           d.message || ""
         );
+
 
       const text = [
 
@@ -580,34 +820,48 @@ async function buildKnowledgeStore(
         cleanedDiscussion
 
       ]
+
       .filter(Boolean)
+
       .join("\n\n");
+
 
       if (
         !text ||
         text.length < 180
       ) {
+
         continue;
+
       }
+
 
       const chunks =
         chunkText(text);
 
-      for (const chunk of chunks) {
+
+      for (
+        const chunk of chunks
+      ) {
 
         const embedding =
           await getLocalEmbedding(
             chunk
           );
 
+
         await upsertPoint(
+
+          collection,
 
           generateId(),
 
           embedding,
 
           {
-            type: "discussion",
+
+            type:
+              "discussion",
 
             courseId,
 
@@ -619,9 +873,11 @@ async function buildKnowledgeStore(
 
             content:
               chunk
+
           }
 
         );
+
 
         totalIndexed++;
 
@@ -629,97 +885,170 @@ async function buildKnowledgeStore(
 
     }
 
-    /* ================= FILES ================= */
 
-    /* ================= FILES ================= */
+    /* ==================================================
+       FILES
+       ================================================== */
 
-      for (const f of (
-        course.files || []
-      )) {
+    for (
+      const f of
+      (course.files || [])
+    ) {
 
-        const fileName =
-          (
-            f.display_name || ""
-          ).toLowerCase();
+      const fileName =
+        (
+          f.display_name || ""
+        ).toLowerCase();
 
-        // SKIP MEDIA / GARBAGE FILES
-        if (
 
-          fileName.endsWith(".svg") ||
-          fileName.endsWith(".png") ||
-          fileName.endsWith(".jpg") ||
-          fileName.endsWith(".jpeg") ||
-          fileName.endsWith(".gif") ||
-          fileName.includes("play_video") ||
-          fileName.includes("objective_m")
+      // SKIP MEDIA / GARBAGE FILES
+      if (
 
-        ) {
-          continue;
-        }
+        fileName.endsWith(
+          ".svg"
+        ) ||
 
-        const text =
-          f.display_name;
+        fileName.endsWith(
+          ".png"
+        ) ||
 
-        if (
-          !text ||
-          text.length < 8
-        ) {
-          continue;
-        }
+        fileName.endsWith(
+          ".jpg"
+        ) ||
 
-        const embedding =
-          await getLocalEmbedding(
-            text
-          );
+        fileName.endsWith(
+          ".jpeg"
+        ) ||
 
-        await upsertPoint(
+        fileName.endsWith(
+          ".gif"
+        ) ||
 
-          generateId(),
+        fileName.includes(
+          "play_video"
+        ) ||
 
-          embedding,
+        fileName.includes(
+          "objective_m"
+        )
 
-          {
-            type: "file",
+      ) {
 
-            courseId,
-
-            courseName:
-              course.name,
-
-            title:
-              f.display_name,
-
-            content:
-              text
-          }
-
-        );
-
-        totalIndexed++;
+        continue;
 
       }
 
+
+      const text =
+        f.display_name;
+
+
+      if (
+        !text ||
+        text.length < 8
+      ) {
+
+        continue;
+
+      }
+
+
+      const embedding =
+        await getLocalEmbedding(
+          text
+        );
+
+
+      await upsertPoint(
+
+        collection,
+
+        generateId(),
+
+        embedding,
+
+        {
+
+          type:
+            "file",
+
+          courseId,
+
+          courseName:
+            course.name,
+
+          title:
+            f.display_name,
+
+          content:
+            text
+
+        }
+
+      );
+
+
+      totalIndexed++;
+
+    }
+
+
+    console.log(
+      `✅ Completed indexing: ${course.name}`
+    );
+
+    console.log(
+      `🗄️ Collection used: ${collection}`
+    );
+
   }
 
+
+  /* ==================================================
+     FINAL SUMMARY
+     ================================================== */
+
   console.log(
-    `🎉 Vector build complete. Indexed: ${totalIndexed}`
+    "\n========================================"
+  );
+
+  console.log(
+    "🎉 VECTOR BUILD COMPLETE"
+  );
+
+  console.log(
+    `📚 Courses indexed: ${totalCoursesIndexed}`
+  );
+
+  console.log(
+    `📦 Total vectors indexed: ${totalIndexed}`
+  );
+
+  console.log(
+    "========================================\n"
   );
 
 }
+
 
 /* -------------------------------------------------- */
 /* EXPORT */
 /* -------------------------------------------------- */
 
 module.exports = {
+
   buildKnowledgeStore
+
 };
+
 
 /* -------------------------------------------------- */
 /* PREVENT DIRECT RUN */
 /* -------------------------------------------------- */
 
-if (require.main === module) {
+if (
+  require.main === module
+) {
 
   console.log(
     "⚠ knowledgeBuilder should be called from sync.js with Canvas data"
