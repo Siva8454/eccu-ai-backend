@@ -1,4 +1,3 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 require("dotenv").config();
 
 console.log("Canvas URL:", process.env.CANVAS_BASE_URL);
@@ -11,12 +10,13 @@ const path = require("path");
 const chatRoutes = require("./routes/chat");
 const syncRoutes = require("./routes/sync");
 const analyticsRoutes = require("./routes/analytics");
+
 console.log("Analytics Route Loaded");
 
 const feedbackRoutes =
   require("./routes/feedback");
 
-  const dashboardRoutes =
+const dashboardRoutes =
   require("./routes/dashboard");
 
 
@@ -57,23 +57,23 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
 
   res.setHeader(
-  "Content-Security-Policy",
-  [
-    "default-src 'self'",
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
 
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://aitutor.eccu.edu https://eccouncil.instructure.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://aitutor.eccu.edu https://eccouncil.instructure.com",
 
-    "style-src 'self' 'unsafe-inline' https://aitutor.eccu.edu https://eccouncil.instructure.com",
+      "style-src 'self' 'unsafe-inline' https://aitutor.eccu.edu https://eccouncil.instructure.com",
 
-    "img-src 'self' data: https://eccouncil.instructure.com https://instructure-uploads.s3.amazonaws.com https://*.cloudfront.net https://*.canvas-user-content.com",
+      "img-src 'self' data: https://eccouncil.instructure.com https://instructure-uploads.s3.amazonaws.com https://*.cloudfront.net https://*.canvas-user-content.com",
 
-    "font-src 'self' data: https://*.cloudfront.net",
+      "font-src 'self' data: https://*.cloudfront.net",
 
-    "connect-src 'self' https://aitutor.eccu.edu https://eccouncil.instructure.com",
+      "connect-src 'self' https://aitutor.eccu.edu https://eccouncil.instructure.com",
 
-    "frame-ancestors 'self' https://eccouncil.instructure.com"
-  ].join("; ")
-);
+      "frame-ancestors 'self' https://eccouncil.instructure.com"
+    ].join("; ")
+  );
 
   next();
 
@@ -82,29 +82,41 @@ app.use((req, res, next) => {
 const testRetriever = require("./routes/testRetriever");
 
 
-
 app.use("/test-retriever", testRetriever);
+
+
 /* -------------------------------------------------- */
 /* SERVE WIDGET STATIC FILES */
 /* -------------------------------------------------- */
 
-app.use("/widget", express.static(path.join(__dirname, "eccu-canvas-widget")));
+app.use(
+  "/widget",
+  express.static(
+    path.join(__dirname, "eccu-canvas-widget")
+  )
+);
+
 
 /* -------------------------------------------------- */
 /* API ROUTES */
 /* -------------------------------------------------- */
 
 app.use("/chat", chatRoutes);
+
 app.use("/sync", syncRoutes);
+
 app.use("/analytics", analyticsRoutes);
+
 app.use(
   "/feedback",
   feedbackRoutes
 );
+
 app.use(
   "/dashboard",
   dashboardRoutes
 );
+
 
 /* -------------------------------------------------- */
 /* WIDGET LOADER FOR CANVAS */
@@ -112,7 +124,7 @@ app.use(
 
 app.get("/widget-loader", (req, res) => {
 
-res.send(`
+  res.send(`
 <html>
 <body>
 
@@ -121,12 +133,17 @@ res.send(`
 if(window.parent){
 
 const script = window.parent.document.createElement("script");
+
 script.src = "https://aitutor.eccu.edu/widget/script.js";
+
 window.parent.document.head.appendChild(script);
 
 const css = window.parent.document.createElement("link");
+
 css.rel = "stylesheet";
+
 css.href = "https://aitutor.eccu.edu/widget/styles.css";
+
 window.parent.document.head.appendChild(css);
 
 }
@@ -139,6 +156,7 @@ window.parent.document.head.appendChild(css);
 
 });
 
+
 /* -------------------------------------------------- */
 /* START SERVER */
 /* -------------------------------------------------- */
@@ -146,5 +164,9 @@ window.parent.document.head.appendChild(css);
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-console.log(`ECCU AI Backend running on port ${PORT}`);
+
+  console.log(
+    `ECCU AI Backend running on port ${PORT}`
+  );
+
 });
