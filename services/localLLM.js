@@ -52,6 +52,7 @@ Please ask a question related to your course content.
 
     const formattedContext = `
 
+
 CURRENT PAGE TITLE:
 ${context?.pageTitle || "No page title"}
 
@@ -62,6 +63,10 @@ ADDITIONAL COURSE CONTEXT:
 ${cleanCanvasText(context?.extraContext || "").slice(0, 1500)}
 
 `;
+console.log("CURRENT PAGE LENGTH:", cleanCanvasText(context?.currentPage || "").length);
+console.log("EXTRA CONTEXT LENGTH:", cleanCanvasText(context?.extraContext || "").length);
+console.log("FORMATTED CONTEXT LENGTH:", formattedContext.length);
+
 
     const prompt = `
 You are an ECCU AI Tutor.
