@@ -17,9 +17,10 @@ const courseConfigs =
 /* -------------------------------------------------- */
 
 const client = new QdrantClient({
-  url: process.env.QDRANT_URL,
-  apiKey: process.env.QDRANT_API_KEY,
-  checkCompatibility: false
+    url: process.env.QDRANT_URL,
+    apiKey: process.env.QDRANT_API_KEY,
+    timeout: 60000,
+    checkCompatibility: false
 });
 
 
