@@ -152,13 +152,112 @@ function isMobileOrTablet() {
 /* -------------------------------------------------- */
 /* COURSE FILTER */
 /* -------------------------------------------------- */
+/* -------------------------------------------------- */
+/* COURSE FILTER */
+/* -------------------------------------------------- */
+
 function isAllowedCourse() {
 
-  const courseId = getCourseId()
+  const courseId = getCourseId();
 
-  const allowedCourses = [2213, 2460, 2360, 2738, 2754]
+  /*
+   * AI TUTOR ENABLED COURSES
+   *
+   * Existing pilot courses:
+   * 2213 - ECCU 501 Master Blueprint
+   * 2460 - MGMT 511 Master Blueprint
+   * 2360 - Existing pilot course
+   * 2738 - ECCU 501 Term 3
+   * 2754 - MGMT 511 Term 3
+   *
+   * Term 4 courses:
+   */
 
-  return allowedCourses.includes(courseId)
+  const allowedCourses = [
+
+    /* =========================================
+       EXISTING PILOT COURSES
+       ========================================= */
+
+    2213,
+    2460,
+    2360,
+    2738,
+    2754,
+
+
+    /* =========================================
+       TERM 4
+       ========================================= */
+
+    // CIS 299
+    2868,
+
+    // CIS 308
+    2870,
+
+    // CIS 406
+    2871,
+
+    // CIS 410 - BSCS
+    2872,
+
+    // ECCU 500
+    2875,
+
+    // ECCU 501
+    2876,
+
+    // ECCU 505
+    2877,
+
+    // ECCU 506
+    2878,
+
+    // ECCU 509
+    2879,
+
+    // ECCU 510
+    2880,
+
+    // ECCU 512
+    2881,
+
+    // ECCU 519 - Capstone Course
+    2883,
+
+    // ECCU 519 - Capstone (MCS)
+    2884,
+
+    // ECCU 519 - Capstone (MBA)
+    2885,
+
+    // ECCU 523
+    2886,
+
+    // ECCU 560
+    2890,
+
+    // ECCU 565
+    2888,
+
+    // ECCU 570
+    2889,
+
+    // MGMT 502 - Section 1
+    2891,
+
+    // MGMT 502 - Section 2
+    2892,
+
+    // MGT 450
+    2894,
+
+    // NSE
+    2865
+  ];
+
+  return allowedCourses.includes(courseId);
 }
 
 
