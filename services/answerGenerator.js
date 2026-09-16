@@ -269,7 +269,7 @@ ${question}
   }
 
   console.log("=== Sending request to Fireworks ===");
-console.log("URL:", "https://api.fireworks.ai/inference/v1/chat/completions");
+console.log("URL:", "https://api.fireworks.ai/inference/v1");
 console.log("Model:", process.env.FIREWORKS_MODEL);
 
 // ===== PROMPT SIZE ANALYSIS =====
@@ -292,7 +292,7 @@ console.log((context?.extraContext || "").substring(0,500));
 
     const response = await axios.post(
 
-      "https://api.fireworks.ai/inference/v1/chat/completions",
+      "https://api.fireworks.ai/inference/v1",
 
       {
 
