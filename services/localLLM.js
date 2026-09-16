@@ -2,7 +2,7 @@ const OpenAI = require("openai");
 
 const client = new OpenAI({
     apiKey: process.env.FIREWORKS_API_KEY,
-    baseURL: "https://api.fireworks.ai/inference/v1",
+    baseURL: "https://api.fireworks.ai/inference/v1/chat/completions",
     timeout: 60000
 });
 
