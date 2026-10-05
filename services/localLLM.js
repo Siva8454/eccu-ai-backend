@@ -529,6 +529,9 @@ console.log(prompt);
 console.log("================================");
 console.log("Prompt Length:", prompt.length);
 
+console.log("FIREWORKS REQUEST MODEL:", process.env.FIREWORKS_MODEL);
+console.log("FIREWORKS REQUEST BASE URL:", process.env.FIREWORKS_BASE_URL || "https://api.fireworks.ai/inference/v1");
+
     const response = await client.chat.completions.create({
       model: process.env.FIREWORKS_MODEL,
       temperature: 0.3,

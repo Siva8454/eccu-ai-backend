@@ -193,6 +193,9 @@ function isAllowedCourse() {
     // CIS 299
     2868,
 
+     // CIS 303
+    2869,
+
     // CIS 308
     2870,
 
@@ -201,6 +204,12 @@ function isAllowedCourse() {
 
     // CIS 410 - BSCS
     2872,
+
+    // COM 340
+    2873,
+
+    // CS 515
+    2874,
 
     // ECCU 500
     2875,
@@ -223,6 +232,9 @@ function isAllowedCourse() {
     // ECCU 512
     2881,
 
+    // ECCU 517
+    2882,
+
     // ECCU 519 - Capstone Course
     2883,
 
@@ -235,8 +247,14 @@ function isAllowedCourse() {
     // ECCU 523
     2886,
 
+    // ECCU 525
+    2887,
+
     // ECCU 560
     2890,
+
+    // MGMT 512
+    2893,
 
     // ECCU 565
     2888,
