@@ -2412,6 +2412,12 @@ The Help page contains:
     );
 
 
+    console.log("================================");
+    console.log("FINAL ANSWER BEFORE SENDING");
+    console.log("FINAL ANSWER LENGTH:", finalAnswer.length);
+    console.log("FINAL ANSWER END:", finalAnswer.slice(-500));
+    console.log("================================");
+
     return res.json({
 
       source:

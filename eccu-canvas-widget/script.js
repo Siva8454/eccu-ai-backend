@@ -1039,20 +1039,30 @@ body: JSON.stringify({
 
 })
 
-const data = await res.json()
+const data = await res.json();
+
 currentRequest = null;
 
-console.log(
-  "🤖 AI Response:",
-  data
-);
+console.log("🤖 AI Response:", data);
 
-loading.remove()
+console.log("===== FRONTEND RESPONSE CHECK =====");
+console.log("DATA.REPLY LENGTH:", data.reply?.length);
+console.log("DATA.REPLY START:", data.reply?.slice(0, 300));
+console.log("DATA.REPLY END:", data.reply?.slice(-500));
+console.log("===================================");
+
+loading.remove();
 
 const botReply = addMessage(
   data.reply || "Please contact your instructor or ECCU support.",
   "bot-msg"
-)
+);
+
+console.log("===== DOM RESPONSE CHECK =====");
+console.log("BOT TEXT LENGTH:", botReply?.innerText?.length);
+console.log("BOT TEXT END:", botReply?.innerText?.slice(-500));
+console.log("BOT HTML LENGTH:", botReply?.innerHTML?.length);
+console.log("================================");
 
 /* -------------------------------- */
 /* FEEDBACK BUTTONS */
