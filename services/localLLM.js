@@ -535,7 +535,7 @@ console.log("FIREWORKS REQUEST BASE URL:", process.env.FIREWORKS_BASE_URL || "ht
     const response = await client.chat.completions.create({
       model: process.env.FIREWORKS_MODEL,
       temperature: 0.3,
-      max_tokens: 2000,
+      max_tokens: 4000,
       messages: [
         {
           role: "user",

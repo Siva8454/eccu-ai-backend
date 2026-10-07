@@ -552,13 +552,20 @@ const maxBtn = root.querySelector("#eccu-max")
 
 function adjustChatSize() {
 
-  if (window.innerWidth <= 1024) {
+  if (window.innerWidth <= 768) {
 
-    chat.style.height = "100dvh";
+    chat.style.height = "80dvh";
+    chat.style.width = "90vw";
+
+  } else if (window.innerWidth <= 1024) {
+
+    chat.style.height = "85vh";
+    chat.style.width = "92vw";
 
   } else {
 
     chat.style.height = "";
+    chat.style.width = "";
 
   }
 
@@ -566,34 +573,13 @@ function adjustChatSize() {
 
 adjustChatSize();
 
-if (isMobileOrTablet()) {
 
-  avatar.style.display = "none";
-
-  chat.classList.add("open");
-
-  chat.classList.add("fullscreen");
-
-  maxBtn.innerText = "❐";
-
-}
 
 window.addEventListener("resize", () => {
 
   adjustChatSize();
 
-  if (isMobileOrTablet()) {
-
-    avatar.style.display = "none";
-
-    chat.classList.add("open");
-    chat.classList.add("fullscreen");
-
-    maxBtn.innerText = "❐";
-
-  } else {
-
-    avatar.style.display = "flex";
+  if (!isMobileOrTablet()) {
 
     chat.classList.remove("fullscreen");
 
@@ -763,10 +749,11 @@ showFAQs()
 closeBtn.onclick = () => {
 
   chat.classList.remove("open");
-
   chat.classList.remove("fullscreen");
 
   maxBtn.innerText = "⛶";
+
+  avatar.style.display = "flex";
 }
 
 /* ---------- MAXIMIZE ---------- */
