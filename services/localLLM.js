@@ -562,16 +562,26 @@ console.log("================================");
 );
 
 
-    const answer = response?.choices?.[0]?.message?.content;
+    const answer = response?.choices?.[0]?.message?.content || "";
 
-    console.log(
-  "Answer Length:",
-  answer?.length
-);
+console.log("================================");
+console.log("RAW FIREWORKS ANSWER");
+console.log("================================");
 
+console.log("Answer Length:", answer.length);
 
+console.log("----- ANSWER START -----");
+console.log(answer.slice(0, 500));
 
-    return answer || "AI could not generate a response.";
+console.log("----- ANSWER END -----");
+console.log(answer.slice(-1000));
+
+console.log("----- FINISH REASON -----");
+console.log(response?.choices?.[0]?.finish_reason);
+
+console.log("================================");
+
+return answer || "AI could not generate a response.";
 
   } catch (err) {
 
