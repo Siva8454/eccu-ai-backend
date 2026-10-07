@@ -533,16 +533,16 @@ console.log("FIREWORKS REQUEST MODEL:", process.env.FIREWORKS_MODEL);
 console.log("FIREWORKS REQUEST BASE URL:", process.env.FIREWORKS_BASE_URL || "https://api.fireworks.ai/inference/v1");
 
     const response = await client.chat.completions.create({
-      model: process.env.FIREWORKS_MODEL,
-      temperature: 0.3,
-      max_tokens: 4000,
-      messages: [
+    model: process.env.FIREWORKS_MODEL,
+    reasoning_effort: "low",
+    max_tokens: 4000,
+    messages: [
         {
-          role: "user",
-          content: prompt
+            role: "user",
+            content: prompt
         }
-      ]
-    });
+    ]
+});
 
     console.log("================================");
 console.log("TOKEN USAGE");
