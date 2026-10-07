@@ -2084,6 +2084,11 @@ ${r.url}`
     let completeResponse =
       aiAnswer || "";
 
+      console.log("===== CHAT.JS BEFORE CLEANING =====");
+console.log("ANSWER LENGTH:", completeResponse.length);
+console.log("ANSWER END:", completeResponse.slice(-500));
+console.log("===================================");
+
 
     completeResponse =
       completeResponse.replace(
