@@ -2090,14 +2090,13 @@ console.log("ANSWER END:", completeResponse.slice(-500));
 console.log("===================================");
 
 
-    completeResponse =
-      completeResponse.replace(
+    completeResponse = completeResponse.replace(
 
-        /(\*\*)?(sources|references|additional resources|course reference|online resources|further reading|resources|citations|additional tips)(\*\*)?\s*:?\s*[\s\S]*$/i,
+  /^\s*#{1,6}\s*(sources|references|additional resources|course reference|online resources|further reading|citations|additional tips)\s*:?\s*[\s\S]*$/im,
 
-        ""
+  ""
 
-      );
+);
 
 
     completeResponse =
